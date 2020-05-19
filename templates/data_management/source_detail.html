@@ -1,0 +1,18 @@
+{% extends 'data_management/object_detail.html' %}
+
+{% block fields %}
+<dt class="col-sm-3">DOI</dt>
+<dd class="col-sm-9"><a href="{{ object.doi }}">{{ object.doi }}</a></dd>
+
+<dt class="col-sm-3">URL</dt>
+<dd class="col-sm-9"><a href="{{ object.url }}">{{ object.url }}</a></dd>
+
+<dt class="col-sm-3">Source Type</dt>
+<dd class="col-sm-9">{{ object.source_type }}</dd>
+
+<dt class="col-sm-3">Short Description</dt>
+<dd class="col-sm-9">{{ object.short_desc }}</dd>
+
+<dt class="col-sm-3">Long Description URL</dt>
+<dd class="col-sm-9"><a href="{{ object.long_desc_url }}">{{ object.long_desc_url }}</a></dd>
+{% endblock %}

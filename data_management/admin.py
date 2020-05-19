@@ -1,22 +1,26 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django.contrib.contenttypes.admin import GenericStackedInline
+from django.utils.html import format_html
+from django.urls import reverse
+
+admin.site.site_header = 'SCRC Data Management'
 
 from .models import (
         Model,
         ModelVersion,
         ModelRun,
         Issue,
-        Parameter,
-        ParameterVersion,
-        ParameterType,
-        ParameterDataType,
+        ModelInput,
+        ModelInputVersion,
+        ModelInputType,
+        ModelInputDataType,
         Source,
         SourceVersion,
         SourceType,
         ProcessingScript,
         ProcessingScriptVersion,
-        ResearchOutput,
+        ModelOutput,
         )
 
 # Register your models here.
@@ -33,13 +37,16 @@ class IssueInline(GenericStackedInline):
     def get_extra(self, request, obj=None, **kwargs):
         return 0
 
-class DataObjectAdmin(admin.ModelAdmin):
-    readonly_fields = ('updated_by',)
-    inlines = (IssueInline,)
+class BaseAdmin(admin.ModelAdmin):
+    readonly_fields = ('updated_by', 'last_updated')
+    list_display = ('name', 'last_updated')
 
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
+
+class DataObjectAdmin(BaseAdmin):
+    inlines = (IssueInline,)
 
     def save_related(self, request, form, formsets, change):
         for formset in formsets:
@@ -54,24 +61,39 @@ class DataObjectAdmin(admin.ModelAdmin):
         return form
 
 class DataObjectVersionAdmin(DataObjectAdmin):
-    readonly_fields = ('updated_by', 'name')
+    readonly_fields = ('updated_by', 'last_updated', 'name')
 
-    #def save_model(self, request, obj, form, change):
-    #    obj.name = '%s %s' % (getattr(obj, obj._object), obj.version_identifier)
-    #    return super().save_model(request, obj, form, change)
+class IssueAdmin(BaseAdmin):
+    exclude = ('content_type', 'object_id')
+    readonly_fields = ('updated_by', 'last_updated', 'data_object_link')
+    list_display = ('name', 'data_object', 'severity', 'last_updated')
+
+    def data_object_link(self, instance):
+        url = reverse('admin:%s_%s_change' % (instance.content_type.app_label, instance.content_type.model),
+                args=(instance.data_object.id,))
+        return format_html(
+                '<a href="{0}">{1}</a>',
+                url,
+                instance.data_object,
+                )
+
+    data_object_link.short_description = 'data object'
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 admin.site.register(Model, DataObjectAdmin)
 admin.site.register(ModelVersion, DataObjectVersionAdmin)
-admin.site.register(ModelRun, DataObjectVersionAdmin)
-admin.site.register(Issue, DataObjectAdmin)
-admin.site.register(Parameter, DataObjectAdmin)
-admin.site.register(ParameterVersion, DataObjectVersionAdmin)
-admin.site.register(ParameterType, DataObjectAdmin)
-admin.site.register(ParameterDataType, DataObjectAdmin)
+admin.site.register(ModelRun, DataObjectAdmin)
+admin.site.register(Issue, IssueAdmin)
+admin.site.register(ModelInput, DataObjectAdmin)
+admin.site.register(ModelInputVersion, DataObjectVersionAdmin)
+admin.site.register(ModelInputType, BaseAdmin)
+admin.site.register(ModelInputDataType, BaseAdmin)
 admin.site.register(Source, DataObjectAdmin)
 admin.site.register(SourceVersion, DataObjectVersionAdmin)
-admin.site.register(SourceType, DataObjectAdmin)
+admin.site.register(SourceType, BaseAdmin)
 admin.site.register(ProcessingScript, DataObjectAdmin)
 admin.site.register(ProcessingScriptVersion, DataObjectVersionAdmin)
-admin.site.register(ResearchOutput, DataObjectAdmin)
+admin.site.register(ModelOutput, DataObjectAdmin)
 

@@ -1,0 +1,32 @@
+{% extends 'data_management/object_detail.html' %}
+
+{% block fields %}
+<dt class="col-sm-3">Model Input</dt>
+<dd class="col-sm-9"><a href="{% url 'modelinput' object.model_input.pk %}">{{ object.model_input }}</a></dd>
+
+<dt class="col-sm-3">Model Input Data Type</dt>
+<dd class="col-sm-9">{{ object.model_input_data_type }}</dd>
+
+<dt class="col-sm-3">Value</dt>
+<dd class="col-sm-9">{{ object.value }}</dd>
+
+<dt class="col-sm-3">Short Description</dt>
+<dd class="col-sm-9">{{ object.short_desc }}</dd>
+
+<dt class="col-sm-3">Source Versions</dt>
+<dd class="col-sm-9">
+    <ul class="list-group list-group-flush list-unstyled">
+    {% for source_version in object.source_versions.all %}
+        <li><a href="{% url 'sourceversion' source_version.pk %}">{{ source_version }}</a></li>
+    {% endfor %}
+</dd>
+
+<dt class="col-sm-3">Used In Runs</dt>
+<dd class="col-sm-9">
+    <ul class="list-group list-group-flush list-unstyled">
+    {% for run in object.model_runs.all %}
+        <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
+    {% endfor %}
+    </ul>
+</dd>
+{% endblock %}

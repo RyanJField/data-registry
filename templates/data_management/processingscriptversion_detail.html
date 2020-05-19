@@ -1,0 +1,18 @@
+{% extends 'data_management/object_detail.html' %}
+
+{% block fields %}
+<dt class="col-sm-3">Processing Script</dt>
+<dd class="col-sm-9"><a href="{% url 'processingscript' object.processing_script.pk %}">{{ object.processing_script }}</a></dd>
+
+<dt class="col-sm-3">URL</dt>
+<dd class="col-sm-9"><a href="{{ object.url }}">{{ object.url }}</a></dd>
+
+<dt class="col-sm-3">Generated Sources</dt>
+<dd class="col-sm-9">
+    <ul class="list-group list-group-flush list-unstyled">
+{% for source in object.generated_sources.all %}
+        <li><a href="{% url 'sourceversion' source.pk %}">{{ source }}</a></li>
+{% endfor %}
+    </ul>
+</dd>
+{% endblock %}
