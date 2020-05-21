@@ -3,12 +3,15 @@ from django.utils.text import camel_case_to_spaces
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from . import views, api_views
-from .models import all_object_models
+from . import views, api_views, models
 
 router = routers.DefaultRouter()
 router.register(r'users', api_views.UserViewSet)
 router.register(r'groups', api_views.GroupViewSet)
+
+for name in models.all_models:
+    url_name = camel_case_to_spaces(name).replace(' ', '_')
+    router.register(url_name, getattr(api_views, name + 'ViewSet'), basename=name.lower())
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -16,13 +19,11 @@ urlpatterns = [
     path('issue/', views.IssueListView.as_view(), name='issues'),
     path('issue/<int:pk>', views.IssueDetailView.as_view(), name='issue'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/', include(router.urls)),
 ]
 
-#urlpatterns = format_suffix_patterns(urlpatterns)
 
-for name in all_object_models:
+for name in models.all_object_models:
     url_name = camel_case_to_spaces(name).replace(' ', '_')
     urlpatterns.append(path(url_name + '/<int:pk>', getattr(views, name + 'DetailView').as_view(), name=name.lower()))
     urlpatterns.append(path(url_name + 's/', getattr(views, name + 'ListView').as_view(), name=name.lower() + 's')) 
-    urlpatterns.append(path('api/' + url_name + 's/', getattr(api_views, name + 'List').as_view()))
-    urlpatterns.append(path('api/' + url_name + '/<int:pk>', getattr(api_views, name + 'Detail').as_view()))

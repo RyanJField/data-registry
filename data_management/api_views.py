@@ -22,43 +22,21 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class BaseList(APIView):
+class BaseViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request, *args, **kwargs):
-        objs = self.model.objects.all()
-        serializer = self.serializer_class(objs, many=True, context={'request': request})
-        return Response(serializer.data)
+    def get_queryset(self):
+        return self.model.objects.all()
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(updated_by=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(updated_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)
 
 
-class BaseDetail(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get(self, request, pk, format=None):
-        obj = get_object_or_404(self.model, pk=pk)
-        serializer = self.serializer_class(obj, context={'request': request})
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        obj = get_object_or_404(self.model, pk=pk)
-        serializer = self.serializer_class(obj, data=request.data, partial=True, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(updated_by=request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-for name, cls in models.all_object_models.items():
+for name, cls in models.all_models.items():
     data = {'model': cls, 'serializer_class': getattr(serializers, name + 'Serializer')}
-    globals()[name + "List"] = type(name + "ListView", (BaseList,), data)
-    globals()[name + "Detail"] = type(name + "DetailView", (BaseDetail,), data)
+    globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
 

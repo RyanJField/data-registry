@@ -16,6 +16,7 @@ class BaseModel(models.Model):
             verbose_name='last updated by',
             )
     last_updated = models.DateField(auto_now=True)
+    fields = ()
 
     def reverse_name(self):
         return self.__class__.__name__.lower()
@@ -51,36 +52,27 @@ class DataObjectVersion(DataObject):
         abstract = True
 
 class Issue(BaseModel):
-    #LOW_SEVERITY = 'L'
-    #MEDIUM_SEVERITY = 'M'
-    #HIGH_SEVERITY = 'H'
-    #ISSUE_SEVERITIES = (
-    #        (LOW_SEVERITY, 'Low'),
-    #        (MEDIUM_SEVERITY, 'Medium'),
-    #        (HIGH_SEVERITY, 'High'),
-    #        )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     data_object = GenericForeignKey('content_type', 'object_id')
-    #severity = models.CharField(max_length=1, choices=ISSUE_SEVERITIES, default=LOW_SEVERITY)
     severity = models.PositiveSmallIntegerField(default=1)
     desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='description')
 
     def __str__(self):
-        #labels = dict(self.ISSUE_SEVERITIES)
         return '%s [Severity %d]' % (self.name, self.severity)
 
 class Model(DataObject):
+    fields = ('versions',)
     url = models.URLField(max_length=255, null=False, blank=False)
     short_desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='short description')
     long_desc_url = models.URLField(max_length=255, null=False, blank=True)
 
 class ModelVersion(DataObjectVersion):
+    fields = ('runs',)
     _object = 'model'
     model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='versions')
     url = models.URLField(max_length=255)
     short_desc = models.TextField(max_length=1024, verbose_name='short description')
-    #parameters = models.ManyToManyField('ModelInput')
 
 class ModelRun(DataObject):
     model_version =  models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='runs')
@@ -153,6 +145,7 @@ class ModelOutput(DataObject):
     short_desc = models.TextField(max_length=1024, verbose_name='short description', blank=True)
     long_desc_url = models.URLField(max_length=255, blank=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_PRIVATE)
+    fields = ('model_runs',)
 
     def status_string(self):
         return dict(self.STATUS_CHOICES)[self.status]
@@ -161,3 +154,9 @@ all_object_models = dict(
     (name, cls) for (name, cls) in globals().items() 
     if isinstance(cls, type) and issubclass(cls, DataObject) and name not in ('DataObject', 'DataObjectVersion')
 )
+
+all_models = dict(
+    (name, cls) for (name, cls) in globals().items()
+    if isinstance(cls, type) and issubclass(cls, BaseModel) and name not in ('BaseModel', 'DataObject', 'DataObjectVersion')
+)
+
