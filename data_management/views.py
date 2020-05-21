@@ -60,32 +60,3 @@ class IssueListView(generic.ListView):
 class IssueDetailView(generic.DetailView):
     model = models.Issue
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = serializers.UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-class GroupViewSet(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = serializers.GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-class BaseList(APIView):
-
-    def get(self, request, *args, **kwargs):
-        objs = self.model.objects.all()
-        serializer = self.serializer_class(objs, many=True, context={'request': request})
-        return Response(serializer.data)
-
-class BaseDetail(APIView):
-
-    def get(self, request, pk, format=None):
-        obj = get_object_or_404(self.model, pk=pk)
-        serializer = self.serializer_class(obj, context={'request': request})
-        return Response(serializer.data)
-
-for name, cls in models.all_object_models.items():
-    data = {'model': cls, 'serializer_class': getattr(serializers, name + 'Serializer')}
-    globals()[name + "List"] = type(name + "ListView", (BaseList,), data)
-    globals()[name + "Detail"] = type(name + "DetailView", (BaseDetail,), data)
-

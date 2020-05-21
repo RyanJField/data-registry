@@ -3,12 +3,12 @@ from django.utils.text import camel_case_to_spaces
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from . import views
+from . import views, api_views
 from .models import all_object_models
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+router.register(r'users', api_views.UserViewSet)
+router.register(r'groups', api_views.GroupViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -24,5 +24,5 @@ for name in all_object_models:
     url_name = camel_case_to_spaces(name).replace(' ', '_')
     urlpatterns.append(path(url_name + '/<int:pk>', getattr(views, name + 'DetailView').as_view(), name=name.lower()))
     urlpatterns.append(path(url_name + 's/', getattr(views, name + 'ListView').as_view(), name=name.lower() + 's')) 
-    urlpatterns.append(path('api/' + url_name + 's/', getattr(views, name + 'List').as_view()))
-    urlpatterns.append(path('api/' + url_name + '/<int:pk>', getattr(views, name + 'Detail').as_view()))
+    urlpatterns.append(path('api/' + url_name + 's/', getattr(api_views, name + 'List').as_view()))
+    urlpatterns.append(path('api/' + url_name + '/<int:pk>', getattr(api_views, name + 'Detail').as_view()))
