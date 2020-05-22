@@ -1,9 +1,6 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework import viewsets, permissions, mixins, generics, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, permissions
 from django.contrib.auth.models import Group
 from custom_user.models import User
 

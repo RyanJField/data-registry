@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import models
 import uuid
 
-# Create your models here.
 
 class BaseModel(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
@@ -28,6 +27,7 @@ class BaseModel(models.Model):
     def __str__(self):
         return self.name
 
+
 class DataObject(BaseModel):
     object_uid = models.UUIDField(default=uuid.uuid4, editable=False)
     responsible_person = models.ForeignKey(
@@ -40,6 +40,7 @@ class DataObject(BaseModel):
     class Meta:
         abstract = True
 
+
 class DataObjectVersion(DataObject):
     version_identifier = models.CharField(max_length=255)
     supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='superseded_by')
@@ -51,6 +52,7 @@ class DataObjectVersion(DataObject):
     class Meta:
         abstract = True
 
+
 class Issue(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -61,11 +63,13 @@ class Issue(BaseModel):
     def __str__(self):
         return '%s [Severity %d]' % (self.name, self.severity)
 
+
 class Model(DataObject):
     fields = ('versions',)
     url = models.URLField(max_length=255, null=False, blank=False)
     short_desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='short description')
     long_desc_url = models.URLField(max_length=255, null=False, blank=True)
+
 
 class ModelVersion(DataObjectVersion):
     fields = ('runs',)
@@ -73,6 +77,7 @@ class ModelVersion(DataObjectVersion):
     model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='versions')
     url = models.URLField(max_length=255)
     short_desc = models.TextField(max_length=1024, verbose_name='short description')
+
 
 class ModelRun(DataObject):
     model_version =  models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='runs')
@@ -87,16 +92,20 @@ class ModelRun(DataObject):
     def name(self):
         return '%s (Run %s)' % (self.model_version.name, self.run_date)
 
+
 class ModelInputType(BaseModel):
     desc = models.CharField(max_length=255, verbose_name='short description')
 
+
 class ModelInputDataType(BaseModel):
     desc = models.CharField(max_length=255, verbose_name='short description')
+
 
 class ModelInput(DataObject):
     model_input_type = models.ForeignKey(ModelInputType, on_delete=models.CASCADE)
     short_desc = models.TextField(max_length=1024, verbose_name='short description')
     long_desc_url = models.URLField(max_length=255, blank=True)
+
 
 class ModelInputVersion(DataObjectVersion):
     _object = 'model_input'
@@ -106,8 +115,10 @@ class ModelInputVersion(DataObjectVersion):
     short_desc = models.TextField(max_length=1024, blank=True, verbose_name='short description')
     source_versions = models.ManyToManyField('SourceVersion', blank=True)
 
+
 class SourceType(BaseModel):
     desc = models.CharField(max_length=255, verbose_name='short description')
+
 
 class Source(DataObject):
     doi = models.URLField(max_length=255, blank=True)
@@ -115,6 +126,7 @@ class Source(DataObject):
     source_type = models.ForeignKey(SourceType, on_delete=models.CASCADE)
     short_desc = models.TextField(max_length=1024, verbose_name='short description')
     long_desc_url = models.URLField(max_length=255, blank=True)
+
 
 class SourceVersion(DataObjectVersion):
     _object = 'source'
@@ -124,13 +136,16 @@ class SourceVersion(DataObjectVersion):
     short_desc = models.TextField(max_length=1024, verbose_name='short description')
     processing_script_version = models.ForeignKey('ProcessingScriptVersion', on_delete=models.CASCADE, related_name='generated_sources')
 
+
 class ProcessingScript(DataObject):
     url = models.URLField(max_length=255)
+
 
 class ProcessingScriptVersion(DataObjectVersion):
     _object = 'processing_script'
     processing_script = models.ForeignKey(ProcessingScript, on_delete=models.CASCADE, related_name='versions')
     url = models.URLField(max_length=255)
+
 
 class ModelOutput(DataObject):
     STATUS_PRIVATE = 0
@@ -149,6 +164,7 @@ class ModelOutput(DataObject):
 
     def status_string(self):
         return dict(self.STATUS_CHOICES)[self.status]
+
 
 all_object_models = dict(
     (name, cls) for (name, cls) in globals().items() 

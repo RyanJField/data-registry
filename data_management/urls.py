@@ -1,7 +1,6 @@
 from django.urls import path, include
 from django.utils.text import camel_case_to_spaces
 from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from . import views, api_views, models
 

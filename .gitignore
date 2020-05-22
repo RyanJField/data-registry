@@ -3,3 +3,5 @@ migrations
 db.sqlite3
 static
 *.pyc
+venv
+.idea
