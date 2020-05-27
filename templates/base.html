@@ -1,4 +1,5 @@
 {% load django_bootstrap_breadcrumbs %}
+{% load socialaccount %}
 
 {% block breadcrumbs %}
     {% clear_breadcrumbs %}
@@ -19,9 +20,14 @@
         <div class="col-12">
           <h1 class="mt-2">SCRC data registration and management system</h1>
           <hr class="mt-0 mb-4">
+	  {% if user.is_authenticated %}
+	  <p>Logged in as: {{ user.username }} | <a href="/accounts/logout">Logout</a></p>
           {% block content %}
             {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap4.html" %}
           {% endblock %}
+	  {% else %}
+	  <a href="{% provider_login_url 'github' %}">Sign in using GitHub</a>
+	  {% endif %}
         </div>
       </div>
     </div>
