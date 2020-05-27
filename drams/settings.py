@@ -39,9 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_bootstrap_breadcrumbs',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
     'custom_user.apps.CustomUserConfig',
     'data_management.apps.DataManagementConfig',
-    'django_bootstrap_breadcrumbs',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +137,25 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+
+# We don't need email verification upon signup as we're using GitHub
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# Redirect authenticated users to this URL
+LOGIN_REDIRECT_URL = '/'
+
+# Specify required scopes
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'read:user',
+            'user:email',
+        ],
+    }
+}
