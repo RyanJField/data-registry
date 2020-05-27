@@ -15,8 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
+from allauth.account.views import login, logout
 
 urlpatterns = [
+    url(r'^accounts/email/', login, name='disable_email'),
+    url(r'^accounts/password/', login, name='disable_password'),
+    url(r'^accounts/inactive/', login, name='disable_inactive'),
+    url(r'^accounts/confirm-email/', login, name='disable_confirm_email'),
+    url(r'^login/$', login, name='account_login'),
+    url(r'^logout/$', logout, name='account_logout'),
+    url(r'^signup/$', login, name='account_signup'),
     path('accounts/', include('allauth.urls')),
     path('grappelli', include('grappelli.urls')),
     path('admin/', admin.site.urls),
