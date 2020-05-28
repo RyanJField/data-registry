@@ -23,3 +23,24 @@
   * **Key** can be left empty
   * The site setup in the previous step should be set as the site
   * Save the changes
+
+# REST API user perspective
+
+## Create a GitHub personal access token
+* Go to your GitHub profile page https://github.com/settings/profile
+* Select **Developer settings** on the LHS menu
+* Select **Personal access tokens**
+* Click **Generate personal access token** with the following info:
+  * Specify a name for the token in **Note**
+  * Select **read:org**
+  * Click **Generate token**
+  
+## Querying the REST API
+You need to include a header of the form specifying the token:
+```
+Authorization: token <token>
+```
+Example request:
+```
+curl -i -X POST -H "Content-Type: application/json" -H "Authorization: token <token>" https://data.scrc.uk/api/model/
+```
