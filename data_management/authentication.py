@@ -18,15 +18,21 @@ class GitHubTokenAuthentication(authentication.BaseAuthentication):
         headers = {'Authorization': 'token %s' % token}
 
         # Get username
-        resp = requests.get('https://api.github.com/user', headers=headers)
-        resp.raise_for_status()
-        userinfo = resp.json()
-        username = userinfo['login']
+        try:
+            resp = requests.get('https://api.github.com/user', headers=headers)
+            resp.raise_for_status()
+            userinfo = resp.json()
+            username = userinfo['login']
+        except:
+            raise exceptions.AuthenticationFailed('Invalid token')
 
         # Check organization membership
-        resp = requests.get('https://api.github.com/user/orgs', headers=headers)
-        resp.raise_for_status()
-        orginfo = resp.json()
+        try:
+            resp = requests.get('https://api.github.com/user/orgs', headers=headers)
+            resp.raise_for_status()
+            orginfo = resp.json()
+        except:
+            raise exceptions.AuthenticationFailed('Unable to obtain GitHub organizations')
 
         membership = False
         for org in orginfo:
