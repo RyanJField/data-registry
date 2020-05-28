@@ -25,7 +25,7 @@ class BaseSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_field_names(self, declared_fields, info):
         expanded_fields = super().get_field_names(declared_fields, info)
-        return expanded_fields + list(self.Meta.model.fields)
+        return expanded_fields + list(self.Meta.model._extra_fields)
 
 
 class ObjectRelatedField(serializers.HyperlinkedRelatedField):
@@ -34,7 +34,7 @@ class ObjectRelatedField(serializers.HyperlinkedRelatedField):
             'pk': obj.pk
         }
         view_name = obj.__class__.__name__.lower()
-        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+        return reverse(view_name + '-detail', kwargs=url_kwargs, request=request, format=format)
 
 
 class IssueSerializer(serializers.ModelSerializer):
