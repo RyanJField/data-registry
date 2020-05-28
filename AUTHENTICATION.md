@@ -36,6 +36,8 @@
   * Click **Generate token**
   
 ## Querying the REST API
+Before using the REST API you need to sign in to the web part of the Django website in order to register as a user. If this step is skipped you will get a `No such user` error when using the REST API.
+
 You need to include a header of the form specifying the token:
 ```
 Authorization: token <token>
