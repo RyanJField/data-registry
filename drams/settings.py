@@ -39,9 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'custom_user.apps.CustomUserConfig',
+    'django.contrib.sites',
     'data_management.apps.DataManagementConfig',
     'django_bootstrap_breadcrumbs',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +98,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = 'custom_user.User'
+#AUTH_USER_MODEL = 'custom_user.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -125,6 +129,28 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+
+# We don't need email verification upon signup as we're using GitHub
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# Redirect authenticated users to this URL
+LOGIN_REDIRECT_URL = 'index'
+
+# Specify required scopes
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'read:user',
+            'user:email',
+        ],
+    }
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

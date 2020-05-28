@@ -12,10 +12,10 @@
 
 <dt class="col-sm-3">Model Input Versions</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
-{% for version in object.versions.all %}
-        <li><a href="{% url 'modelinputversion' version.pk %}">{{ version }}</a></li>
-{% endfor %}
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for version in object.versions.all %}
+    <li><a href="{% url 'modelinputversion' version.pk %}">{{ version }}</a></li>
+    {% endfor %}
 </dd>
-    </ul>
+</ul>
 {% endblock %}

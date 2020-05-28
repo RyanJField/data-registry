@@ -2,13 +2,13 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions
 from django.contrib.auth.models import Group
-from custom_user.models import User
+from django.contrib.auth import get_user_model
 
 from . import models, serializers
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = get_user_model().objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 

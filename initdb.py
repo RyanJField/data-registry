@@ -1,8 +1,8 @@
 from data_management.models import *
-from custom_user.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-user = User.objects.first()
+user = get_user_model().objects.first()
 
 model = Model.objects.create(
         responsible_person=user,

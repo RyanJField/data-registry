@@ -15,18 +15,18 @@
 
 <dt class="col-sm-3">Source Versions</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
+  <ul class="list-group list-group-flush list-unstyled">
     {% for source_version in object.source_versions.all %}
-        <li><a href="{% url 'sourceversion' source_version.pk %}">{{ source_version }}</a></li>
+    <li><a href="{% url 'sourceversion' source_version.pk %}">{{ source_version }}</a></li>
     {% endfor %}
 </dd>
 
 <dt class="col-sm-3">Used In Runs</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
+  <ul class="list-group list-group-flush list-unstyled">
     {% for run in object.model_runs.all %}
-        <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
+    <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
     {% endfor %}
-    </ul>
+  </ul>
 </dd>
 {% endblock %}

@@ -1,13 +1,14 @@
 from django.contrib.auth.models import Group
-from custom_user.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from . import models
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['url', 'username', 'email', 'groups']
 
 
@@ -27,7 +28,26 @@ class BaseSerializer(serializers.HyperlinkedModelSerializer):
         return expanded_fields + list(self.Meta.model.fields)
 
 
+class ObjectRelatedField(serializers.HyperlinkedRelatedField):
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'pk': obj.pk
+        }
+        view_name = obj.__class__.__name__.lower()
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class IssueSerializer(serializers.ModelSerializer):
+    data_object = ObjectRelatedField(view_name='', read_only=True)
+
+    class Meta:
+        model = models.Issue
+        fields = ('data_object', 'severity', 'desc')
+
+
 for name, cls in models.all_models.items():
+    if name == 'Issue':
+        continue
     data = {'Meta': type('Meta', (BaseSerializer.Meta,), {'model': cls})}
     globals()[name + "Serializer"] = type(name + "Serializer", (BaseSerializer,), data)
 
