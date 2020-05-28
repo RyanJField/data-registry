@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions
 from django.contrib.auth.models import Group
 from custom_user.models import User
 
-from . import models, serializers
+from . import authentication, models, serializers
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class BaseViewSet(viewsets.ModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
