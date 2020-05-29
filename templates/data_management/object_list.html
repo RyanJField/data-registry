@@ -3,27 +3,28 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }}
-    {% breadcrumb display_name|title model_name %}
+{{ block.super }}
+{% breadcrumb display_name|title model_name %}
 {% endblock %}
 
 {% block content %}
 {{ block.super }}
 <div class="card">
-<div class="card-body">
-<h2>{{ display_name | title }}:</h2>
-{% if objects %}
-<ul class="list-group list-group-flush">
-    {% for obj in object_list %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
+  <div class="card-body">
+    <h2>{{ display_name | title }}:</h2>
+    {% if objects %}
+    <ul class="list-group list-group-flush">
+      {% for obj in object_list %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="{% url obj.reverse_name obj.id %}">{{ obj.name }}</a>
-        <span class="badge {{ obj.issues.count | yesno:'badge-warning,badge-success' }}">Issues: {{ obj.issues.count }}</span>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No models.</p>
-{% endif %}
-</div>
+        <span
+            class="badge {{ obj.issues.count | yesno:'badge-warning,badge-success' }}">Issues: {{ obj.issues.count }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No models.</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

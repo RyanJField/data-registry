@@ -12,11 +12,11 @@
 {% if object.superseded_by.all %}
 <dt class="col-sm-3">Superseded By</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
-{% for version in object.superseded_by.all %}
-        <li><a href="{% url 'modelversion' version.pk %}">{{ version }}</a></li>
-{% endfor %}
-    </ul>
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for version in object.superseded_by.all %}
+    <li><a href="{% url 'modelversion' version.pk %}">{{ version }}</a></li>
+    {% endfor %}
+  </ul>
 </dd>
 {% endif %}
 
@@ -28,10 +28,10 @@
 
 <dt class="col-sm-3">Model Runs</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
-{% for run in object.runs.all %}
-        <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
-{% endfor %}
-    </ul>
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for run in object.runs.all %}
+    <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
+    {% endfor %}
+  </ul>
 </dd>
 {% endblock %}

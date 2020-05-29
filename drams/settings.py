@@ -99,7 +99,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = 'custom_user.User'
+#AUTH_USER_MODEL = 'custom_user.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -130,7 +130,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -148,7 +147,7 @@ SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 # Redirect authenticated users to this URL
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'index'
 
 # Specify required scopes
 SOCIALACCOUNT_PROVIDERS = {

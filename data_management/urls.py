@@ -15,10 +15,11 @@ for name in models.all_models:
 urlpatterns = [
     path('', views.index, name='index'),
     path('', include(router.urls)),
-    path('issue/', views.IssueListView.as_view(), name='issues'),
+    path('issues/', views.IssueListView.as_view(), name='issues'),
     path('issue/<int:pk>', views.IssueDetailView.as_view(), name='issue'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(router.urls)),
+    path('api/prov-report/<int:pk>', api_views.ProvReportView.as_view(), name='prov_report')
 ]
 
 

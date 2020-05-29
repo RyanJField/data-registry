@@ -15,7 +15,7 @@ class BaseModel(models.Model):
             verbose_name='last updated by',
             )
     last_updated = models.DateField(auto_now=True)
-    fields = ()
+    _extra_fields = ()
 
     def reverse_name(self):
         return self.__class__.__name__.lower()
@@ -65,14 +65,14 @@ class Issue(BaseModel):
 
 
 class Model(DataObject):
-    fields = ('versions',)
+    _extra_fields = ('versions',)
     url = models.URLField(max_length=255, null=False, blank=False)
     short_desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='short description')
     long_desc_url = models.URLField(max_length=255, null=False, blank=True)
 
 
 class ModelVersion(DataObjectVersion):
-    fields = ('runs',)
+    _extra_fields = ('runs',)
     _object = 'model'
     model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='versions')
     url = models.URLField(max_length=255)
@@ -80,7 +80,7 @@ class ModelVersion(DataObjectVersion):
 
 
 class ModelRun(DataObject):
-    model_version =  models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='runs')
+    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='runs')
     run_date = models.DateField()
     short_desc = models.TextField(max_length=1024, verbose_name='short description', blank=True)
     url = models.URLField(max_length=255, blank=True)
@@ -160,7 +160,7 @@ class ModelOutput(DataObject):
     short_desc = models.TextField(max_length=1024, verbose_name='short description', blank=True)
     long_desc_url = models.URLField(max_length=255, blank=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_PRIVATE)
-    fields = ('model_runs',)
+    _extra_fields = ('model_runs',)
 
     def status_string(self):
         return dict(self.STATUS_CHOICES)[self.status]

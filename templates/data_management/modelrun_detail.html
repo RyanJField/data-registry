@@ -20,19 +20,19 @@
 
 <dt class="col-sm-3">Model Input Versions</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
-{% for model_input_version in object.model_input_versions.all %}
-        <li><a href="{% url 'modelinputversion' model_input_version.pk %}">{{ model_input_version }}</a></li>
-{% endfor %}
-    </ul>
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for model_input_version in object.model_input_versions.all %}
+    <li><a href="{% url 'modelinputversion' model_input_version.pk %}">{{ model_input_version }}</a></li>
+    {% endfor %}
+  </ul>
 </dd>
 
 <dt class="col-sm-3">Model Outputs</dt>
 <dd class="col-sm-9">
-    <ul class="list-group list-group-flush list-unstyled">
-{% for model_output in object.model_outputs.all %}
-        <li><a href="{% url 'modeloutput' model_output.pk %}">{{ model_output }}</a></li>
-{% endfor %}
-    </ul>
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for model_output in object.model_outputs.all %}
+    <li><a href="{% url 'modeloutput' model_output.pk %}">{{ model_output }}</a></li>
+    {% endfor %}
+  </ul>
 </dd>
 {% endblock %}
