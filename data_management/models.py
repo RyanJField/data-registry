@@ -29,7 +29,7 @@ class BaseModel(models.Model):
 
 
 class DataObject(BaseModel):
-    object_uid = models.UUIDField(default=uuid.uuid4, editable=False)
+    # object_uid = models.UUIDField(default=uuid.uuid4, editable=False)
     responsible_person = models.ForeignKey(
             settings.AUTH_USER_MODEL,
             on_delete=models.CASCADE,
@@ -42,6 +42,7 @@ class DataObject(BaseModel):
 
 
 class DataObjectVersion(DataObject):
+    _object = ''
     version_identifier = models.CharField(max_length=255)
     supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='superseded_by')
 
@@ -61,109 +62,123 @@ class Issue(BaseModel):
     desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='description')
 
     def __str__(self):
-        return '%s [Severity %d]' % (self.name, self.severity)
+        return '%s [Severity %s]' % (self.name, self.severity)
 
 
-class Model(DataObject):
-    _extra_fields = ('versions',)
-    url = models.URLField(max_length=255, null=False, blank=False)
-    short_desc = models.TextField(max_length=1024, null=False, blank=False, verbose_name='short description')
-    long_desc_url = models.URLField(max_length=255, null=False, blank=True)
+class DataProductType(BaseModel):
+    description = models.TextField(max_length=1024, null=False, blank=False)
 
 
-class ModelVersion(DataObjectVersion):
-    _extra_fields = ('runs',)
-    _object = 'model'
-    model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='versions')
-    url = models.URLField(max_length=255)
-    short_desc = models.TextField(max_length=1024, verbose_name='short description')
+class StorageType(BaseModel):
+    description = models.TextField(max_length=1024)
 
 
-class ModelRun(DataObject):
-    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='runs')
-    run_date = models.DateField()
-    short_desc = models.TextField(max_length=1024, verbose_name='short description', blank=True)
-    url = models.URLField(max_length=255, blank=True)
-    model_input_versions = models.ManyToManyField('ModelInputVersion', blank=True, related_name='model_runs')
-    model_outputs = models.ManyToManyField('ModelOutput', blank=True, related_name='model_runs')
-    supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-
-    @property
-    def name(self):
-        return '%s (Run %s)' % (self.model_version.name, self.run_date)
+class StorageRoot(BaseModel):
+    type = models.ForeignKey(StorageType, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1024)
+    doi = models.URLField(max_length=1024)
+    url = models.URLField(max_length=1024)
+    git_repo = models.URLField(max_length=1024)
 
 
-class ModelInputType(BaseModel):
-    desc = models.CharField(max_length=255, verbose_name='short description')
+class DataStore(DataObject):
+    store_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1024)
+    path = models.CharField(max_length=1024)
+    toml_text = models.TextField(max_length=1024)
+    hash = models.TextField(max_length=1024)
+    local_cache_url = models.TextField(max_length=1024)
 
 
-class ModelInputDataType(BaseModel):
-    desc = models.CharField(max_length=255, verbose_name='short description')
-
-
-class ModelInput(DataObject):
-    model_input_type = models.ForeignKey(ModelInputType, on_delete=models.CASCADE)
-    short_desc = models.TextField(max_length=1024, verbose_name='short description')
-    long_desc_url = models.URLField(max_length=255, blank=True)
-
-
-class ModelInputVersion(DataObjectVersion):
-    _object = 'model_input'
-    model_input = models.ForeignKey(ModelInput, on_delete=models.CASCADE, related_name='versions')
-    model_input_data_type = models.ForeignKey(ModelInputDataType, on_delete=models.CASCADE)
-    value = models.TextField(max_length=1024)
-    short_desc = models.TextField(max_length=1024, blank=True, verbose_name='short description')
-    source_versions = models.ManyToManyField('SourceVersion', blank=True)
+class Accessibility(BaseModel):
+    description = models.TextField(max_length=1024, null=False, blank=False)
+    access_info = models.TextField(max_length=1024, null=False, blank=False)
 
 
 class SourceType(BaseModel):
-    desc = models.CharField(max_length=255, verbose_name='short description')
+    description = models.CharField(max_length=255, verbose_name='short description')
 
 
 class Source(DataObject):
-    doi = models.URLField(max_length=255, blank=True)
-    url = models.URLField(max_length=255, blank=True)
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
     source_type = models.ForeignKey(SourceType, on_delete=models.CASCADE)
-    short_desc = models.TextField(max_length=1024, verbose_name='short description')
-    long_desc_url = models.URLField(max_length=255, blank=True)
+    description = models.CharField(max_length=255)
 
 
 class SourceVersion(DataObjectVersion):
     _object = 'source'
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='versions')
-    doi = models.URLField(max_length=255, blank=True)
-    url = models.URLField(max_length=255, blank=True)
-    short_desc = models.TextField(max_length=1024, verbose_name='short description')
-    processing_script_version = models.ForeignKey('ProcessingScriptVersion', on_delete=models.CASCADE, related_name='generated_sources')
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255)
+    accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
+
+
+class DataProduct(DataObject):
+    _extra_fields = ('versions',)
+    description = models.TextField(max_length=1024, null=False, blank=False)
+
+
+class DataProductDataType(BaseModel):
+    description = models.CharField(max_length=255)
+    type = models.ForeignKey(DataProductType, on_delete=models.CASCADE)
 
 
 class ProcessingScript(DataObject):
-    url = models.URLField(max_length=255)
+    _extra_fields = ('versions',)
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
 
 
 class ProcessingScriptVersion(DataObjectVersion):
     _object = 'processing_script'
     processing_script = models.ForeignKey(ProcessingScript, on_delete=models.CASCADE, related_name='versions')
-    url = models.URLField(max_length=255)
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
+    accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
 
-class ModelOutput(DataObject):
-    STATUS_PRIVATE = 0
-    STATUS_PUBLIC = 1
-    STATUS_CHOICES = (
-            (STATUS_PRIVATE, 'private'),
-            (STATUS_PUBLIC, 'public'),
-            )
-    release_date = models.DateField()
-    doi = models.URLField(max_length=255, blank=True)
-    url = models.URLField(max_length=255, blank=True)
-    short_desc = models.TextField(max_length=1024, verbose_name='short description', blank=True)
-    long_desc_url = models.URLField(max_length=255, blank=True)
-    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_PRIVATE)
+class DataProductVersion(DataObjectVersion):
+    _object = 'data_product'
+    _extra_fields = ('components', 'model_runs')
+    data_product = models.ForeignKey(DataProduct, on_delete=models.CASCADE, related_name='versions')
+    data_type = models.ForeignKey(DataProductDataType, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1024, null=False, blank=False)
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
+    accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
+    processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE)
+    source_versions = models.ManyToManyField(SourceVersion, blank=True)
+
+
+class DataProductVersionComponent(DataObject):
     _extra_fields = ('model_runs',)
+    data_product_version = models.ForeignKey(DataProductVersion, on_delete=models.CASCADE, related_name='components')
 
-    def status_string(self):
-        return dict(self.STATUS_CHOICES)[self.status]
+
+class Model(DataObject):
+    _extra_fields = ('versions',)
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1024, null=False, blank=False)
+
+
+class ModelVersion(DataObjectVersion):
+    _extra_fields = ('model_runs',)
+    _object = 'model'
+    model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='versions')
+    store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1024, null=False, blank=False)
+    accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
+
+
+class ModelRun(DataObject):
+    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='model_runs')
+    release_date = models.DateField()
+    description = models.TextField(max_length=1024, null=False, blank=False)
+    toml_config = models.TextField(max_length=1024, null=False, blank=False)
+    inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='model_runs')
+    outputs = models.ManyToManyField(DataProductVersion, blank=True, related_name='model_runs')
+    supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def name(self):
+        return '%s (Run %s)' % (self.model_version.name, self.release_date)
 
 
 all_object_models = dict(

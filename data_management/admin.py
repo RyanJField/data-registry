@@ -72,18 +72,12 @@ class IssueAdmin(BaseAdmin):
         return False
 
 
-admin.site.register(models.Model, DataObjectAdmin)
-admin.site.register(models.ModelVersion, DataObjectVersionAdmin)
-admin.site.register(models.ModelRun, DataObjectAdmin)
-admin.site.register(models.Issue, IssueAdmin)
-admin.site.register(models.ModelInput, DataObjectAdmin)
-admin.site.register(models.ModelInputVersion, DataObjectVersionAdmin)
-admin.site.register(models.ModelInputType, BaseAdmin)
-admin.site.register(models.ModelInputDataType, BaseAdmin)
-admin.site.register(models.Source, DataObjectAdmin)
-admin.site.register(models.SourceVersion, DataObjectVersionAdmin)
-admin.site.register(models.SourceType, BaseAdmin)
-admin.site.register(models.ProcessingScript, DataObjectAdmin)
-admin.site.register(models.ProcessingScriptVersion, DataObjectVersionAdmin)
-admin.site.register(models.ModelOutput, DataObjectAdmin)
-
+for _, cls in models.all_models.items():
+    if isinstance(cls, models.DataObjectVersion):
+        admin.site.register(cls, DataObjectVersionAdmin)
+    elif isinstance(cls, models.DataObject):
+        admin.site.register(cls, DataObjectAdmin)
+    elif isinstance(cls, models.Issue):
+        admin.site.register(models.Issue, IssueAdmin)
+    else:
+        admin.site.register(cls, BaseAdmin)

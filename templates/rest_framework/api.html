@@ -1,0 +1,30 @@
+{% extends "rest_framework/base.html" %}
+
+{% load socialaccount %}
+{% load static %}
+
+{% block style %}
+    {{ block.super }}
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+{% endblock %}
+
+{% block title %}
+{% if name %}{{ name }}{% else %}REST API{% endif %}
+{% endblock %}
+
+{% block branding %}
+<a class='navbar-brand' rel="nofollow" href='/api'>
+SCRC data registration and management system REST API
+</a>
+{% endblock %}
+
+{% block userlinks %}
+  <span class="navbar-text">
+    {% if user.is_authenticated %}
+    Logged in as: {{ user.username }}
+    <a href="/logout">logout</a>
+    {% else %}
+    <a href="{% provider_login_url 'github' %}">Log in or sign up using GitHub</a>
+    {% endif %}
+  </span>
+{% endblock %}

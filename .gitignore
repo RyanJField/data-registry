@@ -1,7 +1,11 @@
 __pycache__
 migrations
 db.sqlite3
-static
+static/admin
+static/django_extensions
+static/grappelli
+static/rest_framework
+static/images/schema.*
 *.pyc
 venv
 .idea
