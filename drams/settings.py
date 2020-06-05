@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_bootstrap_breadcrumbs',
     'django.contrib.sites',
     'django_extensions',
+    'dynamic_validator',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

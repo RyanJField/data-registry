@@ -20,12 +20,12 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class BaseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = models.Model
+        model = models.BaseModel
         fields = '__all__'
 
     def get_field_names(self, declared_fields, info):
         expanded_fields = super().get_field_names(declared_fields, info)
-        return expanded_fields + list(self.Meta.model._extra_fields)
+        return expanded_fields + list(self.Meta.model.EXTRA_DISPLAY_FIELDS)
 
 
 class ObjectRelatedField(serializers.HyperlinkedRelatedField):

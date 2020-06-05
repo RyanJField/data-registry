@@ -4,6 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 
 user = get_user_model().objects.first()
 
+nfs = StorageType.objects.create(name='NFS')
+root = StorageRoot.objects.create(name='NFS Data Root', type=nfs, uri='file:///data')
+#store1 = DataStore.objects.create()
+
 model = Model.objects.create(
         responsible_person=user,
         updated_by=user, 
