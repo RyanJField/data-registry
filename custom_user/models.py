@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 import mysql.connector as mariadb
 
+from .managers import CustomUserManager
+
 
 def _get_db_connection():
     connection = mariadb.connect(
@@ -12,6 +14,10 @@ def _get_db_connection():
 
 class User(AbstractUser):
 
+    objects = CustomUserManager()
+
+    REQUIRED_FIELDS = []
+
     def full_name(self):
         try:
             conn = _get_db_connection()
@@ -19,7 +25,7 @@ class User(AbstractUser):
             cursor.execute('SELECT full_name FROM user WHERE name = %s', (self.username,))
             row = cursor.fetchone()
             return row[0]
-        except ValueError:
+        except (ValueError, TypeError):
             return 'User Not Found'
 
     def email(self):
@@ -29,7 +35,7 @@ class User(AbstractUser):
             cursor.execute('SELECT email FROM user WHERE name = %s', (self.username,))
             row = cursor.fetchone()
             return row[0]
-        except ValueError:
+        except (ValueError, TypeError):
             return 'User Not Found'
 
     def orgs(self):
@@ -45,5 +51,5 @@ class User(AbstractUser):
             cursor.execute(sql, (self.username,))
             rows = cursor.fetchmany()
             return [row[0] for row in rows]
-        except ValueError:
+        except (ValueError, TypeError):
             return []

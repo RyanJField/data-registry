@@ -2,12 +2,24 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
+from django.core import validators
 from dynamic_validator import ModelFieldRequiredMixin
 import uuid
 
+class URIValidator(validators.URLValidator):
+    #schemes = ['http', 'https', 'ftp', 'ftps', 'ssh', 'git']
+    schemes = []
+
+def dummy(value):
+    pass
+
+
+class URIField(models.URLField):
+    default_validators = [dummy]
+
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=255, null=False, blank=False, unique=True)
     updated_by = models.ForeignKey(
             settings.AUTH_USER_MODEL,
             on_delete=models.CASCADE,
@@ -81,13 +93,8 @@ class StorageType(BaseModel):
 class StorageRoot(BaseModel):
     type = models.ForeignKey(StorageType, on_delete=models.CASCADE, null=False)
     description = models.TextField(max_length=1024, null=True, blank=True)
-    doi = models.URLField(max_length=1024, null=True, blank=True)
-    uri = models.URLField(max_length=1024, null=True, blank=True)
-    git_repo = models.URLField(max_length=1024, null=True, blank=True)
-
-    REQUIRED_TOGGLE_FIELDS = [
-        ['doi', 'uri', 'git_repo'],
-    ]
+    uri = models.CharField( max_length=1024, null=False, blank=False)
+    #uri = models.URLField(validators=[dummy], max_length=1024, null=False, blank=False)
 
 
 class DataStore(DataObject):
@@ -180,7 +187,7 @@ class ModelRun(DataObject):
     model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='model_runs')
     release_date = models.DateField()
     description = models.TextField(max_length=1024, null=True, blank=True)
-    toml_config = models.TextField(max_length=1024, null=True, blank=True)
+    model_config = models.TextField(max_length=1024, null=True, blank=True)
     submission_script = models.TextField(max_length=1024, null=True, blank=True)
     inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='model_runs')
     outputs = models.ManyToManyField(DataProductVersion, blank=True, related_name='model_runs')

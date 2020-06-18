@@ -3,6 +3,7 @@ from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -76,6 +77,9 @@ class GroupViewSet(viewsets.ModelViewSet):
 class BaseViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+    #lookup_field = 'name'
 
     def get_queryset(self):
         return self.model.objects.all()

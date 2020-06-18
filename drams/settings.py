@@ -25,7 +25,7 @@ SECRET_KEY = '91qh0bw%vj8jd(+s1dos++=thx3v165*jlejlt9l-e&2b1*@ak'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['130.246.213.211', '127.0.0.1', 'data.scrc.uk']
+ALLOWED_HOSTS = ['data.scrc.uk']
 
 
 # Application definition
@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'drams.wsgi.application'
 GRAPPELLI_ADMIN_TITLE = 'SCRC DRAMS Admin'
 
 REST_FRAMEWORK = {
-    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata'
+    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
 }
 
 # Database
@@ -136,8 +136,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
 ]
 
 AUTHENTICATION_BACKENDS = (
