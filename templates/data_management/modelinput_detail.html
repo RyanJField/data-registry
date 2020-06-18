@@ -16,6 +16,7 @@
     {% for version in object.versions.all %}
     <li><a href="{% url 'modelinputversion' version.pk %}">{{ version }}</a></li>
     {% endfor %}
+  </ul>
 </dd>
 </ul>
 {% endblock %}

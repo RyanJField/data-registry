@@ -9,20 +9,23 @@
 <dd class="col-sm-9"><a href="{% url 'modelrun' object.supersedes.pk %}">{{ object.supersedes }}</a></dd>
 {% endif %}
 
-<dt class="col-sm-3">Run Date</dt>
-<dd class="col-sm-9">{{ object.run_date | date }}</dd>
+<dt class="col-sm-3">Release Date</dt>
+<dd class="col-sm-9">{{ object.release_date | date }}</dd>
 
-<dt class="col-sm-3">Short Description</dt>
-<dd class="col-sm-9">{{ object.short_desc }}</dd>
+<dt class="col-sm-3">Description</dt>
+<dd class="col-sm-9">{{ object.description }}</dd>
 
-<dt class="col-sm-3">URL</dt>
-<dd class="col-sm-9"><a href="{{ object.url }}">{{ object.url }}</a></dd>
+<dt class="col-sm-3">Model Configuration</dt>
+<dd class="col-sm-9">{{ object.model_config }}</dd>
 
-<dt class="col-sm-3">Model Input Versions</dt>
+<dt class="col-sm-3">Submission Script</dt>
+<dd class="col-sm-9">{{ object.submission_script }}</dd>
+
+<dt class="col-sm-3">Model Inputs</dt>
 <dd class="col-sm-9">
   <ul class="list-group list-group-flush list-unstyled">
-    {% for model_input_version in object.model_input_versions.all %}
-    <li><a href="{% url 'modelinputversion' model_input_version.pk %}">{{ model_input_version }}</a></li>
+    {% for input in object.inputs.all %}
+    <li><a href="{% url 'dataproductversioncomponent' input.pk %}">{{ input }}</a></li>
     {% endfor %}
   </ul>
 </dd>
@@ -30,8 +33,8 @@
 <dt class="col-sm-3">Model Outputs</dt>
 <dd class="col-sm-9">
   <ul class="list-group list-group-flush list-unstyled">
-    {% for model_output in object.model_outputs.all %}
-    <li><a href="{% url 'modeloutput' model_output.pk %}">{{ model_output }}</a></li>
+    {% for output in object.outputs.all %}
+    <li><a href="{% url 'dataproductversion' output.pk %}">{{ output }}</a></li>
     {% endfor %}
   </ul>
 </dd>

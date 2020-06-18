@@ -20,11 +20,14 @@
 </dd>
 {% endif %}
 
-<dt class="col-sm-3">Short Description</dt>
-<dd class="col-sm-9">{{ object.short_desc }}</dd>
+<dt class="col-sm-3">Storage Location</dt>
+<dd class="col-sm-9"><a href="{% url 'datastore' object.store.pk %}">{{ object.store }}</a></dd>
 
-<dt class="col-sm-3">URL</dt>
-<dd class="col-sm-9"><a href="{{ object.url }}">{{ object.url }}</a></dd>
+<dt class="col-sm-3">Description</dt>
+<dd class="col-sm-9">{{ object.description }}</dd>
+
+<dt class="col-sm-3">Accessibility</dt>
+<dd class="col-sm-9">{{ object.accessibility }}</dd>
 
 <dt class="col-sm-3">Model Runs</dt>
 <dd class="col-sm-9">

@@ -1,14 +1,17 @@
 {% extends 'data_management/object_detail.html' %}
 
 {% block fields %}
-<dt class="col-sm-3">Storage Location</dt>
-<dd class="col-sm-9"><a href="{% url 'datastore' object.store.pk %}">{{ object.store }}</a></dd>
+<dt class="col-sm-3">Description</dt>
+<dd class="col-sm-9">{{ object.description }}</dd>
+
+<dt class="col-sm-3">Type</dt>
+<dd class="col-sm-9">{{ object.type }}</dd>
 
 <dt class="col-sm-3">Versions</dt>
 <dd class="col-sm-9">
   <ul class="list-group list-group-flush list-unstyled">
     {% for version in object.versions.all %}
-    <li><a href="{% url 'processingscriptversion' version.pk %}">{{ version }}</a></li>
+    <li><a href="{% url 'dataproductversion' version.pk %}">{{ version }}</a></li>
     {% endfor %}
   </ul>
 </dd>

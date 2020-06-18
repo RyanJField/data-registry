@@ -1,0 +1,45 @@
+{% extends 'data_management/object_detail.html' %}
+
+{% block fields %}
+<dt class="col-sm-3">Data Product</dt>
+<dd class="col-sm-9"><a href="{% url 'dataproduct' object.data_product.pk %}">{{ object.data_product }}</a></dd>
+
+<dt class="col-sm-3">Description</dt>
+<dd class="col-sm-9">{{ object.description }}</dd>
+
+<dt class="col-sm-3">Storage Location</dt>
+<dd class="col-sm-9"><a href="{% url 'datastore' object.store.pk %}">{{ object.store }}</a></dd>
+
+<dt class="col-sm-3">Accessibility</dt>
+<dd class="col-sm-9">{{ object.accessibility }}</dd>
+
+<dt class="col-sm-3">Processing Script Version</dt>
+<dd class="col-sm-9"><a href="{% url 'processingscriptversion' object.processing_script_version.pk %}">{{ object.processing_script_version }}</a></dd>
+
+<dt class="col-sm-3">Source Versions</dt>
+<dd class="col-sm-9">
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for source_version in object.source_versions.all %}
+    <li><a href="{% url 'sourceversion' source_version.pk %}">{{ source_version }}</a></li>
+    {% endfor %}
+  </ul>
+</dd>
+
+<dt class="col-sm-3">Components</dt>
+<dd class="col-sm-9">
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for component in object.components.all %}
+    <li><a href="{% url 'dataproductversioncomponent' component.pk %}">{{ component }}</a></li>
+    {% endfor %}
+  </ul>
+</dd>
+
+<dt class="col-sm-3">Output of Runs</dt>
+<dd class="col-sm-9">
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for run in object.model_runs.all %}
+    <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
+    {% endfor %}
+  </ul>
+</dd>
+{% endblock %}

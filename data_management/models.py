@@ -125,11 +125,11 @@ class SourceVersion(DataObjectVersion):
 class DataProduct(DataObject):
     EXTRA_DISPLAY_FIELDS = ('versions',)
     description = models.TextField(max_length=1024, null=False, blank=False)
-
-
-class DataProductDataType(BaseModel):
-    description = models.CharField(max_length=255)
     type = models.ForeignKey(DataProductType, on_delete=models.CASCADE)
+
+
+# class DataProductDataType(BaseModel):
+#     description = models.CharField(max_length=255)
 
 
 class ProcessingScript(DataObject):
@@ -139,6 +139,7 @@ class ProcessingScript(DataObject):
 
 class ProcessingScriptVersion(DataObjectVersion):
     VERSIONED_OBJECT = 'processing_script'
+    EXTRA_DISPLAY_FIELDS = ('data_product_versions',)
     processing_script = models.ForeignKey(ProcessingScript, on_delete=models.CASCADE, related_name='versions')
     store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
@@ -148,11 +149,11 @@ class DataProductVersion(DataObjectVersion):
     VERSIONED_OBJECT = 'data_product'
     EXTRA_DISPLAY_FIELDS = ('components', 'model_runs')
     data_product = models.ForeignKey(DataProduct, on_delete=models.CASCADE, related_name='versions')
-    data_type = models.ForeignKey(DataProductDataType, on_delete=models.CASCADE)
+    # data_type = models.ForeignKey(DataProductDataType, on_delete=models.CASCADE)
     description = models.TextField(max_length=1024, null=False, blank=False)
     store = models.ForeignKey(DataStore, on_delete=models.CASCADE)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
-    processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE)
+    processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE, related_name='data_product_versions')
     source_versions = models.ManyToManyField(SourceVersion, blank=True)
 
 
