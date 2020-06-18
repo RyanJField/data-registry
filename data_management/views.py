@@ -7,16 +7,17 @@ from . import models
 
 
 def index(request):
-    ObjectCount = namedtuple('object', 'name display_name count')
-    model_names = models.all_object_models
-    object_counts = []
-    for model_name in model_names:
+    ObjectData = namedtuple('object', 'name display_name count doc')
+    object_models = models.all_object_models
+    object_data = []
+    for (model_name, model_cls) in object_models.items():
         count = getattr(models, model_name).objects.count()
         name = model_name.lower() + 's'
         display_name = camel_case_to_spaces(model_name)
-        object_counts.append(ObjectCount(name, display_name, count))
+        doc = model_cls.__doc__
+        object_data.append(ObjectData(name, display_name, count, doc))
     issues = models.Issue.objects.all()
-    return render(request, 'data_management/index.html', { 'objects': object_counts, 'issues': issues })
+    return render(request, 'data_management/index.html', {'objects': object_data, 'issues': issues})
 
 
 class BaseListView(generic.ListView):
