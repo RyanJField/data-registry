@@ -63,12 +63,14 @@ class ProvReportView(views.APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     queryset = get_user_model().objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class GroupViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -77,9 +79,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 class BaseViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name']
-    #lookup_field = 'name'
+    # lookup_field = 'name'
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -91,7 +91,22 @@ class BaseViewSet(viewsets.ModelViewSet):
         serializer.save(updated_by=self.request.user)
 
 
+class DataObjectViewSet(BaseViewSet):
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+
+
+class DataObjectVersionViewSet(BaseViewSet):
+    filter_backends = [DjangoFilterBackend]
+
+
 for name, cls in models.all_models.items():
     data = {'model': cls, 'serializer_class': getattr(serializers, name + 'Serializer')}
-    globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
+    if name == 'ModelRun':
+        globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
+    elif name.endswith('Version'):
+        data['filterset_fields'] = ['version_identifier', cls.VERSIONED_OBJECT]
+        globals()[name + "ViewSet"] = type(name + "ViewSet", (DataObjectVersionViewSet,), data)
+    else:
+        globals()[name + "ViewSet"] = type(name + "ViewSet", (DataObjectViewSet,), data)
 

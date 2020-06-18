@@ -6,17 +6,6 @@ from django.core import validators
 from dynamic_validator import ModelFieldRequiredMixin
 import uuid
 
-class URIValidator(validators.URLValidator):
-    #schemes = ['http', 'https', 'ftp', 'ftps', 'ssh', 'git']
-    schemes = []
-
-def dummy(value):
-    pass
-
-
-class URIField(models.URLField):
-    default_validators = [dummy]
-
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
     name = models.CharField(max_length=255, null=False, blank=False, unique=True)
@@ -90,18 +79,22 @@ class StorageType(BaseModel):
     description = models.TextField(max_length=1024, null=True, blank=True)
 
 
+class URIField(models.URLField):
+    default_validators = []
+
+
 class StorageRoot(BaseModel):
     type = models.ForeignKey(StorageType, on_delete=models.CASCADE, null=False)
     description = models.TextField(max_length=1024, null=True, blank=True)
-    uri = models.CharField( max_length=1024, null=False, blank=False)
-    #uri = models.URLField(validators=[dummy], max_length=1024, null=False, blank=False)
+    uri = models.CharField(max_length=1024, null=False, blank=False)
+    # uri = URIField(max_length=1024, null=False, blank=False)
 
 
 class DataStore(DataObject):
     store_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE)
     description = models.TextField(max_length=1024, null=True, blank=True)
     path = models.CharField(max_length=1024, null=True, blank=True)
-    toml_text = models.TextField(max_length=1024, null=True, blank=True)
+    # toml_text = models.TextField(max_length=1024, null=True, blank=True)
     hash = models.CharField(max_length=1024, null=True, blank=True)
     local_cache_url = models.URLField(max_length=1024, null=True, blank=True)
 
