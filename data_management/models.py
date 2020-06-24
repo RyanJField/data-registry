@@ -2,9 +2,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
-from django.core import validators
 from dynamic_validator import ModelFieldRequiredMixin
-import uuid
 
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
@@ -16,7 +14,7 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
             editable=False,
             verbose_name='last updated by',
             )
-    last_updated = models.DateField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     EXTRA_DISPLAY_FIELDS = ()
     REQUIRED_FIELDS = ['name']
@@ -41,7 +39,7 @@ class DataObject(BaseModel):
             )
     issues = GenericRelation('Issue')
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         abstract = True
 
 
@@ -56,8 +54,9 @@ class DataObjectVersion(DataObject):
     def name(self):
         return '%s (version %s)' % (getattr(self, self.VERSIONED_OBJECT).name, self.version_identifier)
 
-    class Meta:
+    class Meta(DataObject.Meta):
         abstract = True
+        ordering = ['-version_identifier']
 
 
 class Issue(BaseModel):
@@ -142,6 +141,11 @@ class SourceVersion(DataObjectVersion):
     description = models.CharField(max_length=255)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['source', 'version_identifier'], name='source_version_unique_identifier')
+        ]
+
 
 class DataProduct(DataObject):
     """
@@ -174,6 +178,12 @@ class ProcessingScriptVersion(DataObjectVersion):
     store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['processing_script', 'version_identifier'],
+                                    name='processing_script_version_unique_identifier')
+        ]
+
 
 class DataProductVersion(DataObjectVersion):
     """
@@ -188,6 +198,12 @@ class DataProductVersion(DataObjectVersion):
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
     processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE, related_name='data_product_versions')
     source_versions = models.ManyToManyField(SourceVersion, blank=True)
+
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['data_product', 'version_identifier'],
+                                    name='data_product_version_unique_identifier')
+        ]
 
 
 class DataProductVersionComponent(DataObject):
@@ -218,19 +234,31 @@ class ModelVersion(DataObjectVersion):
     description = models.TextField(max_length=1024, null=False, blank=False)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['model', 'version_identifier'], name='model_version_unique_identifier')
+        ]
+
 
 class ModelRun(DataObject):
     """
     Run of a ModelVersion along with its associated input and outputs.
     """
     model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='model_runs')
-    release_date = models.DateField()
+    release_id = models.TextField(max_length=1024, null=False, blank=False)
+    release_date = models.DateTimeField()
     description = models.TextField(max_length=1024, null=True, blank=True)
     model_config = models.TextField(max_length=1024, null=True, blank=True)
     submission_script = models.TextField(max_length=1024, null=True, blank=True)
     inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='model_runs')
     outputs = models.ManyToManyField(DataProductVersion, blank=True, related_name='model_runs')
     supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['model_version', 'release_id'], name='model_run_unique_identifier')
+        ]
+        ordering = ['-release_date']
 
     @property
     def name(self):

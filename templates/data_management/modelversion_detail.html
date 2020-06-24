@@ -32,7 +32,7 @@
 <dt class="col-sm-3">Model Runs</dt>
 <dd class="col-sm-9">
   <ul class="list-group list-group-flush list-unstyled">
-    {% for run in object.runs.all %}
+    {% for run in object.model_runs.all %}
     <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
     {% endfor %}
   </ul>
