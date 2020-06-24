@@ -10,7 +10,7 @@ def index(request):
     ObjectData = namedtuple('object', 'name display_name count doc')
     object_models = models.all_object_models
     object_data = []
-    for (model_name, model_cls) in object_models.items():
+    for (model_name, model_cls) in sorted(object_models.items()):
         count = getattr(models, model_name).objects.count()
         name = model_name.lower() + 's'
         display_name = camel_case_to_spaces(model_name)

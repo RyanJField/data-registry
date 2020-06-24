@@ -4,6 +4,10 @@ import mysql.connector as mariadb
 from .managers import CustomUserManager
 
 
+#        pool_name='users_db_pool',
+#        pool_size=3,
+
+
 def _get_db_connection():
     connection = mariadb.connect(
         option_files='/home/ubuntu/.mysql/people.cnf',
@@ -19,6 +23,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def full_name(self):
+        conn = None
         try:
             conn = _get_db_connection()
             cursor = conn.cursor()
@@ -27,8 +32,11 @@ class User(AbstractUser):
             return row[0]
         except (ValueError, TypeError):
             return 'User Not Found'
+        finally:
+            if conn is not None: conn.close()
 
     def email(self):
+        conn = None
         try:
             conn = _get_db_connection()
             cursor = conn.cursor()
@@ -37,6 +45,8 @@ class User(AbstractUser):
             return row[0]
         except (ValueError, TypeError):
             return 'User Not Found'
+        finally:
+            if conn is not None: conn.close()
 
     def orgs(self):
         sql = '''
@@ -45,6 +55,7 @@ class User(AbstractUser):
           AND user_orgs.user_id = user.id
           AND user_orgs.org_id = org.id
         '''
+        conn = None
         try:
             conn = _get_db_connection()
             cursor = conn.cursor()
@@ -53,3 +64,5 @@ class User(AbstractUser):
             return [row[0] for row in rows]
         except (ValueError, TypeError):
             return []
+        finally:
+            if conn is not None: conn.close()

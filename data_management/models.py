@@ -158,7 +158,7 @@ class DataProduct(DataObject):
 
 class ProcessingScript(DataObject):
     """
-    A pProcessing script used to derive a DataProductVersion.
+    A processing script used to derive a DataProductVersion.
     """
     EXTRA_DISPLAY_FIELDS = ('versions',)
     store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE)

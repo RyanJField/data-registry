@@ -42,7 +42,7 @@ class IssueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Issue
-        fields = ('data_object', 'severity', 'desc')
+        fields = ('data_object', 'severity', 'description')
 
 
 for name, cls in models.all_models.items():
