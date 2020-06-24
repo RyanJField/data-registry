@@ -41,7 +41,7 @@ class DataObject(BaseModel):
             )
     issues = GenericRelation('Issue')
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         abstract = True
 
 
@@ -56,8 +56,9 @@ class DataObjectVersion(DataObject):
     def name(self):
         return '%s (version %s)' % (getattr(self, self.VERSIONED_OBJECT).name, self.version_identifier)
 
-    class Meta:
+    class Meta(DataObject.Meta):
         abstract = True
+        ordering = ['-version_identifier']
 
 
 class Issue(BaseModel):
@@ -142,6 +143,11 @@ class SourceVersion(DataObjectVersion):
     description = models.CharField(max_length=255)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['source', 'version_identifier'], name='source_version_unique_identifier')
+        ]
+
 
 class DataProduct(DataObject):
     """
@@ -174,6 +180,12 @@ class ProcessingScriptVersion(DataObjectVersion):
     store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['processing_script', 'version_identifier'],
+                                    name='processing_script_version_unique_identifier')
+        ]
+
 
 class DataProductVersion(DataObjectVersion):
     """
@@ -188,6 +200,12 @@ class DataProductVersion(DataObjectVersion):
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
     processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE, related_name='data_product_versions')
     source_versions = models.ManyToManyField(SourceVersion, blank=True)
+
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['data_product', 'version_identifier'],
+                                    name='data_product_version_unique_identifier')
+        ]
 
 
 class DataProductVersionComponent(DataObject):
@@ -218,6 +236,11 @@ class ModelVersion(DataObjectVersion):
     description = models.TextField(max_length=1024, null=False, blank=False)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
 
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['model', 'version_identifier'], name='model_version_unique_identifier')
+        ]
+
 
 class ModelRun(DataObject):
     """
@@ -231,6 +254,12 @@ class ModelRun(DataObject):
     inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='model_runs')
     outputs = models.ManyToManyField(DataProductVersion, blank=True, related_name='model_runs')
     supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta(DataObjectVersion.Meta):
+        constraints = [
+            models.UniqueConstraint(fields=['model_version', 'release_date'], name='model_run_unique_identifier')
+        ]
+        ordering = ['-release_date']
 
     @property
     def name(self):

@@ -25,7 +25,7 @@ SECRET_KEY = '91qh0bw%vj8jd(+s1dos++=thx3v165*jlejlt9l-e&2b1*@ak'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['data.scrc.uk']
+ALLOWED_HOSTS = ['data.scrc.uk', '127.0.0.1', 'localhost']
 
 
 # Application definition

@@ -79,6 +79,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 class BaseViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     # lookup_field = 'name'
 
     def get_queryset(self):
@@ -91,22 +92,13 @@ class BaseViewSet(viewsets.ModelViewSet):
         serializer.save(updated_by=self.request.user)
 
 
-class DataObjectViewSet(BaseViewSet):
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name']
-
-
-class DataObjectVersionViewSet(BaseViewSet):
-    filter_backends = [DjangoFilterBackend]
-
-
 for name, cls in models.all_models.items():
     data = {'model': cls, 'serializer_class': getattr(serializers, name + 'Serializer')}
     if name == 'ModelRun':
-        globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
+        data['filterset_fields'] = ['model_version', 'release_date']
     elif name.endswith('Version'):
         data['filterset_fields'] = ['version_identifier', cls.VERSIONED_OBJECT]
-        globals()[name + "ViewSet"] = type(name + "ViewSet", (DataObjectVersionViewSet,), data)
     else:
-        globals()[name + "ViewSet"] = type(name + "ViewSet", (DataObjectViewSet,), data)
+        data['filterset_fields'] = ['name']
+    globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
 
