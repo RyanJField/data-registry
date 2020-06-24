@@ -95,7 +95,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 for name, cls in models.all_models.items():
     data = {'model': cls, 'serializer_class': getattr(serializers, name + 'Serializer')}
     if name == 'ModelRun':
-        data['filterset_fields'] = ['model_version', 'release_date']
+        data['filterset_fields'] = ['model_version', 'release_id', 'release_date']
     elif name.endswith('Version'):
         data['filterset_fields'] = ['version_identifier', cls.VERSIONED_OBJECT]
     else:

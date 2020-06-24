@@ -1,0 +1,15 @@
+{% extends 'data_management/object_detail.html' %}
+
+{% block fields %}
+<dt class="col-sm-3">Data Product Version</dt>
+<dd class="col-sm-9"><a href="{% url 'dataproductversion' object.data_product_version.pk %}">{{ object.data_product_version }}</a></dd>
+
+<dt class="col-sm-3">Input of Model Runs</dt>
+<dd class="col-sm-9">
+  <ul class="list-group list-group-flush list-unstyled">
+    {% for run in object.model_runs.all %}
+    <li><a href="{% url 'modelrun' run.pk %}">{{ run }}</a></li>
+    {% endfor %}
+  </ul>
+</dd>
+{% endblock %}

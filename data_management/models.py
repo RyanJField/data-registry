@@ -2,9 +2,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
-from django.core import validators
 from dynamic_validator import ModelFieldRequiredMixin
-import uuid
 
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
@@ -16,7 +14,7 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
             editable=False,
             verbose_name='last updated by',
             )
-    last_updated = models.DateField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     EXTRA_DISPLAY_FIELDS = ()
     REQUIRED_FIELDS = ['name']
@@ -247,7 +245,8 @@ class ModelRun(DataObject):
     Run of a ModelVersion along with its associated input and outputs.
     """
     model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='model_runs')
-    release_date = models.DateField()
+    release_id = models.TextField(max_length=1024, null=False, blank=False)
+    release_date = models.DateTimeField()
     description = models.TextField(max_length=1024, null=True, blank=True)
     model_config = models.TextField(max_length=1024, null=True, blank=True)
     submission_script = models.TextField(max_length=1024, null=True, blank=True)
@@ -257,7 +256,7 @@ class ModelRun(DataObject):
 
     class Meta(DataObjectVersion.Meta):
         constraints = [
-            models.UniqueConstraint(fields=['model_version', 'release_date'], name='model_run_unique_identifier')
+            models.UniqueConstraint(fields=['model_version', 'release_id'], name='model_run_unique_identifier')
         ]
         ordering = ['-release_date']
 
