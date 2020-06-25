@@ -224,7 +224,7 @@ class DataProductVersionComponent(DataObject):
     data_product_version = models.ForeignKey(DataProductVersion, on_delete=models.CASCADE, related_name='components')
     name = models.CharField(max_length=255, null=False, blank=False, unique=False)
 
-    class Meta(DataObjectVersion.Meta):
+    class Meta(DataObject.Meta):
         constraints = [
             models.UniqueConstraint(fields=['data_product_version', 'name'],
                                     name='data_product_version_component_unique_identifier')
