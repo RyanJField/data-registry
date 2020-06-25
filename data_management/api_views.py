@@ -67,6 +67,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['username']
 
 
 class GroupViewSet(viewsets.ModelViewSet):
