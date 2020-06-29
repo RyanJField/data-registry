@@ -273,8 +273,8 @@ class ModelRun(DataObject):
     description = models.TextField(max_length=1024, null=True, blank=True)
     model_config = models.TextField(max_length=1024, null=True, blank=True)
     submission_script = models.TextField(max_length=1024, null=True, blank=True)
-    inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='model_runs')
-    outputs = models.ManyToManyField(DataProductVersion, blank=True, related_name='model_runs')
+    inputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='input_to_model_runs')
+    outputs = models.ManyToManyField(DataProductVersionComponent, blank=True, related_name='output_of_model_runs')
     supersedes = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta(DataObjectVersion.Meta):
