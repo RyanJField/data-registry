@@ -204,7 +204,8 @@ class DataProductVersion(DataObjectVersion):
     description = models.TextField(max_length=1024, null=False, blank=False)
     store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE)
     accessibility = models.ForeignKey(Accessibility, on_delete=models.CASCADE)
-    processing_script_version = models.ForeignKey(ProcessingScriptVersion, on_delete=models.CASCADE, related_name='data_product_versions')
+    processing_script_version = models.ForeignKey(ProcessingScriptVersion, null=True, blank=True,
+                                                  on_delete=models.CASCADE, related_name='data_product_versions')
     source_versions = models.ManyToManyField(SourceVersion, blank=True)
 
     class Meta(DataObjectVersion.Meta):
