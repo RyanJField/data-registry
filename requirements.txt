@@ -22,6 +22,7 @@ oauthlib==3.1.0
 pkg-resources==0.0.0
 protobuf==3.12.2
 prov==1.5.3
+psycopg2-binary==2.8.5
 pydot==1.4.1
 pyparsing==2.4.7
 python-dateutil==2.8.1

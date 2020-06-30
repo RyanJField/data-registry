@@ -196,7 +196,7 @@ class DataProductVersion(DataObjectVersion):
     Specific version of a DataProduct that is associated with a ModelRun.
     """
     VERSIONED_OBJECT = 'data_product'
-    EXTRA_DISPLAY_FIELDS = ('components', 'model_runs')
+    EXTRA_DISPLAY_FIELDS = ('components',)
     FILTERSET_FIELDS = ['version_identifier', VERSIONED_OBJECT]
 
     data_product = models.ForeignKey(DataProduct, on_delete=models.CASCADE, related_name='versions')
@@ -219,7 +219,7 @@ class DataProductVersionComponent(DataObject):
     """
     A component of a DataProductVersion being used as the input to a ModelRun.
     """
-    EXTRA_DISPLAY_FIELDS = ('model_runs',)
+    EXTRA_DISPLAY_FIELDS = ('input_to_model_runs', 'output_of_model_runs')
     FILTERSET_FIELDS = ['data_product_version', 'name']
 
     data_product_version = models.ForeignKey(DataProductVersion, on_delete=models.CASCADE, related_name='components')
