@@ -1,7 +1,7 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework import viewsets, permissions, views, renderers
+from rest_framework import viewsets, permissions, views, renderers, mixins
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import Group
@@ -62,7 +62,7 @@ class ProvReportView(views.APIView):
         return Response(value)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     queryset = get_user_model().objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
@@ -71,14 +71,22 @@ class UserViewSet(viewsets.ModelViewSet):
     filterset_fields = ['username']
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
-class BaseViewSet(viewsets.ModelViewSet):
+class BaseViewSet(mixins.CreateModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  viewsets.GenericViewSet):
+    """
+    Base class for all model API views. Allows for GET to retrieve lists of objects and single object, and
+    POST to create a new object.
+    """
+
     authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
