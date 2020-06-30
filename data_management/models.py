@@ -265,11 +265,11 @@ class ModelRun(DataObject):
     """
     Run of a ModelVersion along with its associated input and outputs.
     """
-    FILTERSET_FIELDS = ['model_version', 'release_id', 'release_date']
+    FILTERSET_FIELDS = ['model_version', 'run_id', 'run_date']
 
     model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name='model_runs')
-    release_id = models.TextField(max_length=1024, null=False, blank=False)
-    release_date = models.DateTimeField()
+    run_id = models.TextField(max_length=1024, null=False, blank=False)
+    run_date = models.DateTimeField()
     description = models.TextField(max_length=1024, null=True, blank=True)
     model_config = models.TextField(max_length=1024, null=True, blank=True)
     submission_script = models.TextField(max_length=1024, null=True, blank=True)
@@ -279,13 +279,13 @@ class ModelRun(DataObject):
 
     class Meta(DataObjectVersion.Meta):
         constraints = [
-            models.UniqueConstraint(fields=['model_version', 'release_id'], name='model_run_unique_identifier')
+            models.UniqueConstraint(fields=['model_version', 'run_id'], name='model_run_unique_identifier')
         ]
-        ordering = ['-release_date']
+        ordering = ['-run_date']
 
     @property
     def name(self):
-        return '%s (Run %s)' % (self.model_version.name, self.release_date)
+        return '%s (Run %s)' % (self.model_version.name, self.run_date)
 
 
 def _is_data_object_subclass(name, cls):
