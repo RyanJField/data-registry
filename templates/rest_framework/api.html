@@ -31,8 +31,10 @@ SCRC data registration and management system REST API
 
 {% block breadcrumbs %}
 {{ block.super }}
+{% if user.is_authenticated %}
 <div style="margin-top:1em">
   Click <a href="{% url 'get_token' %}">here</a> to create a new token for accessing the REST API or
   click <a href="{% url 'revoke_token' %}">here</a> to revoke an existing token.
 </div>
+{% endif %}
 {% endblock %}
