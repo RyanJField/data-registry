@@ -103,9 +103,9 @@ class StorageLocation(DataObject):
     store_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE)
     description = models.TextField(max_length=1024, null=True, blank=True)
     path = models.CharField(max_length=1024, null=True, blank=True)
-    # toml_text = models.TextField(max_length=1024, null=True, blank=True)
     hash = models.CharField(max_length=1024, null=True, blank=True)
-    local_cache_url = models.URLField(max_length=1024, null=True, blank=True)
+    valid_storage = models.BooleanField(default=True)
+    cached_storage_location = models.ForeignKey(StorageRoot, null=True, on_delete=models.CASCADE, related_name='cached_locations')
 
 
 class Accessibility(BaseModel):
