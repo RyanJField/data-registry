@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['data.scrc.uk', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     'grappelli',
     'rest_framework',
+    'rest_framework.authtoken',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -92,13 +93,13 @@ REST_FRAMEWORK = {
 
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'scrc',
-        'USER': 'scrc',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'NAME': 'scrc',
+        # 'USER': 'scrc',
+        # 'HOST': 'localhost',
+        # 'PORT': '5432',
     }
 }
 

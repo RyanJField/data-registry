@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
+from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 from collections import namedtuple
 
 from . import models
@@ -18,6 +20,23 @@ def index(request):
         object_data.append(ObjectData(name, display_name, count, doc))
     issues = models.Issue.objects.all()
     return render(request, 'data_management/index.html', {'objects': object_data, 'issues': issues})
+
+
+def get_token(request):
+    user_model = get_user_model()
+    user_name = request.user.username
+    user = user_model.objects.get_by_natural_key(user_name)
+    Token.objects.filter(user=user).delete()
+    token = Token.objects.get_or_create(user=user)
+    return HttpResponse('Your token is: %s' % token[0])
+
+
+def revoke_token(request):
+    user_model = get_user_model()
+    user_name = request.user.username
+    user = user_model.objects.get_by_natural_key(user_name)
+    Token.objects.filter(user=user).delete()
+    return HttpResponse('Your token has been deleted')
 
 
 class BaseListView(generic.ListView):

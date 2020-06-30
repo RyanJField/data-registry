@@ -1,4 +1,4 @@
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins
@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
-from . import authentication, models, serializers
+from . import models, serializers
 from .prov import generate_prov_document, serialize_prov_document
 
 
@@ -63,7 +63,7 @@ class ProvReportView(views.APIView):
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     queryset = get_user_model().objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -72,7 +72,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -87,7 +87,7 @@ class BaseViewSet(mixins.CreateModelMixin,
     POST to create a new object.
     """
 
-    authentication_classes = [SessionAuthentication, BasicAuthentication, authentication.GitHubTokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     # lookup_field = 'name'
