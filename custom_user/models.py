@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 import mysql.connector as mariadb
 
 from .managers import CustomUserManager
@@ -66,3 +66,7 @@ class User(AbstractUser):
             return []
         finally:
             if conn is not None: conn.close()
+
+    def clean(self):
+        AbstractBaseUser.clean(self)
+
