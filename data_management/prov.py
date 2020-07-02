@@ -5,15 +5,31 @@ import io
 import json
 
 
-def generate_prov_document(model_run):
+def generate_prov_document(code_run):
     doc = prov.model.ProvDocument()
     doc.set_default_namespace('http://data.scrc.uk')
-    mo = doc.entity('/api/model_output/' + str(model_run.id), (
+    cr = doc.activity(
+        '/api/code_run/' + str(code_run.id),
+        str(code_run.run_date),
+        None,
+        {prov.model.PROV_TYPE: 'run'}
+    )
+    for i, input in enumerate(code_run.inputs.all()):
+        ci = doc.entity('/api/object_component/' + str(input.id), (
+            (prov.model.PROV_TYPE, 'Component'),
+        ))
+        obj = input.object
+        o = doc.entity('/api/object/' + str(obj.id), (
+            (prov.model.PROV_TYPE, 'Object'),
+        ))
+        doc.association(o, ci)
+
+    mo = doc.entity('/api/model_output/' + str(code_run.id), (
         (prov.model.PROV_TYPE, 'file'),
-        ('path', model_run.url),
-        ('description', model_run.short_desc),
+        ('path', code_run.url),
+        ('description', code_run.short_desc),
     ))
-    for i, run in enumerate(model_run.model_runs.all()):
+    for i, run in enumerate(code_run.model_runs.all()):
         r = doc.activity(
             '/api/model_run/' + str(run.id),
             str(run.run_date),

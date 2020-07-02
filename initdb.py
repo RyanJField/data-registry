@@ -1,169 +1,116 @@
-from data_management.models import *
+from data_management import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
 user = get_user_model().objects.first()
 
-nfs = StorageType.objects.create(name='NFS')
-root = StorageRoot.objects.create(name='NFS Data Root', type=nfs, uri='file:///data')
-#store1 = DataStore.objects.create()
+models.Object.objects.all().delete()
+models.ObjectComponent.objects.all().delete()
+models.CodeRun.objects.all().delete()
 
-model = Model.objects.create(
+simple_network_sim = models.Object.objects.create(
+        updated_by=user,
         responsible_person=user,
-        updated_by=user, 
-        name='Test Model',
-        url='http://model.url',
-        short_desc='Test model',
-        )
+        name='simple_network_sim',
+        type='CODE',
+        version_identifier='0.1.0',
+        accessibility='public',
+        uri='git@github.com:ScottishCovidResponse/simple_network_sim.git',
+)
 
-model_version1 = ModelVersion.objects.create(
+human_pop_processing_script = models.Object.objects.create(
+        updated_by=user,
         responsible_person=user,
-        updated_by=user,
-        model=model,
-        version_identifier='1.0',
-        url='http://git.url',
-        short_desc='Version 1.0 of Test Model',
-        )
+        name='simple_network_sim human population processing script',
+        type='CODE',
+        version_identifier='0.1.0',
+        accessibility='public',
+        uri='git@github.com:ScottishCovidResponse/simple_network_sim.git',
+)
 
-model_version2 = ModelVersion.objects.create(
+pop_source = models.Object.objects.create(
+        updated_by=user,
         responsible_person=user,
-        updated_by=user,
-        model=model,
-        version_identifier='1.1',
-        url='http://git.url',
-        short_desc='Bugfix of version 1.0 of Test Model',
-        supersedes=model_version1
-        )
+        name='Human Population Data Source',
+        type='SOURCE',
+        version_identifier='1',
+        accessibility='public',
+        uri='https://doi.org/some/paper/doi',
+)
 
-model_version3 = ModelVersion.objects.create(
+pop_source_comp = models.ObjectComponent.objects.create(
+        updated_by=user,
         responsible_person=user,
-        updated_by=user,
-        model=model,
-        version_identifier='2.0',
-        url='http://git.url',
-        short_desc='Version 2.0 of Test Model',
-        supersedes=model_version1
-        )
+        object=pop_source,
+        name='Human Population',
+)
 
-model_input_type = ModelInputType.objects.create(
+pop = models.Object.objects.create(
         updated_by=user,
-        name='Parameter',
-        desc='Model parameters',
-        )
-
-model_input = ModelInput.objects.create(
         responsible_person=user,
-        updated_by=user,
-        name='Parameter 1',
-        model_input_type=model_input_type,
-        short_desc='Model parameter 1',
-        long_desc_url='',
-        )
+        name='Human Population Data',
+        type='DATA_PRODUCT',
+        version_identifier='1',
+        accessibility='public',
+        uri='https://github.com/ScottishCovidResponse/simple_network_sim/blob/master/sample_input_files/human/population/1/data.csv',
+)
 
-model_input_data_type = ModelInputDataType.objects.create(
+pop_comp = models.ObjectComponent.objects.create(
         updated_by=user,
-        name='Double',
-        desc='Float64 data',
-        )
-
-model_input_version = ModelInputVersion.objects.create(
         responsible_person=user,
-        updated_by=user,
-        model_input=model_input,
-        version_identifier='1.0',
-        model_input_data_type=model_input_data_type,
-        value='1.234',
-        short_desc='Version 1.0 of Parameter 1'
-        )
+        object=pop,
+        name='Human Population',
+)
 
-source_type = SourceType.objects.create(
+pop_script_run = models.CodeRun.objects.create(
         updated_by=user,
-        name='Research paper',
-        desc='Type for data coming from papers',
-        )
+        run_identifier='',
+        code=human_pop_processing_script,
+        run_date='2020-07-02T15:43:21Z',
+)
+pop_script_run.inputs.add(pop_source_comp)
+pop_script_run.outputs.add(pop_comp)
 
-source = Source.objects.create(
+out = models.Object.objects.create(
+        updated_by=user,
         responsible_person=user,
-        updated_by=user,
-        name='Test source',
-        doi='http://url.of.article',
-        source_type=source_type,
-        short_desc='Test research paper source',
-        )
+        name='simple_network_sim output file',
+        type='DATA_PRODUCT',
+        version_identifier='1',
+        accessibility='public',
+        uri='ftp://server.com/some/stored/data',
+)
 
-processing_script = ProcessingScript.objects.create(
+out_comp = models.ObjectComponent.objects.create(
+        updated_by=user,
         responsible_person=user,
+        object=out,
+        name='simple_network_sim output',
+)
+
+sns_run = models.CodeRun.objects.create(
         updated_by=user,
-        name='Test script',
-        url='http://url.of.script',
-        )
+        run_identifier='',
+        code=simple_network_sim,
+        run_date='2020-07-02T15:43:21Z',
+)
+sns_run.inputs.add(pop_comp)
+sns_run.outputs.add(out_comp)
 
-processing_script_version = ProcessingScriptVersion.objects.create(
-        responsible_person=user,
+models.Issue.objects.create(
         updated_by=user,
-        version_identifier='1.0',
-        processing_script=processing_script,
-        url='http://url.of_script.version',
-        )
-
-source_version = SourceVersion.objects.create(
-        responsible_person=user,
-        updated_by=user,
-        source=source,
-        version_identifier='1.0',
-        doi='http://doi.of.data',
-        url='',
-        short_desc='Version 1.0 of Test script',
-        processing_script_version=processing_script_version,
-        )
-
-model_input_version.source_versions.add(source_version)
-model_input_version.save()
-
-model_run = ModelRun.objects.create(
-        responsible_person=user,
-        updated_by=user,
-        model_version=model_version3,
-        run_date='2020-05-18',
-        short_desc='Run of test model on 2020-05-18',
-        url='',
-        )
-
-model_run.model_input_versions.add(model_input_version)
-
-model_output = ModelOutput.objects.create(
-        responsible_person=user,
-        updated_by=user,
-        name='Output of test model run on 2020-05-18',
-        release_date='2020-05-18',
-        )
-
-model_run.model_outputs.add(model_output)
-model_run.save()
-
-Issue.objects.create(
-        updated_by=user,
-        content_type=ContentType.objects.get_for_model(Model),
-        object_id=model.id,
-        name='Bad Model',
-        desc='Don\'t use this model.',
-        severity=3,
-        )
-
-Issue.objects.create(
-        updated_by=user,
-        content_type=ContentType.objects.get_for_model(ModelVersion),
-        object_id=model_version1.id,
-        name='Problem with this version',
-        desc='Issue with version 1.0 of the model.',
+        content_type=ContentType.objects.get_for_model(models.ObjectComponent),
+        object_id=pop_comp.id,
+        name='Bad Parameter',
+        description='This parameter is no good.',
         severity=8,
         )
 
-Issue.objects.create(
+models.Issue.objects.create(
         updated_by=user,
-        content_type=ContentType.objects.get_for_model(ModelInputVersion),
-        object_id=model_input.id,
-        name='Bad Parameter',
-        desc='This parameter is no good.',
+        content_type=ContentType.objects.get_for_model(models.Object),
+        object_id=simple_network_sim.id,
+        name='Problem with this version',
+        description='Issue with version 1.0 of the model.',
         severity=2,
         )

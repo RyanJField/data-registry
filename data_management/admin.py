@@ -32,8 +32,9 @@ class BaseAdmin(admin.ModelAdmin):
         return super().save_model(request, obj, form, change)
 
 
-class DataObjectAdmin(BaseAdmin):
+class ObjectAdmin(BaseAdmin):
     inlines = (IssueInline,)
+    readonly_fields = ('updated_by', 'last_updated', 'name')
 
     def save_related(self, request, form, formsets, change):
         for formset in formsets:
@@ -46,10 +47,6 @@ class DataObjectAdmin(BaseAdmin):
         if 'responsible_person' in form.base_fields:
             form.base_fields['responsible_person'].initial = request.user
         return form
-
-
-class DataObjectVersionAdmin(DataObjectAdmin):
-    readonly_fields = ('updated_by', 'last_updated', 'name')
 
 
 class IssueAdmin(BaseAdmin):
@@ -72,12 +69,7 @@ class IssueAdmin(BaseAdmin):
         return False
 
 
-for _, cls in models.all_models.items():
-    if isinstance(cls, models.DataObjectVersion):
-        admin.site.register(cls, DataObjectVersionAdmin)
-    elif isinstance(cls, models.DataObject):
-        admin.site.register(cls, DataObjectAdmin)
-    elif isinstance(cls, models.Issue):
-        admin.site.register(models.Issue, IssueAdmin)
-    else:
-        admin.site.register(cls, BaseAdmin)
+admin.site.register(models.Object, ObjectAdmin)
+admin.site.register(models.ObjectComponent, ObjectAdmin)
+admin.site.register(models.CodeRun, ObjectAdmin)
+admin.site.register(models.Issue, IssueAdmin)
