@@ -88,7 +88,30 @@ class URIField(models.URLField):
 
 class StorageRoot(BaseModel):
     """
-    The root location of a storage cache where model files are stored.
+***The root location of a storage cache where model files are stored.***
+
+### Writeable Fields:
+`name`: Name of the StorageRoot, unique in the context of `StorageRoot`s
+
+`description`: Description of the StorageRoot
+
+`uri`: URI (including protocol) to the root of a `StorageLocation`, when prepended to a `StorageLocation` `path`
+produces a complete URI to a file. Examples:
+
+    - https://somewebsite.com/
+    - ftp://host/ (ftp://username:password@host:port/)
+    - ssh://host/
+    - file:///someroot/ (file://C:\)
+    - github://org:repo@sha/ (github://org:repo/ (master))
+
+`type`: Reference to the `StorageType` of this `StorageRoot`
+
+### Read-only Fields:
+`url`: url link to the instance of the `StorageRoot`, final integer is the `StorageRoot`'s id
+
+`last_updated`: datetime that this record was last updated
+
+`updated_by`: id of the user that updated this record
     """
     type = models.ForeignKey(StorageType, on_delete=models.CASCADE, null=False)
     description = models.TextField(max_length=1024, null=True, blank=True)
