@@ -1,7 +1,6 @@
 from django.db import models
 from dynamic_validator import ModelFieldRequiredMixin
 from django.contrib.auth import get_user_model
-from django.core import validators
 import semantic_version.django_fields
 
 
@@ -50,8 +49,28 @@ class Object(BaseModel):
     """
     Data objects.
     """
+    EXTRA_DISPLAY_FIELDS = (
+        'components',
+        'data_product',
+        'code_repo_release',
+        'external_object',
+        'quality_control',
+        'authors',
+        'licences',
+        'keywords',
+    )
+    FILTERSET_FIELDS = (
+        'last_updated',
+        'updated_by',
+        'storage_location',
+        'data_product',
+        'code_repo_release',
+        'external_object',
+    )
+
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
-    storage_location = models.ForeignKey('StorageLocation', on_delete=models.CASCADE, null=False)
+    storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
+                                            related_name='location_for_object')
 
     def name(self):
         if self.storage_location:
@@ -148,7 +167,7 @@ class ExternalObject(BaseModel):
 
 
 class QualityControlled(BaseModel):
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='quality_control')
+    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='quality_control')
 
 
 class Keyword(BaseModel):

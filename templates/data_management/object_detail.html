@@ -69,6 +69,16 @@
       {% endif %}
     </dl>
 
+    {% if object.components.count %}
+    <h3>Components</h3>
+    <dl class="row">
+      {% for component in object.components.all %}
+      <dt class="col-sm-3">Name</dt>
+      <dd class="col-sm-9">{{ component.name }}</dd>
+      {% endfor %}
+    </dl>
+    {% endif %}
+
     {% if object.licences.count %}
     <h3>Licences</h3>
     <dl class="row">
