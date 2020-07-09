@@ -25,14 +25,14 @@ class IssueInline(GenericStackedInline):
 
 class BaseAdmin(admin.ModelAdmin):
     readonly_fields = ('updated_by', 'last_updated')
-    list_display = ('name', 'last_updated')
+    list_display = ('last_updated',)
 
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
 
 
-class DataObjectAdmin(BaseAdmin):
+class ObjectAdmin(BaseAdmin):
     inlines = (IssueInline,)
 
     def save_related(self, request, form, formsets, change):
@@ -40,16 +40,6 @@ class DataObjectAdmin(BaseAdmin):
             for f in formset:
                 f.updated_by = request.user
         return super().save_related(request, form, formsets, change)
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if 'responsible_person' in form.base_fields:
-            form.base_fields['responsible_person'].initial = request.user
-        return form
-
-
-class DataObjectVersionAdmin(DataObjectAdmin):
-    readonly_fields = ('updated_by', 'last_updated', 'name')
 
 
 class IssueAdmin(BaseAdmin):
@@ -73,11 +63,9 @@ class IssueAdmin(BaseAdmin):
 
 
 for _, cls in models.all_models.items():
-    if isinstance(cls, models.DataObjectVersion):
-        admin.site.register(cls, DataObjectVersionAdmin)
-    elif isinstance(cls, models.DataObject):
-        admin.site.register(cls, DataObjectAdmin)
+    if isinstance(cls, models.Object):
+        admin.site.register(cls, ObjectAdmin)
     elif isinstance(cls, models.Issue):
-        admin.site.register(models.Issue, IssueAdmin)
+        admin.site.register(cls, IssueAdmin)
     else:
         admin.site.register(cls, BaseAdmin)

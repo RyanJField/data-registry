@@ -10,14 +10,9 @@ from . import models
 
 def index(request):
     ObjectData = namedtuple('object', 'name display_name count doc')
-    object_models = models.all_object_models
-    object_data = []
-    for (model_name, model_cls) in sorted(object_models.items()):
-        count = getattr(models, model_name).objects.count()
-        name = model_name.lower() + 's'
-        display_name = camel_case_to_spaces(model_name)
-        doc = model_cls.__doc__
-        object_data.append(ObjectData(name, display_name, count, doc))
+    object_data = [
+        ObjectData('objects', 'Object', models.Object.objects.count(), models.Object.__doc__)
+    ]
     issues = models.Issue.objects.all()
     return render(request, 'data_management/index.html', {'objects': object_data, 'issues': issues})
 
@@ -62,7 +57,7 @@ class BaseDetailView(generic.DetailView):
 
 
 # Generate ListView and DetailView classes for each model that subclasses DataObject
-for name, cls in models.all_object_models.items():
+for name, cls in models.all_models.items():
     data = {'model': cls, 'model_name': name}
     globals()[name + "ListView"] = type(name + "ListView", (BaseListView,), data)
     globals()[name + "DetailView"] = type(name + "DetailView", (BaseDetailView,), data)

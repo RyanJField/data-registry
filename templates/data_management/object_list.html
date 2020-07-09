@@ -16,7 +16,7 @@
     <ul class="list-group list-group-flush">
       {% for obj in object_list %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{% url obj.reverse_name obj.id %}">{{ obj.name }}</a>
+        <a href="{% url obj.reverse_name obj.id %}">{{ obj }}</a>
         <span
             class="badge {{ obj.issues.count | yesno:'badge-warning,badge-success' }}">Issues: {{ obj.issues.count }}</span>
       </li>
