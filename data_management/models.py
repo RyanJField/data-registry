@@ -1,7 +1,8 @@
+import semver
+from django.core.exceptions import ValidationError
 from django.db import models
 from dynamic_validator import ModelFieldRequiredMixin
 from django.contrib.auth import get_user_model
-import semantic_version.django_fields
 
 
 PATH_FIELD_LENGTH = 1024 * 8
@@ -213,13 +214,44 @@ class Namespace(BaseModel):
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
 
+class VersionValidator:
+    message = 'Version %(value)s is not a valid semantic version.'
+    code = 'invalid_version'
+
+    def __call__(self, value):
+        try:
+            semver.parse(value)
+        except ValueError:
+            raise ValidationError(
+                self.message,
+                code=self.code,
+                params={
+                    'value': value,
+                }
+            )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.message == other.message and
+            self.code == other.code
+        )
+
+
+class VersionField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 1024
+        kwargs['validators'] = (VersionValidator(),)
+        super().__init__(*args, **kwargs)
+
+
 class DataProduct(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    version = semantic_version.django_fields.VersionField()
+    version = VersionField()
 
 
 class CodeRepoRelease(BaseModel):
@@ -227,7 +259,7 @@ class CodeRepoRelease(BaseModel):
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    version = semantic_version.django_fields.VersionField()
+    version = VersionField()
     website = models.URLField(null=True, blank=True)
 
 
