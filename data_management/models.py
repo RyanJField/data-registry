@@ -38,6 +38,8 @@ class Issue(BaseModel):
     """
     A quality issue which can be attached to any data object in the registry.
     """
+    FILTERSET_FIELDS = ('name',)
+
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     severity = models.PositiveSmallIntegerField(default=1)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
@@ -86,12 +88,16 @@ class Object(BaseModel):
 
 
 class ObjectComponent(BaseModel):
+    FILTERSET_FIELDS = ('name', 'last_updated', 'object')
+
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
 
 
 class CodeRun(BaseModel):
+    FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
+
     code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=False)
     model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=False)
     submission_script = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='submission_script_of', null=False)
@@ -114,6 +120,8 @@ class StorageRoot(BaseModel):
     """
     The root location of a storage cache where model files are stored.
     """
+    FILTERSET_FIELDS = ('name', 'root', 'last_updated', 'accessibility')
+
     PUBLIC = 0
     PRIVATE = 1
     CHOICES = (
@@ -135,6 +143,8 @@ class StorageLocation(BaseModel):
     """
     The storage location of a model file relative to a StorageRoot.
     """
+    FILTERSET_FIELDS = ('last_updated', 'path', 'hash')
+
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
     hash = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     storage_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE, related_name='locations')
@@ -147,6 +157,8 @@ class StorageLocation(BaseModel):
 
 
 class Source(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
+
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     abbreviation = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     website = models.URLField(null=True, blank=True)
@@ -156,6 +168,8 @@ class Source(BaseModel):
 
 
 class ExternalObject(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'doi_or_unique_name', 'release_date', 'title', 'version')
+
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
     doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False, unique=True)
     primary_not_supplement = models.BooleanField(default=True)
@@ -172,26 +186,36 @@ class QualityControlled(BaseModel):
 
 
 class Keyword(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'keyphrase')
+
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
     keyphrase = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
 
 class Author(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
+
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
     family_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     personal_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
 
 class Licence(BaseModel):
+    FILTERSET_FIELDS = ('last_updated',)
+
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
     licence_info = models.TextField()
 
 
 class Namespace(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'name')
+
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
 
 class DataProduct(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
+
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
@@ -199,6 +223,8 @@ class DataProduct(BaseModel):
 
 
 class CodeRepoRelease(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'name', 'version')
+
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     version = semantic_version.django_fields.VersionField()
@@ -206,6 +232,8 @@ class CodeRepoRelease(BaseModel):
 
 
 class KeyValue(BaseModel):
+    FILTERSET_FIELDS = ('last_updated', 'key')
+
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='metadata')
     key = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     value = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
