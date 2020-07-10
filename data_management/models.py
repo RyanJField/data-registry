@@ -1,6 +1,7 @@
 import semver
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.deconstruct import deconstructible
 from dynamic_validator import ModelFieldRequiredMixin
 from django.contrib.auth import get_user_model
 
@@ -214,6 +215,7 @@ class Namespace(BaseModel):
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
 
+@deconstructible
 class VersionValidator:
     message = 'Version %(value)s is not a valid semantic version.'
     code = 'invalid_version'

@@ -68,5 +68,5 @@ class User(AbstractUser):
             if conn is not None: conn.close()
 
     def clean(self):
+        # Skip the AbstractUser.clean as this tries to set self.email
         AbstractBaseUser.clean(self)
-
