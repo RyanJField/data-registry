@@ -24,6 +24,7 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
     EXTRA_DISPLAY_FIELDS = ()
     REQUIRED_FIELDS = ()
     FILTERSET_FIELDS = ()
+    ADMIN_LIST_FIELDS = ()
 
     def reverse_name(self):
         return self.__class__.__name__.lower()
@@ -72,6 +73,7 @@ class Object(BaseModel):
         'code_repo_release',
         'external_object',
     )
+    ADMIN_LIST_FIELDS = ('name',)
 
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
     storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
@@ -91,14 +93,23 @@ class Object(BaseModel):
 
 class ObjectComponent(BaseModel):
     FILTERSET_FIELDS = ('name', 'last_updated', 'object')
+    ADMIN_LIST_FIELDS = ('object', 'name')
 
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('object', 'name'),
+                name='unique_object_component'),
+        ]
+
 
 class CodeRun(BaseModel):
     FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
+    ADMIN_LIST_FIELDS = ('run_identifier',)
 
     code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=False)
     model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=False)
@@ -107,6 +118,13 @@ class CodeRun(BaseModel):
     run_identifier = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of')
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('run_identifier',),
+                name='unique_code_run'),
+        ]
 
 
 ###############################################################################
@@ -123,6 +141,7 @@ class StorageRoot(BaseModel):
     The root location of a storage cache where model files are stored.
     """
     FILTERSET_FIELDS = ('name', 'root', 'last_updated', 'accessibility')
+    ADMIN_LIST_FIELDS = ('name',)
 
     PUBLIC = 0
     PRIVATE = 1
@@ -133,6 +152,13 @@ class StorageRoot(BaseModel):
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     root = URIField(null=False, blank=False)
     accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name',),
+                name='unique_storage_root'),
+        ]
 
     def is_public(self):
         return self.accessibility == self.PUBLIC
@@ -146,10 +172,18 @@ class StorageLocation(BaseModel):
     The storage location of a model file relative to a StorageRoot.
     """
     FILTERSET_FIELDS = ('last_updated', 'path', 'hash')
+    ADMIN_LIST_FIELDS = ('storage_root', 'path')
 
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
     hash = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     storage_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE, related_name='locations')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('storage_root', 'path', 'hash'),
+                name='unique_storage_location'),
+        ]
 
     def full_uri(self):
         return self.storage_root.root + '/' + self.path
@@ -160,10 +194,18 @@ class StorageLocation(BaseModel):
 
 class Source(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
+    ADMIN_LIST_FIELDS = ('name',)
 
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     abbreviation = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     website = models.URLField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name',),
+                name='unique_source'),
+        ]
 
     def __str__(self):
         return self.name
@@ -171,6 +213,7 @@ class Source(BaseModel):
 
 class ExternalObject(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'doi_or_unique_name', 'release_date', 'title', 'version')
+    ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
     doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False, unique=True)
@@ -182,20 +225,38 @@ class ExternalObject(BaseModel):
     original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
     version = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('doi_or_unique_name', 'title', 'version'),
+                name='unique_external_object'),
+        ]
+
 
 class QualityControlled(BaseModel):
+    ADMIN_LIST_FIELDS = ('object',)
+
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='quality_control')
 
 
 class Keyword(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'keyphrase')
+    ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
     keyphrase = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('object', 'keyphrase'),
+                name='unique_keyword'),
+        ]
+
 
 class Author(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
+    ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
     family_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
@@ -204,6 +265,7 @@ class Author(BaseModel):
 
 class Licence(BaseModel):
     FILTERSET_FIELDS = ('last_updated',)
+    ADMIN_LIST_FIELDS = ('object',)
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
     licence_info = models.TextField()
@@ -211,8 +273,16 @@ class Licence(BaseModel):
 
 class Namespace(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name')
+    ADMIN_LIST_FIELDS = ('name',)
 
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name',),
+                name='unique_namespace'),
+        ]
 
 
 @deconstructible
@@ -249,28 +319,52 @@ class VersionField(models.CharField):
 
 class DataProduct(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
+    ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     version = VersionField()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('namespace', 'name', 'version'),
+                name='unique_data_product'),
+        ]
+
 
 class CodeRepoRelease(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name', 'version')
+    ADMIN_LIST_FIELDS = ('name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     version = VersionField()
     website = models.URLField(null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'version'),
+                name='unique_code_repo_release'),
+        ]
+
 
 class KeyValue(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'key')
+    ADMIN_LIST_FIELDS = ('object', 'key')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='metadata')
     key = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     value = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('object', 'key'),
+                name='unique_key_value'),
+        ]
 
 
 def _is_base_model_subclass(name, cls):
