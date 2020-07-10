@@ -163,7 +163,7 @@ class ExternalObject(BaseModel):
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='external_objects')
     original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
-    version = semantic_version.django_fields.VersionField()
+    version = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
 
 class QualityControlled(BaseModel):
