@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 import semantic_version.django_fields
 
 
+PATH_FIELD_LENGTH = 1024 * 8
 CHAR_FIELD_LENGTH = 1024
 TEXT_FIELD_LENGTH = 1024**2
 
@@ -134,7 +135,7 @@ class StorageLocation(BaseModel):
     """
     The storage location of a model file relative to a StorageRoot.
     """
-    path = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
     hash = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     storage_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE, related_name='locations')
 
