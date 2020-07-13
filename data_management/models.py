@@ -91,10 +91,11 @@ class Object(BaseModel):
     def name(self):
         if self.storage_location:
             return str(self.storage_location)
-        elif self.external_object:
-            return str(self.external_object)
         else:
-            return super().__str__(self)
+            try:
+                return str(self.external_object)
+            except ExternalObject.DoesNotExist:
+                return super().__str__()
 
     def __str__(self):
         return self.name()
@@ -293,6 +294,9 @@ class Namespace(BaseModel):
                 fields=('name',),
                 name='unique_namespace'),
         ]
+
+    def __str__(self):
+        return self.name
 
 
 @deconstructible

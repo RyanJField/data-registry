@@ -9,12 +9,23 @@ from . import models
 
 
 def index(request):
+    data_products = models.Object.objects.filter(data_product__isnull=False)
+    external_objects = models.Object.objects.filter(external_object__isnull=False)
+    code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
+
     ObjectData = namedtuple('object', 'name display_name count doc')
     object_data = [
         ObjectData('objects', 'Object', models.Object.objects.count(), models.Object.__doc__)
     ]
     issues = models.Issue.objects.all()
-    return render(request, 'data_management/index.html', {'objects': object_data, 'issues': issues})
+    ctx = {
+        'objects': object_data,
+        'issues': issues,
+        'data_products': data_products,
+        'external_objects': external_objects,
+        'code_repo_release': code_repo_release,
+    }
+    return render(request, 'data_management/index.html', ctx)
 
 
 def get_token(request):
