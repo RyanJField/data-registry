@@ -41,14 +41,22 @@ class Issue(BaseModel):
     """
     A quality issue which can be attached to any data object in the registry.
     """
-    FILTERSET_FIELDS = ('name',)
+    FILTERSET_FIELDS = ('severity',)
+    SHORT_DESC_LENGTH = 40
 
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     severity = models.PositiveSmallIntegerField(default=1)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
+    def short_desc(self):
+        if self.description is None:
+            return ''
+        elif len(self.description) <= self.SHORT_DESC_LENGTH:
+            return self.description
+        else:
+            return self.description[:self.SHORT_DESC_LENGTH - 3] + '...'
+
     def __str__(self):
-        return '%s [Severity %s]' % (self.name, self.severity)
+        return '%s [Severity %s]' % (self.short_desc(), self.severity)
 
 
 class Object(BaseModel):
@@ -78,6 +86,7 @@ class Object(BaseModel):
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
     storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
                                             related_name='location_for_object')
+    description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
     def name(self):
         if self.storage_location:
@@ -95,9 +104,10 @@ class ObjectComponent(BaseModel):
     FILTERSET_FIELDS = ('name', 'last_updated', 'object')
     ADMIN_LIST_FIELDS = ('object', 'name')
 
+    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
     name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
+    description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -186,7 +196,7 @@ class StorageLocation(BaseModel):
         ]
 
     def full_uri(self):
-        return self.storage_root.root + '/' + self.path
+        return self.storage_root.root + self.path
 
     def __str__(self):
         return self.full_uri()

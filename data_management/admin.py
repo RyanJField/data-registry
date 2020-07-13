@@ -16,14 +16,14 @@ class BaseAdmin(admin.ModelAdmin):
 
 class IssueAdmin(BaseAdmin):
     readonly_fields = ('updated_by', 'last_updated', 'linked_objects')
-    list_display = ('name', 'severity', 'last_updated')
+    list_display = ('short_desc', 'severity', 'last_updated')
 
     @classmethod
     def linked_objects(cls, issue):
         return list(issue.object_issues.all()) + list(issue.component_issues.all())
 
-    def has_add_permission(self, request, obj=None):
-        return False
+    # def has_add_permission(self, request, obj=None):
+    #     return False
 
 
 for name, cls in models.all_models.items():
