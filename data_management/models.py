@@ -117,18 +117,21 @@ class ObjectComponent(BaseModel):
                 name='unique_object_component'),
         ]
 
+    def __str__(self):
+        return self.name
+
 
 class CodeRun(BaseModel):
     FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
     ADMIN_LIST_FIELDS = ('run_identifier',)
 
-    code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=False)
-    model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=False)
-    submission_script = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='submission_script_of', null=False)
-    run_date = models.DateTimeField(null=False)
+    code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=True, blank=True)
+    model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=True, blank=True)
+    submission_script = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='submission_script_of', null=False, blank=False)
+    run_date = models.DateTimeField(null=False, blank=False)
     run_identifier = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of')
-    outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of')
+    inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
+    outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
 
     class Meta:
         constraints = [
@@ -136,6 +139,11 @@ class CodeRun(BaseModel):
                 fields=('run_identifier',),
                 name='unique_code_run'),
         ]
+
+    def __str__(self):
+        if self.code_repo:
+            return '%s run %s' % (self.code_repo, self.run_identifier)
+        return self.run_identifier
 
 
 ###############################################################################
@@ -243,6 +251,9 @@ class ExternalObject(BaseModel):
                 name='unique_external_object'),
         ]
 
+    def __str__(self):
+        return '%s %s version %s' % (self.doi_or_unique_name, self.title, self.version)
+
 
 class QualityControlled(BaseModel):
     ADMIN_LIST_FIELDS = ('object',)
@@ -264,6 +275,9 @@ class Keyword(BaseModel):
                 name='unique_keyword'),
         ]
 
+    def __str__(self):
+        return self.keyphrase
+
 
 class Author(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
@@ -272,6 +286,9 @@ class Author(BaseModel):
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
     family_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     personal_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+
+    def __str__(self):
+        return '%s, %s' % (self.family_name, self.personal_name)
 
 
 class Licence(BaseModel):
@@ -347,6 +364,9 @@ class DataProduct(BaseModel):
                 name='unique_data_product'),
         ]
 
+    def __str__(self):
+        return '%s:%s version %s' % (self.namespace, self.name, self.version)
+
 
 class CodeRepoRelease(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name', 'version')
@@ -364,6 +384,9 @@ class CodeRepoRelease(BaseModel):
                 name='unique_code_repo_release'),
         ]
 
+    def __str__(self):
+        return '%s version %s' % (self.name, self.version)
+
 
 class KeyValue(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'key')
@@ -379,6 +402,9 @@ class KeyValue(BaseModel):
                 fields=('object', 'key'),
                 name='unique_key_value'),
         ]
+
+    def __str__(self):
+        return self.key
 
 
 def _is_base_model_subclass(name, cls):
