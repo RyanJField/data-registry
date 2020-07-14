@@ -1,8 +1,9 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework import viewsets, permissions, views, renderers, mixins
+from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
+from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
@@ -78,6 +79,11 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class APIIntegrityError(exceptions.APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_code = 'integrity_error'
+
+
 class BaseViewSet(mixins.CreateModelMixin,
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
@@ -96,10 +102,16 @@ class BaseViewSet(mixins.CreateModelMixin,
         return self.model.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(updated_by=self.request.user)
+        try:
+            serializer.save(updated_by=self.request.user)
+        except IntegrityError as ex:
+            raise APIIntegrityError(str(ex))
 
     def perform_update(self, serializer):
-        serializer.save(updated_by=self.request.user)
+        try:
+            serializer.save(updated_by=self.request.user)
+        except IntegrityError as ex:
+            raise APIIntegrityError(str(ex))
 
 
 for name, cls in models.all_models.items():
