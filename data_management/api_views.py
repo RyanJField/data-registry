@@ -1,10 +1,15 @@
+from copy import deepcopy
+
+from django import forms
+from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
 from django.db import IntegrityError
-from django_filters.rest_framework import DjangoFilterBackend
+from django.db import models as db_models
+from django_filters.rest_framework import DjangoFilterBackend, filterset
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -84,6 +89,31 @@ class APIIntegrityError(exceptions.APIException):
     default_code = 'integrity_error'
 
 
+class RegexFilter(filters.Filter):
+    def __init__(self, *args, **kwargs):
+        kwargs['lookup_expr'] = 'regex'
+        super().__init__(*args, **kwargs)
+    field_class = forms.CharField
+
+
+class CustomFilterSet(filterset.FilterSet):
+    FILTER_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
+    FILTER_DEFAULTS.update({
+        db_models.CharField: {'filter_class': RegexFilter},
+        db_models.TextField: {'filter_class': RegexFilter},
+        db_models.SlugField: {'filter_class': RegexFilter},
+        db_models.EmailField: {'filter_class': RegexFilter},
+        db_models.FilePathField: {'filter_class': RegexFilter},
+        db_models.URLField: {'filter_class': RegexFilter},
+        db_models.GenericIPAddressField: {'filter_class': RegexFilter},
+        db_models.CommaSeparatedIntegerField: {'filter_class': RegexFilter},
+    })
+
+
+class CustomDjangoFilterBackend(DjangoFilterBackend):
+    default_filter_set = CustomFilterSet
+
+
 class BaseViewSet(mixins.CreateModelMixin,
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
@@ -95,7 +125,7 @@ class BaseViewSet(mixins.CreateModelMixin,
 
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [CustomDjangoFilterBackend]
     # lookup_field = 'name'
 
     def get_queryset(self):

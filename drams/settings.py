@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_bootstrap_breadcrumbs',
     'django.contrib.sites',
     'django_extensions',
+    'crispy_forms',
     'dynamic_validator',
     'allauth',
     'allauth.account',

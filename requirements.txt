@@ -35,3 +35,4 @@ six==1.14.0
 sqlparse==0.3.1
 urllib3==1.25.9
 semver==2.10.2
+django-crispy-forms==1.9.2
