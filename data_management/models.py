@@ -1,9 +1,8 @@
-import semver
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.deconstruct import deconstructible
 from dynamic_validator import ModelFieldRequiredMixin
 from django.contrib.auth import get_user_model
+
+from . import validators
 
 
 PATH_FIELD_LENGTH = 1024 * 8
@@ -32,6 +31,29 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
     class Meta:
         abstract = True
         ordering = ['-last_updated']
+
+
+###############################################################################
+# Custom Fields
+
+class URIField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 1024
+        super().__init__(*args, **kwargs)
+
+
+class NameField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 1024
+        kwargs['validators'] = (validators.NameValidator(),)
+        super().__init__(*args, **kwargs)
+
+
+class VersionField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 1024
+        kwargs['validators'] = (validators.VersionValidator(),)
+        super().__init__(*args, **kwargs)
 
 
 ###############################################################################
@@ -106,7 +128,7 @@ class ObjectComponent(BaseModel):
     ADMIN_LIST_FIELDS = ('object', 'name')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
 
@@ -149,12 +171,6 @@ class CodeRun(BaseModel):
 ###############################################################################
 # Metadata objects
 
-class URIField(models.CharField):
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 1024
-        super().__init__(*args, **kwargs)
-
-
 class StorageRoot(BaseModel):
     """
     The root location of a storage cache where model files are stored.
@@ -168,7 +184,7 @@ class StorageRoot(BaseModel):
         (PUBLIC, 'Public'),
         (PRIVATE, 'Private'),
     )
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
     root = URIField(null=False, blank=False)
     accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
 
@@ -215,8 +231,8 @@ class Source(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
     ADMIN_LIST_FIELDS = ('name',)
 
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    abbreviation = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
+    abbreviation = NameField(null=False, blank=False)
     website = models.URLField(null=True, blank=True)
 
     class Meta:
@@ -235,7 +251,7 @@ class ExternalObject(BaseModel):
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
-    doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False, unique=True)
+    doi_or_unique_name = NameField(null=False, blank=False, unique=True)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
@@ -284,8 +300,8 @@ class Author(BaseModel):
     ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
-    family_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    personal_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    family_name = NameField(null=False, blank=False)
+    personal_name = NameField(null=False, blank=False)
 
     def __str__(self):
         return '%s, %s' % (self.family_name, self.personal_name)
@@ -303,7 +319,7 @@ class Namespace(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'name')
     ADMIN_LIST_FIELDS = ('name',)
 
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
 
     class Meta:
         constraints = [
@@ -316,45 +332,13 @@ class Namespace(BaseModel):
         return self.name
 
 
-@deconstructible
-class VersionValidator:
-    message = 'Version %(value)s is not a valid semantic version.'
-    code = 'invalid_version'
-
-    def __call__(self, value):
-        try:
-            semver.parse(value)
-        except ValueError:
-            raise ValidationError(
-                self.message,
-                code=self.code,
-                params={
-                    'value': value,
-                }
-            )
-
-    def __eq__(self, other):
-        return (
-            isinstance(other, self.__class__) and
-            self.message == other.message and
-            self.code == other.code
-        )
-
-
-class VersionField(models.CharField):
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 1024
-        kwargs['validators'] = (VersionValidator(),)
-        super().__init__(*args, **kwargs)
-
-
 class DataProduct(BaseModel):
     FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
     version = VersionField()
 
     class Meta:
@@ -373,7 +357,7 @@ class CodeRepoRelease(BaseModel):
     ADMIN_LIST_FIELDS = ('name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
-    name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    name = NameField(null=False, blank=False)
     version = VersionField()
     website = models.URLField(null=True, blank=True)
 

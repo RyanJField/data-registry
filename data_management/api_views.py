@@ -9,7 +9,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
 from django.db import IntegrityError
-from django.db import models as db_models
 from django_filters.rest_framework import DjangoFilterBackend, filterset
 from django_filters import constants
 from django.contrib.auth.models import Group
@@ -119,14 +118,7 @@ class GlobFilter(filters.Filter):
 class CustomFilterSet(filterset.FilterSet):
     FILTER_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
     FILTER_DEFAULTS.update({
-        db_models.CharField: {'filter_class': GlobFilter},
-        db_models.TextField: {'filter_class': GlobFilter},
-        db_models.SlugField: {'filter_class': GlobFilter},
-        db_models.EmailField: {'filter_class': GlobFilter},
-        db_models.FilePathField: {'filter_class': GlobFilter},
-        db_models.URLField: {'filter_class': GlobFilter},
-        db_models.GenericIPAddressField: {'filter_class': GlobFilter},
-        db_models.CommaSeparatedIntegerField: {'filter_class': GlobFilter},
+        models.NameField: {'filter_class': GlobFilter},
     })
 
 
