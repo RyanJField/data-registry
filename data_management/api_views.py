@@ -107,7 +107,7 @@ class GlobFilter(filters.Filter):
             return qs
         if self.distinct:
             qs = qs.distinct()
-        regex_value = fnmatch.translate(value)
+        regex_value = '\\A' + fnmatch.translate(value).replace('?s:', '')
         lookup = '%s__regex' % (self.field_name,)
         qs = self.get_method(qs)(**{lookup: regex_value})
         return qs

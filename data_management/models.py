@@ -232,7 +232,7 @@ class Source(BaseModel):
     ADMIN_LIST_FIELDS = ('name',)
 
     name = NameField(null=False, blank=False)
-    abbreviation = NameField(null=False, blank=False)
+    abbreviation = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     website = models.URLField(null=True, blank=True)
 
     class Meta:
@@ -251,7 +251,7 @@ class ExternalObject(BaseModel):
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
-    doi_or_unique_name = NameField(null=False, blank=False, unique=True)
+    doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
@@ -282,7 +282,7 @@ class Keyword(BaseModel):
     ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
-    keyphrase = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    keyphrase = NameField(null=False, blank=False)
 
     class Meta:
         constraints = [
