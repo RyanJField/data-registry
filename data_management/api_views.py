@@ -1,4 +1,5 @@
 from copy import deepcopy
+import fnmatch
 
 from django import forms
 from django_filters import filters
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from django.db import models as db_models
 from django_filters.rest_framework import DjangoFilterBackend, filterset
+from django_filters import constants
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -96,17 +98,35 @@ class RegexFilter(filters.Filter):
     field_class = forms.CharField
 
 
+class GlobFilter(filters.Filter):
+    def __init__(self, *args, **kwargs):
+        kwargs['lookup_expr'] = 'glob'
+        super().__init__(*args, **kwargs)
+
+    def filter(self, qs, value):
+        if value in constants.EMPTY_VALUES:
+            return qs
+        if self.distinct:
+            qs = qs.distinct()
+        regex_value = fnmatch.translate(value)
+        lookup = '%s__regex' % (self.field_name,)
+        qs = self.get_method(qs)(**{lookup: regex_value})
+        return qs
+
+    field_class = forms.CharField
+
+
 class CustomFilterSet(filterset.FilterSet):
     FILTER_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
     FILTER_DEFAULTS.update({
-        db_models.CharField: {'filter_class': RegexFilter},
-        db_models.TextField: {'filter_class': RegexFilter},
-        db_models.SlugField: {'filter_class': RegexFilter},
-        db_models.EmailField: {'filter_class': RegexFilter},
-        db_models.FilePathField: {'filter_class': RegexFilter},
-        db_models.URLField: {'filter_class': RegexFilter},
-        db_models.GenericIPAddressField: {'filter_class': RegexFilter},
-        db_models.CommaSeparatedIntegerField: {'filter_class': RegexFilter},
+        db_models.CharField: {'filter_class': GlobFilter},
+        db_models.TextField: {'filter_class': GlobFilter},
+        db_models.SlugField: {'filter_class': GlobFilter},
+        db_models.EmailField: {'filter_class': GlobFilter},
+        db_models.FilePathField: {'filter_class': GlobFilter},
+        db_models.URLField: {'filter_class': GlobFilter},
+        db_models.GenericIPAddressField: {'filter_class': GlobFilter},
+        db_models.CommaSeparatedIntegerField: {'filter_class': GlobFilter},
     })
 
 
