@@ -12,7 +12,7 @@
 {{ block.super }}
 <div class="card">
   <div class="card-body">
-    <h2>{{ object.name }}</h2>
+    <h3>{{ object.name }}</h3>
     <dl class="row">
       <dt class="col-sm-3">Updated By</dt>
       <dd class="col-sm-9">{{ object.updated_by }}</dd>
@@ -69,16 +69,6 @@
       {% endif %}
     </dl>
 
-    {% if object.components.count %}
-    <h3>Components</h3>
-    <dl class="row">
-      {% for component in object.components.all %}
-      <dt class="col-sm-3">Name</dt>
-      <dd class="col-sm-9">{{ component.name }}</dd>
-      {% endfor %}
-    </dl>
-    {% endif %}
-
     {% if object.licences.count %}
     <h3>Licences</h3>
     <dl class="row">
@@ -120,7 +110,38 @@
       {% endfor %}
     </dl>
     {% endif %}
+  </div>
+</div>
 
+{% if object.components.count %}
+<div class="card">
+  <table
+    data-toggle="table"
+    data-pagination="true"
+    data-search="true"
+    data-sortable="true"
+    data-sort-name="issue-count"
+    data-sort-order="desc">
+  <thead>
+  <tr>
+    <th data-sortable="true" data-field="name">Name</th>
+    <th data-sortable="true" data-field="issue-count">Issue Count</th>
+  </tr>
+  </thead>
+  <tbody>
+      {% for component in object.components.all %}
+        <tr>
+          <td><a href="{% url 'objectcomponent' component.pk %}">{{ component.name }}</a></td>
+          <td>{{ component.issues.count }}</td>
+        </tr>
+      {% endfor %}
+  </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
     <h2>Issues:</h2>
     {% if object.issues.count %}
     <ul class="list-group list-group-flush">

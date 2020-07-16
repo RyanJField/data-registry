@@ -17,9 +17,9 @@
     data-search="true">
   <thead>
   <tr>
-    <th>Namespace</th>
-    <th>Name</th>
-    <th>Version</th>
+    <th data-sortable="false">Namespace</th>
+    <th data-sortable="true" data-sorter="linksSorter">Name</th>
+    <th data-sortable="true">Version</th>
   </tr>
   </thead>
   <tbody>
@@ -34,6 +34,17 @@
 </table>
   </div>
 </div>
+
+<script type="text/javascript">
+function linksSorter(a, b) {
+    var a = $(a).text();
+    var b = $(b).text();
+    if (a < b) return -1;
+    if (a > b) return 1;
+
+    return 0;
+}
+</script>
 
 <div class="card">
   <div class="card-body">
