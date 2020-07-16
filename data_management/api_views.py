@@ -59,6 +59,16 @@ class ProvnRenderer(renderers.BaseRenderer):
         return data
 
 
+class TextRenderer(renderers.BaseRenderer):
+    media_type = 'text/plain'
+    format = 'text'
+    charset = 'utf8'
+    render_style = 'text'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data['text']
+
+
 @renderer_classes([renderers.BrowsableAPIRenderer, renderers.JSONRenderer, JPEGRenderer, SVGRenderer, XMLRenderer, ProvnRenderer])
 class ProvReportView(views.APIView):
 
@@ -163,5 +173,7 @@ for name, cls in models.all_models.items():
         'filterset_fields': cls.FILTERSET_FIELDS,
         '__doc__': cls.__doc__,
     }
+    if name == 'TextFile':
+        data['renderer_classes'] = BaseViewSet.renderer_classes + [TextRenderer]
     globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
 
