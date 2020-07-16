@@ -161,6 +161,7 @@ for name, cls in models.all_models.items():
         'model': cls,
         'serializer_class': getattr(serializers, name + 'Serializer'),
         'filterset_fields': cls.FILTERSET_FIELDS,
+        '__doc__': cls.__doc__,
     }
     globals()[name + "ViewSet"] = type(name + "ViewSet", (BaseViewSet,), data)
 

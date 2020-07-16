@@ -37,12 +37,11 @@ class ObjectRelatedField(serializers.HyperlinkedRelatedField):
         return reverse(view_name + '-detail', kwargs=url_kwargs, request=request, format=format)
 
 
-class IssueSerializer(serializers.ModelSerializer):
-    data_object = ObjectRelatedField(view_name='', read_only=True)
-
+class IssueSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Issue
-        fields = ('data_object', 'severity', 'description')
+        fields = ('url', 'last_updated', 'updated_by', 'severity', 'description', 'object_issues', 'component_issues')
+        read_only_fields = ('url', 'last_updated', 'updated_by')
 
 
 for name, cls in models.all_models.items():

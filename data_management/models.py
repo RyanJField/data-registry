@@ -61,13 +61,32 @@ class VersionField(models.CharField):
 
 class Issue(BaseModel):
     """
-    A quality issue which can be attached to any data object in the registry.
+    ***A quality issue that can be attached to any `Object` or `ObjectComponent`.***
+
+    ### Writable Fields:
+    `severity`: Severity of this `Issue` as an integer, the larger the value the more severe the `Issue`
+
+    `description`: Free text description of the `Issue`
+
+    `object_issues`: List of `Object` URLs which the `Issue` is associated with
+
+    `component_issues`: List of `ObjectComponent` URLs which the `Issue` is associated with
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Issue`, final integer is the `Issue` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
     """
+    # EXTRA_DISPLAY_FIELDS = (
+    #     'last_updated',
+    # )
     FILTERSET_FIELDS = ('severity',)
     SHORT_DESC_LENGTH = 40
 
     severity = models.PositiveSmallIntegerField(default=1)
-    description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=False, blank=False)
 
     def short_desc(self):
         if self.description is None:
@@ -83,7 +102,38 @@ class Issue(BaseModel):
 
 class Object(BaseModel):
     """
-    Data objects.
+    ***Core traceability object used to represent any data object such `DataProduct`, `CodeRepoRelease`, etc. ***
+
+    ### Writable Fields:
+    `description` (*optional*): Free text description of the `Object`
+
+    `storage_location` (*optional*): The URL of the `StorageLocation` which is the location of the physical data of
+     this object, if applicable
+
+    `issues` (*optional*): List of `Issues` URLs to associate with this `Object`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Object`, final integer is the `Object` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+
+    `components`: List of `ObjectComponents` API URLs associated with this `Object`
+
+    `data_product`: The `DataProduct` API URL if one is associated with this `Object`
+
+    `code_repo_release`: The `CodeRepoRelease` API URL if one is associated with this `Object`
+
+    `external_object`: The `ExternalObject` API URL if one is associated with this `Object`
+
+    `quality_control`: The `QualityControl` API URL if one is associated with this `Object`
+
+    `authors`: List of `Author` API URLs associated with this `Object`
+
+    `licences`: List of `Licence` API URLs associated with this `Object`
+
+    `keywords`: List of `Keyword` API URLs associated with this `Object`
     """
     EXTRA_DISPLAY_FIELDS = (
         'components',
@@ -124,8 +174,33 @@ class Object(BaseModel):
 
 
 class ObjectComponent(BaseModel):
+    """
+    ***A component of a `Object` being used as the input to a `CodeRun` or produced as an output from a
+    `CodeRun`.***
+
+    ### Writable Fields:
+    `object`: The API URL of the `Object` to associate this `ObjectComponent` with
+
+    `name`: Name of the `ObjectComponent`, unique in the context of `ObjectComponent` and its `Object` reference
+
+    `description` (*optional*): Free text description of the `ObjectComponent`
+
+    `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `ObjectComponent`, final integer is the `ObjectComponent` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+
+    `input_of`: List of `CodeRun` that the `ObjectComponent` is being used as an input to
+
+    `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
+    """
     FILTERSET_FIELDS = ('name', 'last_updated', 'object')
     ADMIN_LIST_FIELDS = ('object', 'name')
+    EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
     name = NameField(null=False, blank=False)
@@ -144,6 +219,31 @@ class ObjectComponent(BaseModel):
 
 
 class CodeRun(BaseModel):
+    """
+    ***A code run along with its associated, code repo, configuration, input and outputs.***
+
+    ### Writable Fields:
+    `run_date`: datetime of the `CodeRun`
+
+    `description` (*optional*): Free text description of the `CodeRun`
+
+    `code_repo` (*optional*):  Reference to the `Object` associated with the `CodeRepoRelease` that was run
+
+    `model_config`: Reference to the `Object` for the YAML configuration used for the `CodeRun`
+
+    `submission_script`: Reference to the `Object` for the submission script used for the `CodeRun`
+
+    `inputs`: List of `ObjectComponent` that the `CodeRun` used as inputs
+
+    `outputs`: List of `ObjectComponent` that the `CodeRun` produced as outputs
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `ModelRun`, final integer is the `ModelRun` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
     ADMIN_LIST_FIELDS = ('run_identifier',)
 
@@ -173,7 +273,32 @@ class CodeRun(BaseModel):
 
 class StorageRoot(BaseModel):
     """
-    The root location of a storage cache where model files are stored.
+    ***The root location of a storage cache where model files are stored.***
+
+    ### Writable Fields:
+    `name`: Name of the `StorageRoot`, unique in the context of `StorageRoot`
+
+    `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation`
+
+    `path` produces a complete URI to a file. Examples:
+
+    * https://somewebsite.com/
+    * ftp://host/ (ftp://username:password@host:port/)
+    * ssh://host/
+    * file:///someroot/ (file://C:\)
+    * github://org:repo@sha/ (github://org:repo/ (master))
+
+    `accessibility` (*optional*): Integer value for the Accessibility enum:
+
+    * 0: Public (*default*) - the storage root is completely pubic with no provisos for use
+    * 1: Private - the storage root is for inaccessible data or there are provisos attached to the data use
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `StorageRoot`, final integer is the `StorageRoot` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
     """
     FILTERSET_FIELDS = ('name', 'root', 'last_updated', 'accessibility')
     ADMIN_LIST_FIELDS = ('name',)
@@ -204,7 +329,25 @@ class StorageRoot(BaseModel):
 
 class StorageLocation(BaseModel):
     """
-    The storage location of a model file relative to a StorageRoot.
+    ***The location of an item relative to a `StorageRoot`.***
+
+    ### Writable Fields:
+    `path`: Path from a `StorageRoot` `uri` to the item location, when appended to a `StorageRoot` `uri`
+    produces a complete URI.
+
+    `hash`: If `StorageLocation` references a file, this is the calculated SHA1 hash of the file. If `StorageLocation`
+    references a directory *TODO: can't be git sha for validation (doesn't care about local changes), could be recursive
+    sha1 of all files in the directory (excluding .git and things referenced in .gitignore), but needs to be OS independent
+    (order matters) and things like logging output might affect it...*
+
+    `store_root`: Reference to the `StorageRoot` to append the `path` to.
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `StorageLocation`, final integer is the `StorageLocation` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
     """
     FILTERSET_FIELDS = ('last_updated', 'path', 'hash')
     ADMIN_LIST_FIELDS = ('storage_root', 'path')
@@ -228,6 +371,23 @@ class StorageLocation(BaseModel):
 
 
 class Source(BaseModel):
+    """
+    ***Primary source of data being using by models. For example a paper or government website.***
+
+    ### Writable Fields:
+    `name`: Name of the `Source`, unique in the context of `Source`
+
+    `abbreviation`: Common abbreviation of the `Source`
+
+    `website` (*optional*): Website URL associated with the data source
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Source`, final integer is the `Source` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
     ADMIN_LIST_FIELDS = ('name',)
 
@@ -247,6 +407,38 @@ class Source(BaseModel):
 
 
 class ExternalObject(BaseModel):
+    """
+    *** An external data object, i.e. one that has comes from a `Source` rather than being generated as part of the
+      modelling pipeline.***
+
+    ### Writable Fields:
+    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of `ExternalObject`
+
+    `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
+
+    `release_date`: Date-time the `ExternalObject` was released
+
+    `title`: Title of the `ExternalObject`
+
+    `description` (*optional*):  Free text description of the `ExternalObject`
+
+    `version`: `ExternalObject` version identifier
+
+    `object`: API URL of the associated `Object`
+
+    `source`: API URL of the associated `Source`
+
+    `original_store` (*optional*): `StorageLocation` that references the original location of this `ExternalObject`.
+    For example, if the original data location could be transient and so the data has been copied to a more robust
+    location, this would be the reference to the original data location.
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `ExternalObject`, final integer is the `ExternalObject` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'doi_or_unique_name', 'release_date', 'title', 'version')
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
@@ -272,12 +464,41 @@ class ExternalObject(BaseModel):
 
 
 class QualityControlled(BaseModel):
+    """
+    ***Marks that the associated `Object` has been quality controlled.***
+
+    ### Writable Fields:
+    `object`: API URL of the associated `Object`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `QualityControlled`, final integer is the `QualityControlled` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     ADMIN_LIST_FIELDS = ('object',)
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='quality_control')
 
 
 class Keyword(BaseModel):
+    """
+    ***Keywords that can be associated with an `Object` usually for use with `ExternalObject`s to record paper keywords,
+    etc.***
+
+    ### Writable Fields:
+    `object`: API URL of the associated `Object`
+
+    `keyphrase`: Free text field for the key phrase to associate with the `Object`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Keyword`, final integer is the `Keyword` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'keyphrase')
     ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
@@ -296,6 +517,24 @@ class Keyword(BaseModel):
 
 
 class Author(BaseModel):
+    """
+    ***Authors that can be associated with an `Object` usually for use with `ExternalObject`s to record paper authors,
+    etc.***
+
+    ### Writable Fields:
+    `object`: API URL of the associated `Object`
+
+    `family_name`: Family name of the `Author`
+
+    `personal_name`: Personal name of the `Author`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Author`, final integer is the `Author` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
     ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
 
@@ -308,6 +547,22 @@ class Author(BaseModel):
 
 
 class Licence(BaseModel):
+    """
+    ***Licence that can be associated with an `Object` in case the code or data source has a specific licence that needs
+    to be recorded.***
+
+    ### Writable Fields:
+    `object`: API URL of the associated `Object`
+
+    `licence_info`: Free text field to store the information about the `Licence`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Licence`, final integer is the `Licence` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated',)
     ADMIN_LIST_FIELDS = ('object',)
 
@@ -316,6 +571,19 @@ class Licence(BaseModel):
 
 
 class Namespace(BaseModel):
+    """
+    ***A namespace that can be used to group `DataProduct`s.***
+
+    ### Writable Fields:
+    `name`: The `Namespace` name
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Namespace`, final integer is the `Namespace` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'name')
     ADMIN_LIST_FIELDS = ('name',)
 
@@ -333,6 +601,25 @@ class Namespace(BaseModel):
 
 
 class DataProduct(BaseModel):
+    """
+    ***A data product that is used by or generated by a model.***
+
+    ### Writable Fields:
+    `name`: Name of the `DataProduct`, unique in the context of `DataProduct`
+
+    `version`: Version identifier of the `DataProduct`, must conform to semantic versioning syntax
+
+    `object`: API URL of the associated `Object`
+
+    `namespace`: API URL of the `Namespace` of the `DataProduct`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `DataProduct`, final integer is the `DataProduct` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
@@ -353,6 +640,26 @@ class DataProduct(BaseModel):
 
 
 class CodeRepoRelease(BaseModel):
+    """
+    ***Information marking that an `Object` is an official release of a model code.***
+
+    ### Writable Fields:
+    `name`: Name of the `CodeRepoRelease`, unique in the context of the `CodeRepoRelease.version`
+
+    `version`: Version identifier of the `CodeRepoRelease`, must conform to semantic versioning syntax, unique in the
+    context of the `CodeRepoRelease.name`
+
+    `object`: API URL of the associated `Object`
+
+    `website` (*optional*): URL of the website for this code release, if applicable
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `CodeRepoRelease`, final integer is the `CodeRepoRelease` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'name', 'version')
     ADMIN_LIST_FIELDS = ('name', 'version')
 
@@ -373,6 +680,23 @@ class CodeRepoRelease(BaseModel):
 
 
 class KeyValue(BaseModel):
+    """
+    ***Free meta-data key-values associated with an `Object`.***
+
+    ### Writable Fields:
+    `object`: API URL of the associated `Object`
+
+    `key`: Meta-data name
+
+    `value`: Meta-data value
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `KeyValue`, final integer is the `KeyValue` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
     FILTERSET_FIELDS = ('last_updated', 'key')
     ADMIN_LIST_FIELDS = ('object', 'key')
 
