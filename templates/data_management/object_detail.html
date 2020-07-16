@@ -122,11 +122,11 @@
     {% endif %}
 
     <h2>Issues:</h2>
-    {% if object.issues.all %}
+    {% if object.issues.count %}
     <ul class="list-group list-group-flush">
       {% for issue in object.issues.all %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{% url 'issue' issue.pk %}">{{ issue.name | title }}</a>
+        <a href="{% url 'issue' issue.pk %}">{{ issue.description }}</a>
         <span class="badge badge-warning">Severity: {{ issue.severity }}</span>
       </li>
       {% endfor %}
