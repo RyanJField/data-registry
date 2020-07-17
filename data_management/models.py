@@ -450,7 +450,7 @@ class ExternalObject(BaseModel):
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='external_objects')
     original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
-    version = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    version = VersionField(null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -626,7 +626,7 @@ class DataProduct(BaseModel):
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = NameField(null=False, blank=False)
-    version = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    version = VersionField(null=True, blank=True)
 
     class Meta:
         constraints = [
