@@ -5,6 +5,9 @@ from django.utils.deconstruct import deconstructible
 
 @deconstructible
 class VersionValidator:
+    """
+    Custom validator to apply semantic versioning validation to a field.
+    """
     message = 'Version %(value)s is not a valid semantic version.'
     code = 'invalid_version'
 
@@ -30,6 +33,9 @@ class VersionValidator:
 
 @deconstructible
 class NameValidator:
+    """
+    Custom validator to ensure field does not contain characters that might break glob filtering.
+    """
     INVALID_CHARS = '[]?*'
     message = 'Name %(value)s contains invalid characters (' + INVALID_CHARS + ').'
     code = 'invalid_name'

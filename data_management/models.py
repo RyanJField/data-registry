@@ -1,4 +1,6 @@
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
+from django.urls import reverse
 from dynamic_validator import ModelFieldRequiredMixin
 from django.contrib.auth import get_user_model
 
@@ -82,6 +84,7 @@ class Issue(BaseModel):
     # EXTRA_DISPLAY_FIELDS = (
     #     'last_updated',
     # )
+    EXTRA_DISPLAY_FIELDS = ('object_issues', 'component_issues')
     FILTERSET_FIELDS = ('severity',)
     SHORT_DESC_LENGTH = 40
 
@@ -244,6 +247,7 @@ class CodeRun(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
+    EXTRA_DISPLAY_FIELDS = ('prov_report',)
     FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
     ADMIN_LIST_FIELDS = ('run_identifier',)
 
@@ -261,6 +265,11 @@ class CodeRun(BaseModel):
                 fields=('run_identifier',),
                 name='unique_code_run'),
         ]
+
+    def prov_report(self):
+        url = reverse('prov_report', kwargs={'pk': 1})
+        full_url = ''.join(['http://', get_current_site(None).domain, url, '/'])
+        return full_url
 
     def __str__(self):
         if self.code_repo:

@@ -18,7 +18,7 @@ urlpatterns = [
     path('issue/<int:pk>', views.IssueDetailView.as_view(), name='issue'),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(router.urls)),
-    path('api/prov-report/<int:pk>', api_views.ProvReportView.as_view(), name='prov_report'),
+    path('api/prov-report/<int:pk>/', api_views.ProvReportView.as_view(), name='prov_report'),
     path('get-token', views.get_token, name='get_token'),
     path('revoke-token', views.revoke_token, name='revoke_token'),
 ]

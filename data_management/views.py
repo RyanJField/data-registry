@@ -9,6 +9,10 @@ from . import models
 
 
 def index(request):
+    """
+    Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
+    Releases.
+    """
     data_products = models.Object.objects.filter(data_product__isnull=False)
     external_objects = models.Object.objects.filter(external_object__isnull=False)
     code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
@@ -29,6 +33,9 @@ def index(request):
 
 
 def get_token(request):
+    """
+    Generate a new API access token for the User.
+    """
     user_model = get_user_model()
     user_name = request.user.username
     user = user_model.objects.get_by_natural_key(user_name)
@@ -38,6 +45,9 @@ def get_token(request):
 
 
 def revoke_token(request):
+    """
+    Revoke an existing API access token for the User.
+    """
     user_model = get_user_model()
     user_name = request.user.username
     user = user_model.objects.get_by_natural_key(user_name)
@@ -46,6 +56,9 @@ def revoke_token(request):
 
 
 class BaseListView(generic.ListView):
+    """
+    Base class for views for displaying a table of the database objects.
+    """
     context_object_name = 'objects'
     template_name = 'data_management/object_list.html'
 
@@ -57,6 +70,9 @@ class BaseListView(generic.ListView):
 
 
 class BaseDetailView(generic.DetailView):
+    """
+    Base class for views for displaying details about a specific database object.
+    """
     context_object_name = 'object'
 
     def get_context_data(self, **kwargs):
@@ -75,9 +91,15 @@ for name, cls in models.all_models.items():
 
 
 class IssueListView(generic.ListView):
+    """
+    View for displaying all Issues.
+    """
     model = models.Issue
     context_object_name = 'issues'
 
 
 class IssueDetailView(generic.DetailView):
+    """
+    View for displaying details about a specific Issue.
+    """
     model = models.Issue

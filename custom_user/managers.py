@@ -2,6 +2,10 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
+    """
+    Custom user manager that handles the fact that the email address on our custom user is readonly therefore we cannot
+    try and set it as part of creating a new superuser, which is the default behaviour.
+    """
 
     def _create_user(self, username, password, **extra_fields):
         if not username:
