@@ -21,6 +21,8 @@ urlpatterns = [
     path('api/prov-report/<int:pk>/', api_views.ProvReportView.as_view(), name='prov_report'),
     path('get-token', views.get_token, name='get_token'),
     path('revoke-token', views.revoke_token, name='revoke_token'),
+    path('docs/', views.doc_index),
+    path('docs/<str:name>', views.docs),
 ]
 
 

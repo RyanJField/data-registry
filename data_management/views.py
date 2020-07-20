@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
@@ -103,3 +104,21 @@ class IssueDetailView(generic.DetailView):
     View for displaying details about a specific Issue.
     """
     model = models.Issue
+
+
+def docs(request, name):
+    with open(os.path.join('docs', name + '.md')) as file:
+        text = file.read()
+    ctx = {
+        'text': text
+    }
+    return render(request, 'data_management/docs.html', ctx)
+
+
+def doc_index(request):
+    with open('docs/index.md') as file:
+        text = file.read()
+    ctx = {
+        'text': text
+    }
+    return render(request, 'data_management/docs.html', ctx)
