@@ -12,7 +12,7 @@
 {{ block.super }}
 <div class="card">
   <div class="card-body">
-    <h2>{{ object.name }}</h2>
+    <h3>{{ object.name }}</h3>
     <dl class="row">
       <dt class="col-sm-3">Updated By</dt>
       <dd class="col-sm-9">{{ object.updated_by }}</dd>
@@ -20,21 +20,134 @@
       <dt class="col-sm-3">Last Updated On</dt>
       <dd class="col-sm-9">{{ object.last_updated }}</dd>
 
-      <dt class="col-sm-3">Object UID</dt>
-      <dd class="col-sm-9">{{ object.object_uid }}</dd>
+      {% if object.code_repo_release %}
+        <dt class="col-sm-3">Code Repo Name</dt>
+        <dd class="col-sm-9">{{ object.code_repo_release.name }}</dd>
 
-      <dt class="col-sm-3">Responsible Person</dt>
-      <dd class="col-sm-9">{{ object.responsible_person }}</dd>
+        <dt class="col-sm-3">Code Repo Version</dt>
+        <dd class="col-sm-9">{{ object.code_repo_release.version }}</dd>
 
-      {% block fields %}
-      {% endblock %}
+        <dt class="col-sm-3">Code Repo Website</dt>
+        <dd class="col-sm-9">{{ object.code_repo_release.website }}</dd>
+      {% endif %}
+
+      {% if object.data_product %}
+        <dt class="col-sm-3">Data Product Namespace</dt>
+        <dd class="col-sm-9">{{ object.data_product.namespace }}</dd>
+
+        <dt class="col-sm-3">Data Product Name</dt>
+        <dd class="col-sm-9">{{ object.data_product.name }}</dd>
+
+        <dt class="col-sm-3">Data Product Version</dt>
+        <dd class="col-sm-9">{{ object.data_product.version }}</dd>
+      {% endif %}
+
+      {% if object.external_object %}
+        <dt class="col-sm-3">External Object DOI or Unique Name</dt>
+        <dd class="col-sm-9">{{ object.external_object.doi_or_unique_name }}</dd>
+
+        <dt class="col-sm-3">External Object Primary Source</dt>
+        <dd class="col-sm-9">{{ object.external_object.primary_not_supplement }}</dd>
+
+        <dt class="col-sm-3">External Object Release Date</dt>
+        <dd class="col-sm-9">{{ object.external_object.release_date }}</dd>
+
+        <dt class="col-sm-3">External Object Title</dt>
+        <dd class="col-sm-9">{{ object.external_object.title }}</dd>
+
+        <dt class="col-sm-3">External Object Description</dt>
+        <dd class="col-sm-9">{{ object.external_object.description }}</dd>
+
+        <dt class="col-sm-3">External Object Source</dt>
+        <dd class="col-sm-9">{{ object.external_object.source }}</dd>
+
+        <dt class="col-sm-3">External Object Original Store</dt>
+        <dd class="col-sm-9">{{ object.external_object.original_store }}</dd>
+
+        <dt class="col-sm-3">External Object Version</dt>
+        <dd class="col-sm-9">{{ object.external_object.version }}</dd>
+      {% endif %}
     </dl>
+
+    {% if object.licences.count %}
+    <h3>Licences</h3>
+    <dl class="row">
+      {% for licence in object.licences.all %}
+      <dt class="col-sm-3">Licence Info</dt>
+      <dd class="col-sm-9">{{ licence.licence_info }}</dd>
+      {% endfor %}
+    </dl>
+    {% endif %}
+
+    {% if object.authors.count %}
+    <h3>Authors</h3>
+    <dl class="row">
+      {% for author in object.authors.all %}
+      <dt class="col-sm-3">Family Name</dt>
+      <dd class="col-sm-9">{{ author.family_name }}</dd>
+      <dt class="col-sm-3">Personal Name</dt>
+      <dd class="col-sm-9">{{ author.personal_name }}</dd>
+      {% endfor %}
+    </dl>
+    {% endif %}
+
+    {% if object.keywords.count %}
+    <h3>Keywords</h3>
+    <dl class="row">
+      {% for keyword in object.keywords.all %}
+      <dt class="col-sm-3">Key-phrase</dt>
+      <dd class="col-sm-9">{{ keyword.keyphrase }}</dd>
+      {% endfor %}
+    </dl>
+    {% endif %}
+
+    {% if object.metadata.count %}
+    <h3>Metadata</h3>
+    <dl class="row">
+      {% for keyvalue in object.metadata.all %}
+      <dt class="col-sm-3">{{ keyvalue.key }}</dt>
+      <dd class="col-sm-9">{{ keyvalue.value }}</dd>
+      {% endfor %}
+    </dl>
+    {% endif %}
+  </div>
+</div>
+
+{% if object.components.count %}
+<div class="card">
+  <table
+    data-toggle="table"
+    data-pagination="true"
+    data-search="true"
+    data-sortable="true"
+    data-sort-name="issue-count"
+    data-sort-order="desc">
+  <thead>
+  <tr>
+    <th data-sortable="true" data-field="name">Name</th>
+    <th data-sortable="true" data-field="issue-count">Issue Count</th>
+  </tr>
+  </thead>
+  <tbody>
+      {% for component in object.components.all %}
+        <tr>
+          <td><a href="{% url 'objectcomponent' component.pk %}">{{ component.name }}</a></td>
+          <td>{{ component.issues.count }}</td>
+        </tr>
+      {% endfor %}
+  </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
     <h2>Issues:</h2>
-    {% if object.issues.all %}
+    {% if object.issues.count %}
     <ul class="list-group list-group-flush">
       {% for issue in object.issues.all %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{% url 'issue' issue.pk %}">{{ issue.name | title }}</a>
+        <a href="{% url 'issue' issue.pk %}">{{ issue.description }}</a>
         <span class="badge badge-warning">Severity: {{ issue.severity }}</span>
       </li>
       {% endfor %}

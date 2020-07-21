@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
@@ -9,20 +10,33 @@ from . import models
 
 
 def index(request):
+    """
+    Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
+    Releases.
+    """
+    data_products = models.Object.objects.filter(data_product__isnull=False)
+    external_objects = models.Object.objects.filter(external_object__isnull=False)
+    code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
+
     ObjectData = namedtuple('object', 'name display_name count doc')
-    object_models = models.all_object_models
-    object_data = []
-    for (model_name, model_cls) in sorted(object_models.items()):
-        count = getattr(models, model_name).objects.count()
-        name = model_name.lower() + 's'
-        display_name = camel_case_to_spaces(model_name)
-        doc = model_cls.__doc__
-        object_data.append(ObjectData(name, display_name, count, doc))
+    object_data = [
+        ObjectData('objects', 'Object', models.Object.objects.count(), models.Object.__doc__)
+    ]
     issues = models.Issue.objects.all()
-    return render(request, 'data_management/index.html', {'objects': object_data, 'issues': issues})
+    ctx = {
+        'objects': object_data,
+        'issues': issues,
+        'data_products': data_products,
+        'external_objects': external_objects,
+        'code_repo_release': code_repo_release,
+    }
+    return render(request, 'data_management/index.html', ctx)
 
 
 def get_token(request):
+    """
+    Generate a new API access token for the User.
+    """
     user_model = get_user_model()
     user_name = request.user.username
     user = user_model.objects.get_by_natural_key(user_name)
@@ -32,6 +46,9 @@ def get_token(request):
 
 
 def revoke_token(request):
+    """
+    Revoke an existing API access token for the User.
+    """
     user_model = get_user_model()
     user_name = request.user.username
     user = user_model.objects.get_by_natural_key(user_name)
@@ -40,6 +57,9 @@ def revoke_token(request):
 
 
 class BaseListView(generic.ListView):
+    """
+    Base class for views for displaying a table of the database objects.
+    """
     context_object_name = 'objects'
     template_name = 'data_management/object_list.html'
 
@@ -51,6 +71,9 @@ class BaseListView(generic.ListView):
 
 
 class BaseDetailView(generic.DetailView):
+    """
+    Base class for views for displaying details about a specific database object.
+    """
     context_object_name = 'object'
 
     def get_context_data(self, **kwargs):
@@ -62,16 +85,40 @@ class BaseDetailView(generic.DetailView):
 
 
 # Generate ListView and DetailView classes for each model that subclasses DataObject
-for name, cls in models.all_object_models.items():
+for name, cls in models.all_models.items():
     data = {'model': cls, 'model_name': name}
     globals()[name + "ListView"] = type(name + "ListView", (BaseListView,), data)
     globals()[name + "DetailView"] = type(name + "DetailView", (BaseDetailView,), data)
 
 
 class IssueListView(generic.ListView):
+    """
+    View for displaying all Issues.
+    """
     model = models.Issue
     context_object_name = 'issues'
 
 
 class IssueDetailView(generic.DetailView):
+    """
+    View for displaying details about a specific Issue.
+    """
     model = models.Issue
+
+
+def docs(request, name):
+    with open(os.path.join('docs', name + '.md')) as file:
+        text = file.read()
+    ctx = {
+        'text': text
+    }
+    return render(request, 'data_management/docs.html', ctx)
+
+
+def doc_index(request):
+    with open('docs/index.md') as file:
+        text = file.read()
+    ctx = {
+        'text': text
+    }
+    return render(request, 'data_management/docs.html', ctx)

@@ -12,7 +12,7 @@
 {{ block.super }}
 <div class="card">
   <div class="card-body">
-    <h2>{{ object.name }}</h2>
+    <h2>Issue Details</h2>
     <dl class="row">
       <dt class="col-sm-3">Updated By</dt>
       <dd class="col-sm-9">{{ object.updated_by }}</dd>
@@ -20,16 +20,25 @@
       <dt class="col-sm-3">Last Updated On</dt>
       <dd class="col-sm-9">{{ object.last_updated }}</dd>
 
-      <dt class="col-sm-3">Attached Object</dt>
-      <dd class="col-sm-9"><a href="{% url object.content_type.model object.object_id %}">{{ object.data_object }}</a>
-      </dd>
-
       <dt class="col-sm-3">Severity</dt>
       <dd class="col-sm-9">{{ object.severity }}</dd>
 
       <dt class="col-sm-3">Description</dt>
       <dd class="col-sm-9">{{ object.description }}</dd>
+
     </dl>
+    <h2>Associated Objects</h2>
+    <ul>
+    {% for obj in object.object_issues.all %}
+      <li><a href={% url 'object' obj.id %}>{{ obj.name }}</a></li>
+    {% endfor %}
+    </ul>
+    <h2>Associated Object Components</h2>
+    <ul>
+    {% for obj in object.component_issues.all %}
+      <li><a href={% url 'objectcomponent' obj.id %}>{{ obj.name }}</a></li>
+    {% endfor %}
+    </ul>
   </div>
 </div>
 {% endblock %}

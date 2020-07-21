@@ -4,10 +4,6 @@ import mysql.connector as mariadb
 from .managers import CustomUserManager
 
 
-#        pool_name='users_db_pool',
-#        pool_size=3,
-
-
 def _get_db_connection():
     connection = mariadb.connect(
         option_files='/home/ubuntu/.mysql/people.cnf',
@@ -17,7 +13,9 @@ def _get_db_connection():
 
 
 class User(AbstractUser):
-
+    """
+    Custom user that retrieves user details from the SCRC personnel database.
+    """
     objects = CustomUserManager()
 
     REQUIRED_FIELDS = []
@@ -65,8 +63,9 @@ class User(AbstractUser):
         except (ValueError, TypeError):
             return []
         finally:
-            if conn is not None: conn.close()
+            if conn is not None:
+                conn.close()
 
     def clean(self):
+        # Skip the AbstractUser.clean as this tries to set self.email
         AbstractBaseUser.clean(self)
-

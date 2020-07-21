@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load markdown_extras %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% breadcrumb 'Docs' 'docs' %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="container">
+  {{ text | markdown | safe }}
+</div>
+{% endblock %}

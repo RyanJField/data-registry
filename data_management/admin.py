@@ -1,83 +1,44 @@
 from django.contrib import admin
-from django.forms import ModelForm
-from django.contrib.contenttypes.admin import GenericStackedInline
-from django.utils.html import format_html
-from django.urls import reverse
 
 from . import models
 
 admin.site.site_header = 'SCRC Data Management'
 
 
-class IssueForm(ModelForm):
-    def save(self, **kwargs):
-        self.instance.updated_by = self.updated_by
-        return super().save(**kwargs)
-
-
-class IssueInline(GenericStackedInline):
-    model = models.Issue
-    form = IssueForm
-
-    def get_extra(self, request, obj=None, **kwargs):
-        return 0
-
-
 class BaseAdmin(admin.ModelAdmin):
+    """
+    Base model for admin views.
+    """
     readonly_fields = ('updated_by', 'last_updated')
-    list_display = ('name', 'last_updated')
+    list_display = ('last_updated',)
 
     def save_model(self, request, obj, form, change):
+        """
+        Customising the admin save behaviour to add the current user as the updated_by user on the model.
+        """
         obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
 
 
-class DataObjectAdmin(BaseAdmin):
-    inlines = (IssueInline,)
-
-    def save_related(self, request, form, formsets, change):
-        for formset in formsets:
-            for f in formset:
-                f.updated_by = request.user
-        return super().save_related(request, form, formsets, change)
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if 'responsible_person' in form.base_fields:
-            form.base_fields['responsible_person'].initial = request.user
-        return form
-
-
-class DataObjectVersionAdmin(DataObjectAdmin):
-    readonly_fields = ('updated_by', 'last_updated', 'name')
-
-
 class IssueAdmin(BaseAdmin):
-    exclude = ('content_type', 'object_id')
-    readonly_fields = ('updated_by', 'last_updated', 'data_object_link')
-    list_display = ('name', 'data_object', 'severity', 'last_updated')
+    """
+    Admin view for the Issue model.
+    """
+    readonly_fields = ('updated_by', 'last_updated', 'linked_objects')
+    list_display = ('short_desc', 'severity', 'last_updated')
 
-    def data_object_link(self, instance):
-        url = reverse('admin:%s_%s_change' % (instance.content_type.app_label, instance.content_type.model),
-                args=(instance.data_object.id,))
-        return format_html(
-                '<a href="{0}">{1}</a>',
-                url,
-                instance.data_object,
-                )
-
-    data_object_link.short_description = 'data object'
-
-    def has_add_permission(self, request, obj=None):
-        return False
+    @classmethod
+    def linked_objects(cls, issue):
+        """
+        Return all the Objects and ObjectComponents that this Issue has been assigned to.
+        """
+        return list(issue.object_issues.all()) + list(issue.component_issues.all())
 
 
-for _, cls in models.all_models.items():
-    if isinstance(cls, models.DataObjectVersion):
-        admin.site.register(cls, DataObjectVersionAdmin)
-    elif isinstance(cls, models.DataObject):
-        admin.site.register(cls, DataObjectAdmin)
-    elif isinstance(cls, models.Issue):
-        admin.site.register(models.Issue, IssueAdmin)
+for name, cls in models.all_models.items():
+    if issubclass(cls, models.Issue):
+        admin.site.register(cls, IssueAdmin)
     else:
-        admin.site.register(cls, BaseAdmin)
+        data = {'list_display': cls.ADMIN_LIST_FIELDS + ('updated_by', 'last_updated')}
+        admin_cls = type(name + 'Admin', (BaseAdmin,), data)
+        admin.site.register(cls, admin_cls)

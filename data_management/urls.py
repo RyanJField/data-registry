@@ -18,13 +18,15 @@ urlpatterns = [
     path('issue/<int:pk>', views.IssueDetailView.as_view(), name='issue'),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(router.urls)),
-    path('api/prov-report/<int:pk>', api_views.ProvReportView.as_view(), name='prov_report'),
+    path('api/prov-report/<int:pk>/', api_views.ProvReportView.as_view(), name='prov_report'),
     path('get-token', views.get_token, name='get_token'),
     path('revoke-token', views.revoke_token, name='revoke_token'),
+    path('docs/', views.doc_index),
+    path('docs/<str:name>', views.docs),
 ]
 
 
-for name in models.all_object_models:
+for name in models.all_models:
     url_name = camel_case_to_spaces(name).replace(' ', '_')
     urlpatterns.append(path(url_name + '/<int:pk>', getattr(views, name + 'DetailView').as_view(), name=name.lower()))
     urlpatterns.append(path(url_name + 's/', getattr(views, name + 'ListView').as_view(), name=name.lower() + 's')) 

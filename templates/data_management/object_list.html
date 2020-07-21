@@ -13,15 +13,28 @@
   <div class="card-body">
     <h2>{{ display_name | title }}:</h2>
     {% if objects %}
-    <ul class="list-group list-group-flush">
-      {% for obj in object_list %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{% url obj.reverse_name obj.id %}">{{ obj.name }}</a>
-        <span
-            class="badge {{ obj.issues.count | yesno:'badge-warning,badge-success' }}">Issues: {{ obj.issues.count }}</span>
-      </li>
-      {% endfor %}
-    </ul>
+      <table
+        data-toggle="table"
+        data-pagination="true"
+        data-search="true"
+        data-sortable="true"
+        data-sort-name="issue-count"
+        data-sort-order="desc">
+      <thead>
+      <tr>
+        <th data-sortable="true" data-field="name">Name</th>
+        <th data-sortable="true" data-field="issue-count">Issue Count</th>
+      </tr>
+      </thead>
+      <tbody>
+          {% for obj in object_list %}
+            <tr>
+              <td><a href="{% url obj.reverse_name obj.id %}">{{ obj }}</a></td>
+              <td>{{ obj.issues.count }}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+      </table>
     {% else %}
     <p>No {{ display_name }}.</p>
     {% endif %}
