@@ -2,4 +2,4 @@
 
 Test documentation
 
-[some more docs](another)
+[some more docs](another.md)

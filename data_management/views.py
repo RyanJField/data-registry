@@ -107,7 +107,7 @@ class IssueDetailView(generic.DetailView):
 
 
 def docs(request, name):
-    with open(os.path.join('docs', name + '.md')) as file:
+    with open(os.path.join('docs', name)) as file:
         text = file.read()
     ctx = {
         'text': text
