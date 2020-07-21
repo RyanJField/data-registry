@@ -13,10 +13,12 @@ def _generate_object_meta(obj):
     if obj.storage_location:
         data.append(('storage', str(obj.storage_location)))
 
-    if obj.data_product:
+    try:
         data.append(('namespace', str(obj.data_product.namespace)))
         data.append(('name', str(obj.data_product.name)))
         data.append(('version', str(obj.data_product.version)))
+    except models.DataProduct.DoesNotExist:
+        pass
 
     try:
         data.append(('name', str(obj.code_repo_release.name)))
@@ -75,6 +77,7 @@ def generate_prov_document(code_run):
                 (prov.model.PROV_TYPE, 'file'),
                 *_generate_object_meta(input.object)
             ))
+            prov_objects[input.object.id] = obj
         doc.association(i, obj)
 
     for output in code_run.outputs.all():
@@ -95,6 +98,7 @@ def generate_prov_document(code_run):
                 (prov.model.PROV_TYPE, 'file'),
                 *_generate_object_meta(output.object)
             ))
+            prov_objects[output.object.id] = obj
         doc.association(o, obj)
 
     return doc
@@ -135,3 +139,4 @@ def serialize_prov_document(doc, format):
             serializer(doc).serialize(buf)
             buf.seek(0)
             return json.loads(buf.read())
+

@@ -248,32 +248,32 @@ class CodeRun(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
-    FILTERSET_FIELDS = ('run_date', 'run_identifier', 'last_updated')
-    ADMIN_LIST_FIELDS = ('run_identifier',)
+    FILTERSET_FIELDS = ('run_date', 'description', 'last_updated')
+    ADMIN_LIST_FIELDS = ('description',)
 
     code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=True, blank=True)
     model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=True, blank=True)
     submission_script = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='submission_script_of', null=False, blank=False)
     run_date = models.DateTimeField(null=False, blank=False)
-    run_identifier = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('run_identifier',),
+                fields=('description',),
                 name='unique_code_run'),
         ]
 
     def prov_report(self):
-        url = reverse('prov_report', kwargs={'pk': 1})
-        full_url = ''.join(['http://', get_current_site(None).domain, url, '/'])
+        url = reverse('prov_report', kwargs={'pk': self.id})
+        full_url = ''.join(['http://', get_current_site(None).domain, url])
         return full_url
 
     def __str__(self):
         if self.code_repo:
-            return '%s run %s' % (self.code_repo, self.run_identifier)
+            return '%s run %s' % (self.code_repo, self.description)
         return self.run_identifier
 
 
