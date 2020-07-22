@@ -2,9 +2,11 @@ from copy import deepcopy
 import fnmatch
 
 from django import forms
+from django.http import HttpResponseBadRequest, JsonResponse
 from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
@@ -17,6 +19,11 @@ from django.shortcuts import get_object_or_404
 
 from . import models, serializers
 from .prov import generate_prov_document, serialize_prov_document
+
+
+class BadQuery(APIException):
+    status_code = 400
+    default_code = 'bad_query'
 
 
 class JPEGRenderer(renderers.BaseRenderer):
@@ -112,6 +119,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['username']
 
+    def list(self, request, *args, **kwargs):
+        if set(request.query_params.keys()) - {'username'}:
+            raise BadQuery(detail='Invalid query arguments, only query arguments [username] are allowed')
+        return super().list(request, *args, **kwargs)
+
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -121,6 +133,11 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        if request.query_params.keys():
+            raise BadQuery(detail='Invalid query arguments, no query arguments are allowed')
+        return super().list(request, *args, **kwargs)
 
 
 class APIIntegrityError(exceptions.APIException):
@@ -194,6 +211,12 @@ class BaseViewSet(mixins.CreateModelMixin,
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [CustomDjangoFilterBackend]
     # lookup_field = 'name'
+
+    def list(self, request, *args, **kwargs):
+        if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS):
+            args = ', '.join(self.model.FILTERSET_FIELDS)
+            raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.model.objects.all()

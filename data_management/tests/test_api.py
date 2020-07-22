@@ -283,23 +283,23 @@ class IssueAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('issue-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['description'], 'Test Issue 1')
+
+    def test_filter_by_severity(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('issue-list')
+        response = client.get(url, data={'severity': '6'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['description'], 'Test Issue 2')
 
 
 class CodeRunAPITests(TestCase):
@@ -321,23 +321,34 @@ class CodeRunAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('coderun-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
+
+    def test_filter_by_run_date(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('coderun-list')
+        response = client.get(url, data={'run_date': '2020-07-17T18:21:11Z'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
+
+    def test_filter_by_description(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('coderun-list')
+        response = client.get(url, data={'description': 'Script run to upload and process scottish coronavirus-covid-19-management-information'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
 
 
 class SourceAPITests(TestCase):
