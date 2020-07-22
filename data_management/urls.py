@@ -23,6 +23,7 @@ urlpatterns = [
     path('revoke-token', views.revoke_token, name='revoke_token'),
     path('docs/', views.doc_index),
     path('docs/<str:name>', views.docs),
+    path('api/data/<path:name>', api_views.ObjectStorageView.as_view())
 ]
 
 
