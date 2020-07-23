@@ -1,4 +1,5 @@
 import os
+
 from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces

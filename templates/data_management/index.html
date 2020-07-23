@@ -13,67 +13,45 @@ Click <a href="docs">here</a> to see documentation.
   <div class="card-body">
     <h2>Data Products</h2>
 <table
+    id="dataproduct"
     data-toggle="table"
+    data-ajax="dataProductsData"
     data-pagination="true"
+    data-side-pagination="server"
+    data-sort-name="name"
+    data-sort-order="asc"
     data-search="true">
   <thead>
   <tr>
-    <th data-sortable="false">Namespace</th>
-    <th data-sortable="true" data-sorter="linksSorter">Name</th>
-    <th data-sortable="true">Version</th>
+    <th data-sortable="true" data-field="namespace">Namespace</th>
+    <th data-sortable="true" data-field="name">Name</th>
+    <th data-sortable="true" data-field="version">Version</th>
   </tr>
   </thead>
-  <tbody>
-      {% for object in data_products %}
-        <tr>
-          <td>{{ object.data_product.namespace }}</td>
-          <td><a href="{% url 'object' object.pk %}">{{ object.data_product.name }}</a></td>
-          <td>{{ object.data_product.version }}</td>
-        </tr>
-      {% endfor %}
-  </tbody>
 </table>
   </div>
 </div>
-
-<script type="text/javascript">
-function linksSorter(a, b) {
-    var a = $(a).text();
-    var b = $(b).text();
-    if (a < b) return -1;
-    if (a > b) return 1;
-
-    return 0;
-}
-</script>
 
 <div class="card">
   <div class="card-body">
     <h2>External Objects</h2>
 <table
     data-toggle="table"
+    data-ajax="externalObjectsData"
     data-pagination="true"
+    data-side-pagination="server"
+    data-sort-name="doi_or_unique_name"
+    data-sort-order="asc"
     data-search="true">
   <thead>
   <tr>
-    <th>Source</th>
-    <th>DOI or Unique Name</th>
-    <th>Release Date</th>
-    <th>Title</th>
-    <th>Version</th>
+    <th data-sortable="true" data-field="source">Source</th>
+    <th data-sortable="true" data-field="doi_or_unique_name">DOI or Unique Name</th>
+    <th data-sortable="true" data-field="release_date">Release Date</th>
+    <th data-sortable="true" data-field="title">Title</th>
+    <th data-sortable="true" data-field="version">Version</th>
   </tr>
   </thead>
-  <tbody>
-      {% for object in external_objects %}
-        <tr>
-          <td>{{ object.external_object.source }}</td>
-          <td><a href="{% url 'object' object.pk %}">{{ object.external_object.doi_or_unique_name }}</a></td>
-          <td>{{ object.external_object.release_date }}</td>
-          <td>{{ object.external_object.title }}</td>
-          <td>{{ object.external_object.version }}</td>
-        </tr>
-      {% endfor %}
-  </tbody>
 </table>
   </div>
 </div>
@@ -83,24 +61,19 @@ function linksSorter(a, b) {
     <h2>Code Repo Release</h2>
 <table
     data-toggle="table"
+    data-ajax="codeRepoReleasesData"
     data-pagination="true"
+    data-side-pagination="server"
+    data-sort-name="name"
+    data-sort-order="asc"
     data-search="true">
   <thead>
   <tr>
-    <th>Name</th>
-    <th>Version</th>
-    <th>Website</th>
+    <th data-sortable="true" data-field="name">Name</th>
+    <th data-sortable="true" data-field="version">Version</th>
+    <th data-sortable="true" data-field="website">Website</th>
   </tr>
   </thead>
-  <tbody>
-      {% for object in code_repo_release %}
-        <tr>
-          <td><a href="{% url 'object' object.pk %}">{{ object.code_repo_release.name }}</a></td>
-          <td>{{ object.code_repo_release.version }}</td>
-          <td>{{ object.code_repo_release.website }}</td>
-        </tr>
-      {% endfor %}
-  </tbody>
 </table>
   </div>
 </div>
