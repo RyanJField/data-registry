@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
-from .. import models
 from .initdb import init_db
 
 
@@ -370,23 +369,23 @@ class SourceAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('source-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'Journal of Population Therapeutics and Clinical Pharmacology')
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('source-list')
+        response = client.get(url, data={'name': 'Scottish Government Open Data Repository'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['name'], 'Scottish Government Open Data Repository')
 
 
 class ExternalObjectAPITests(TestCase):
@@ -408,23 +407,45 @@ class ExternalObjectAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('externalobject-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['doi_or_unique_name'], 'scottish deaths-involving-coronavirus-covid-19')
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('externalobject-list')
+        response = client.get(url, data={'doi_or_unique_name': '10.15586/jptcp.v27iSP1.691'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
+
+    def test_filter_by_title(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('externalobject-list')
+        response = client.get(url, data={'title': 'Covid-19: A systemic disease treated with a wide-ranging approach: A case report'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
+
+    def test_filter_by_version(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('externalobject-list')
+        response = client.get(url, data={'version': '20100710.0'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['doi_or_unique_name'], 'scottish coronavirus-covid-19-management-information')
 
 
 class QualityControlledAPITests(TestCase):
@@ -446,23 +467,12 @@ class QualityControlledAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('qualitycontrolled-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['object'], 'http://testserver/api/object/15/')
 
 
 class KeywordAPITests(TestCase):
@@ -484,23 +494,33 @@ class KeywordAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('keyword-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['keyphrase'], 'treatment')
+
+    def test_filter_by_keyphrase(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('keyword-list')
+        response = client.get(url, data={'keyphrase': 'monoclonal antibodies'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['keyphrase'], 'monoclonal antibodies')
+
+    def test_filter_by_keyphrase_glob(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('keyword-list')
+        response = client.get(url, data={'keyphrase': 'co*'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 2)
 
 
 class AuthorAPITests(TestCase):
@@ -522,23 +542,54 @@ class AuthorAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('author-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['family_name'], 'Valenti')
+
+    def test_filter_by_family_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('author-list')
+        response = client.get(url, data={'family_name': '*ti'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 2)
+
+    def test_filter_by_family_name_glob(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('author-list')
+        response = client.get(url, data={'family_name': 'Cipriani'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['family_name'], 'Cipriani')
+
+    def test_filter_by_personal_name(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('author-list')
+        response = client.get(url, data={'personal_name': 'Rosanna'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['family_name'], 'Massabeti')
+
+    def test_filter_by_personal_name_glob(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('author-list')
+        response = client.get(url, data={'personal_name': '*na'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 2)
 
 
 class LicenceAPITests(TestCase):
@@ -560,23 +611,12 @@ class LicenceAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('licence-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertIn('Copyright 2020 SCRC', response.json()['licence_info'])
 
 
 class NamespaceAPITests(TestCase):
@@ -598,23 +638,33 @@ class NamespaceAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('namespace-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'SCRC')
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('namespace-list')
+        response = client.get(url, data={'name': 'simple_network_sim'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['name'], 'simple_network_sim')
+
+    def test_filter_by_name_glob(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('namespace-list')
+        response = client.get(url, data={'name': '[sS]*'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 2)
 
 
 class DataProductAPITests(TestCase):
@@ -636,23 +686,53 @@ class DataProductAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('dataproduct-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'human/infection/SARS-CoV-2/symptom-probability')
+
+    def test_filter_by_namespace(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('dataproduct-list')
+        response = client.get(url, data={'namespace': '1'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 7)
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('dataproduct-list')
+        response = client.get(url, data={'name': 'human/infection/SARS-CoV-2/latent-period'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['name'], 'human/infection/SARS-CoV-2/latent-period')
+
+    def test_filter_by_name_glob(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('dataproduct-list')
+        response = client.get(url, data={'name': 'human/infection/SARS-CoV-2/*'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 7)
+
+    def test_filter_by_version(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('dataproduct-list')
+        response = client.get(url, data={'version': '0.1.0'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 11)
 
 
 class CodeRepoReleaseAPITests(TestCase):
@@ -674,23 +754,34 @@ class CodeRepoReleaseAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('codereporelease-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'ScottishCovidResponse/SCRCdata')
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('codereporelease-list')
+        response = client.get(url, data={'name': 'ScottishCovidResponse/SCRCdata'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['name'], 'ScottishCovidResponse/SCRCdata')
+
+    def test_filter_by_version(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('codereporelease-list')
+        response = client.get(url, data={'version': '0.1.0'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['name'], 'ScottishCovidResponse/SCRCdata')
 
 
 class KeyvalueAPITests(TestCase):
@@ -712,23 +803,23 @@ class KeyvalueAPITests(TestCase):
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-detail', kwargs={'pk': 1})
-        # response = client.get(url, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(response.json()['name'], 'Test Root 1')
+        url = reverse('keyvalue-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
 
-    def test_filter_by_name(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['key'], 'TestKey1')
+
+    def test_filter_by_key(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        # url = reverse('storageroot-list')
-        # response = client.get(url, data={'name': 'Test Root 2'}, format='json')
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response['Content-Type'], 'application/json')
-        # self.assertEqual(len(response.json()), 1)
-        # self.assertEqual(response.json()[0]['name'], 'Test Root 2')
+        url = reverse('keyvalue-list')
+        response = client.get(url, data={'key': 'TestKey2'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]['key'], 'TestKey2')
 
 
 class TextFileAPITests(TestCase):
