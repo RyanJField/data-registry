@@ -2,13 +2,6 @@
 
 {% block content %}
 {{ block.super }}
-Click <a href="docs">here</a> to see documentation.
-{% if user.is_authenticated %}
-<div style="margin-top:1em;margin-bottom:1em;">
-  Click <a href="{% url 'get_token' %}">here</a> to create a new token for accessing the REST API or
-  click <a href="{% url 'revoke_token' %}">here</a> to revoke an existing token.
-</div>
-{% endif %}
 <div class="card">
   <div class="card-body">
     <h2>Data Products</h2>

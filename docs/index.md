@@ -1,5 +1,5 @@
 # Test docs
 
-Test documentation
+Test documentation.
 
 [some more docs](another.md)

@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/prov-report/<int:pk>/', api_views.ProvReportView.as_view(), name='prov_report'),
     path('get-token', views.get_token, name='get_token'),
     path('revoke-token', views.revoke_token, name='revoke_token'),
-    path('docs/', views.doc_index),
+    path('docs/', views.doc_index, name='docs_index'),
     path('docs/<str:name>', views.docs),
     path('tables/dataproducts', tables.data_product_table_data),
     path('tables/externalobjects', tables.external_objects_table_data),
