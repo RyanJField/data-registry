@@ -4,10 +4,28 @@ from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
 from django.contrib.auth import get_user_model
+from django.views.decorators.cache import cache_page
 from rest_framework.authtoken.models import Token
-from collections import namedtuple
+from rest_framework import pagination, response
+from collections import namedtuple, OrderedDict
 
 from . import models
+
+
+class CustomPagination(pagination.CursorPagination):
+    ordering = '-id'
+
+    def paginate_queryset(self, queryset, request, view=None):
+        self.count = queryset.count()
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        return response.Response(OrderedDict([
+            ('count', self.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data),
+        ]))
 
 
 def index(request):

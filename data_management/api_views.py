@@ -215,9 +215,9 @@ class BaseViewSet(mixins.CreateModelMixin,
     # lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
-        if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS + ('page',)):
-            args = ', '.join(self.model.FILTERSET_FIELDS + ('page',))
-            raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
+        #if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS + ('page',)):
+        #    args = ', '.join(self.model.FILTERSET_FIELDS + ('page',))
+        #    raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):

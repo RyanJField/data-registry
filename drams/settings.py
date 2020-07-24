@@ -87,6 +87,8 @@ GRAPPELLI_ADMIN_TITLE = 'SCRC DRAMS Admin'
 
 REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
+    'DEFAULT_PAGINATION_CLASS': 'data_management.views.CustomPagination',
+    'PAGE_SIZE': 100,
 }
 
 # Database
@@ -108,6 +110,19 @@ import sys
 if 'test' in sys.argv:
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
     DATABASES['default']['NAME'] = os.path.join(BASE_DIR, 'test_db.sqlite3')
+
+# Caching
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': None,
+        'OPTIONS': {
+            'binary': True,
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
