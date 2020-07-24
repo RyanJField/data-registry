@@ -6,7 +6,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
@@ -216,7 +216,6 @@ class BaseViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         if self.model.FILTERSET_FIELDS == '__all__':
-            print(self.model.field_names())
             filterset_fields = self.model.field_names() + ('cursor',)
         else:
             filterset_fields = self.model.FILTERSET_FIELDS + ('cursor',)
@@ -228,18 +227,22 @@ class BaseViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         return self.model.objects.all()
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         """
-        Customising the create to add the current user as the models updated_by.
+        Customising the create method to raise a 409 on uniqueness validation failing.
         """
         try:
-            serializer.save(updated_by=self.request.user)
-        except IntegrityError as ex:
-            raise APIIntegrityError(str(ex))
+            super().create(request, *args, **kwargs)
+        except ValidationError as ex:
+            name = list(ex.detail.keys())[0]
+            if ex.detail[name][0].code == 'unique':
+                raise APIIntegrityError('Field ' + name + ' must be unique')
+            else:
+                raise ex
 
-    def perform_update(self, serializer):
+    def perform_create(self, serializer):
         """
-        Customising the update to add the current user as the models updated_by.
+        Customising the save method to add the current user as the models updated_by.
         """
         try:
             serializer.save(updated_by=self.request.user)
