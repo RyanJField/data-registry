@@ -120,7 +120,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['username']
 
     def list(self, request, *args, **kwargs):
-        if set(request.query_params.keys()) - {'username'}:
+        if set(request.query_params.keys()) - {'username', 'cursor'}:
             raise BadQuery(detail='Invalid query arguments, only query arguments [username] are allowed')
         return super().list(request, *args, **kwargs)
 
@@ -135,7 +135,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        if request.query_params.keys():
+        if set(request.query_params.keys()) - {'cursor'}:
             raise BadQuery(detail='Invalid query arguments, no query arguments are allowed')
         return super().list(request, *args, **kwargs)
 
@@ -215,9 +215,14 @@ class BaseViewSet(mixins.CreateModelMixin,
     # lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
-        #if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS + ('page',)):
-        #    args = ', '.join(self.model.FILTERSET_FIELDS + ('page',))
-        #    raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
+        if self.model.FILTERSET_FIELDS == '__all__':
+            print(self.model.field_names())
+            filterset_fields = self.model.field_names() + ('cursor',)
+        else:
+            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor',)
+        if set(request.query_params.keys()) - set(filterset_fields):
+            args = ', '.join(filterset_fields)
+            raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):

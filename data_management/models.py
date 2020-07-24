@@ -13,6 +13,10 @@ TEXT_FIELD_LENGTH = 1024**2
 
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
+    """
+    Base model for all objects in the database. Used to defined common fields and functionality.
+    """
+    _field_names = None
     updated_by = models.ForeignKey(
             get_user_model(),
             on_delete=models.CASCADE,
@@ -30,6 +34,12 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
     def reverse_name(self):
         return self.__class__.__name__.lower()
 
+    @classmethod
+    def field_names(cls):
+        if cls._field_names is None:
+            cls._field_names = tuple(field.name for field in cls._meta.get_fields() if field.name != 'id')
+        return cls._field_names
+
     class Meta:
         abstract = True
         ordering = ['-last_updated']
@@ -39,12 +49,19 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
 # Custom Fields
 
 class URIField(models.CharField):
+    """
+    A field type used to specify that a field holds a URI.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         super().__init__(*args, **kwargs)
 
 
 class NameField(models.CharField):
+    """
+    A field type used to specify that a field holds a simple name, one that we can apply a glob filter to
+    when filtering the query.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         kwargs['validators'] = (validators.NameValidator(),)
@@ -52,6 +69,9 @@ class NameField(models.CharField):
 
 
 class VersionField(models.CharField):
+    """
+    A field type used to specify that a field holds a semantic version.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         kwargs['validators'] = (validators.VersionValidator(),)
