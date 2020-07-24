@@ -1,7 +1,7 @@
 from copy import deepcopy
 import fnmatch
 
-from django import forms
+from django import forms, db
 from django.http import HttpResponseBadRequest, JsonResponse
 from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
@@ -189,6 +189,8 @@ class CustomFilterSet(filterset.FilterSet):
     FILTER_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
     FILTER_DEFAULTS.update({
         models.NameField: {'filter_class': GlobFilter},
+        db.models.OneToOneField: {'filter_class': filters.NumberFilter},
+        db.models.ForeignKey: {'filter_class': filters.NumberFilter},
     })
 
 
@@ -213,8 +215,8 @@ class BaseViewSet(mixins.CreateModelMixin,
     # lookup_field = 'name'
 
     def list(self, request, *args, **kwargs):
-        if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS):
-            args = ', '.join(self.model.FILTERSET_FIELDS)
+        if set(request.query_params.keys()) - set(self.model.FILTERSET_FIELDS + ('page',)):
+            args = ', '.join(self.model.FILTERSET_FIELDS + ('page',))
             raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
         return super().list(request, *args, **kwargs)
 

@@ -24,7 +24,7 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
 
     EXTRA_DISPLAY_FIELDS = ()
     REQUIRED_FIELDS = ()
-    FILTERSET_FIELDS = ()
+    FILTERSET_FIELDS = '__all__'
     ADMIN_LIST_FIELDS = ()
 
     def reverse_name(self):
@@ -85,7 +85,6 @@ class Issue(BaseModel):
     #     'last_updated',
     # )
     EXTRA_DISPLAY_FIELDS = ('object_issues', 'component_issues')
-    FILTERSET_FIELDS = ('severity',)
     SHORT_DESC_LENGTH = 40
 
     severity = models.PositiveSmallIntegerField(default=1)
@@ -147,14 +146,6 @@ class Object(BaseModel):
         'authors',
         'licences',
         'keywords',
-    )
-    FILTERSET_FIELDS = (
-        'last_updated',
-        'updated_by',
-        'storage_location',
-        'data_product',
-        'code_repo_release',
-        'external_object',
     )
     ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
@@ -224,7 +215,6 @@ class ObjectComponent(BaseModel):
 
     `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
     """
-    FILTERSET_FIELDS = ('name', 'last_updated', 'object')
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
 
@@ -271,7 +261,6 @@ class CodeRun(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
-    FILTERSET_FIELDS = ('run_date', 'description', 'last_updated')
     ADMIN_LIST_FIELDS = ('description',)
 
     code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=True, blank=True)
@@ -332,7 +321,6 @@ class StorageRoot(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('name', 'root', 'last_updated', 'accessibility')
     ADMIN_LIST_FIELDS = ('name',)
 
     PUBLIC = 0
@@ -381,7 +369,6 @@ class StorageLocation(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'path', 'hash')
     ADMIN_LIST_FIELDS = ('storage_root', 'path')
 
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
@@ -420,7 +407,6 @@ class Source(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
     ADMIN_LIST_FIELDS = ('name',)
 
     name = NameField(null=False, blank=False)
@@ -471,7 +457,6 @@ class ExternalObject(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'doi_or_unique_name', 'release_date', 'title', 'version')
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
@@ -531,7 +516,6 @@ class Keyword(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'keyphrase')
     ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
@@ -567,7 +551,6 @@ class Author(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
     ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
@@ -595,7 +578,6 @@ class Licence(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated',)
     ADMIN_LIST_FIELDS = ('object',)
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
@@ -616,7 +598,6 @@ class Namespace(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name')
     ADMIN_LIST_FIELDS = ('name',)
 
     name = NameField(null=False, blank=False)
@@ -652,7 +633,6 @@ class DataProduct(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
@@ -692,7 +672,6 @@ class CodeRepoRelease(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name', 'version')
     ADMIN_LIST_FIELDS = ('name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
@@ -729,7 +708,6 @@ class KeyValue(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'key')
     ADMIN_LIST_FIELDS = ('object', 'key')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='metadata')
