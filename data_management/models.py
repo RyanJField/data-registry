@@ -156,7 +156,7 @@ class Object(BaseModel):
         'code_repo_release',
         'external_object',
     )
-    ADMIN_LIST_FIELDS = ('name',)
+    ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
     storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
@@ -171,6 +171,29 @@ class Object(BaseModel):
                 return str(self.external_object)
             except ExternalObject.DoesNotExist:
                 return super().__str__()
+
+    def is_orphan(self):
+        """
+        Test is this object is connected to anything else.
+        """
+        if self.storage_location:
+            return False
+        try:
+            if self.data_product:
+                return False
+        except DataProduct.DoesNotExist:
+            pass
+        try:
+            if self.code_repo_release:
+                return False
+        except CodeRepoRelease.DoesNotExist:
+            pass
+        try:
+            if self.external_object:
+                return False
+        except ExternalObject.DoesNotExist:
+            pass
+        return True
 
     def __str__(self):
         return self.name()
