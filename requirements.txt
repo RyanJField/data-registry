@@ -37,3 +37,4 @@ urllib3==1.25.9
 semver==2.10.2
 django-crispy-forms==1.9.2
 Markdown==3.2.2
+pylibmc==1.6.1
