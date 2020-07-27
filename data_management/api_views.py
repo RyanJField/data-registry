@@ -232,7 +232,7 @@ class BaseViewSet(mixins.CreateModelMixin,
         Customising the create method to raise a 409 on uniqueness validation failing.
         """
         try:
-            super().create(request, *args, **kwargs)
+            return super().create(request, *args, **kwargs)
         except ValidationError as ex:
             name = list(ex.detail.keys())[0]
             if ex.detail[name][0].code == 'unique':
@@ -245,7 +245,7 @@ class BaseViewSet(mixins.CreateModelMixin,
         Customising the save method to add the current user as the models updated_by.
         """
         try:
-            serializer.save(updated_by=self.request.user)
+            return serializer.save(updated_by=self.request.user)
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
