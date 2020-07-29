@@ -291,13 +291,6 @@ class CodeRun(BaseModel):
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('description',),
-                name='unique_code_run'),
-        ]
-
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
         full_url = ''.join(['http://', get_current_site(None).domain, url])
@@ -341,6 +334,7 @@ class StorageRoot(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
+    EXTRA_DISPLAY_FIELDS = ('locations',)
     ADMIN_LIST_FIELDS = ('name',)
 
     PUBLIC = 0
@@ -350,7 +344,7 @@ class StorageRoot(BaseModel):
         (PRIVATE, 'Private'),
     )
     name = NameField(null=False, blank=False)
-    root = URIField(null=False, blank=False)
+    root = URIField(null=False, blank=False, unique=True)
     accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
 
     class Meta:
