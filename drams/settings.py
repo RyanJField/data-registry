@@ -90,6 +90,10 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'data_management.metadata.CustomMetadata',
     'DEFAULT_PAGINATION_CLASS': 'data_management.pagination.CustomPagination',
     'PAGE_SIZE': 100,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'data_management.renderers.BrowsableAPIRenderer',
+    ]
 }
 
 # Database

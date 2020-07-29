@@ -249,7 +249,16 @@ class BaseViewSet(mixins.CreateModelMixin,
             raise APIIntegrityError(str(ex))
 
 
+class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
+    model = models.Issue
+    serializer_class = serializers.IssueSerializer
+    filterset_fields = models.Issue.FILTERSET_FIELDS
+    __doc__ = models.Issue.__doc__
+
+
 for name, cls in models.all_models.items():
+    if name == 'Issue':
+        continue
     data = {
         'model': cls,
         'serializer_class': getattr(serializers, name + 'Serializer'),
