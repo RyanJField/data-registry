@@ -3,6 +3,12 @@ from rest_framework.utils.field_mapping import ClassLookupDict
 
 
 class HTMLFormRenderer(renderers.HTMLFormRenderer):
+    """
+    Subclassing the default HTMLFormRenderer to override some of the default_style options.
+
+    We need to do this as the default style for the relational fields causes a timeout when
+    generating the HTML for for very large number of options for the related field.
+    """
     default_style = ClassLookupDict({
         serializers.Field: {
             'base_template': 'input.html',
@@ -79,5 +85,7 @@ class HTMLFormRenderer(renderers.HTMLFormRenderer):
 
 
 class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
+    """
+    Subclassing the BrowsableAPIRenderer to use our custom HTMLFormRenderer.
+    """
     form_renderer_class = HTMLFormRenderer
-

@@ -87,12 +87,12 @@ WSGI_APPLICATION = 'drams.wsgi.application'
 GRAPPELLI_ADMIN_TITLE = 'SCRC DRAMS Admin'
 
 REST_FRAMEWORK = {
-    'DEFAULT_METADATA_CLASS': 'data_management.metadata.CustomMetadata',
-    'DEFAULT_PAGINATION_CLASS': 'data_management.pagination.CustomPagination',
+    'DEFAULT_METADATA_CLASS': 'data_management.rest.metadata.CustomMetadata',
+    'DEFAULT_PAGINATION_CLASS': 'data_management.rest.pagination.CustomPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'data_management.renderers.BrowsableAPIRenderer',
+        'data_management.rest.renderers.BrowsableAPIRenderer',
     ]
 }
 

@@ -3,7 +3,8 @@ from django.utils.text import camel_case_to_spaces
 from django.views.decorators.cache import cache_page
 from rest_framework import routers
 
-from . import views, api_views, models, tables
+from . import views, models, tables
+from .rest import views as api_views
 
 router = routers.DefaultRouter()
 router.register(r'users', api_views.UserViewSet)
@@ -31,6 +32,7 @@ urlpatterns = [
 
 for name in models.all_models:
     url_name = camel_case_to_spaces(name).replace(' ', '_')
-    urlpatterns.append(path(url_name + '/<int:pk>', cache_page(300)(getattr(views, name + 'DetailView').as_view()), name=name.lower()))
-    #urlpatterns.append(path(url_name + '/<int:pk>', getattr(views, name + 'DetailView').as_view(), name=name.lower()))
+    urlpatterns.append(path(url_name + '/<int:pk>', cache_page(300)(getattr(views, name + 'DetailView').as_view()),
+                            name=name.lower()))
+    # urlpatterns.append(path(url_name + '/<int:pk>', getattr(views, name + 'DetailView').as_view(), name=name.lower()))
     urlpatterns.append(path(url_name + 's/', getattr(views, name + 'ListView').as_view(), name=name.lower() + 's')) 

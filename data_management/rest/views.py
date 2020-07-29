@@ -16,8 +16,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
-from . import models, serializers
-from .prov import generate_prov_document, serialize_prov_document
+from data_management import models
+from data_management.rest import serializers
+from data_management.prov import generate_prov_document, serialize_prov_document
 
 
 class BadQuery(APIException):
