@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'custom_user.apps.CustomUserConfig',
     'data_management.apps.DataManagementConfig',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,8 @@ REST_FRAMEWORK = {
         'data_management.rest.renderers.BrowsableAPIRenderer',
     ]
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

@@ -38,7 +38,8 @@ class UsersAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 4)
+        results = response.json()['results']
+        self.assertEqual(len(results), 4)
 
     def test_get_detail(self):
         client = APIClient()
@@ -58,8 +59,9 @@ class UsersAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['username'], 'testuserb')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['username'], 'testuserb')
 
 
 class GroupsAPITests(TestCase):
@@ -76,7 +78,8 @@ class GroupsAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 0)
+        results = response.json()['results']
+        self.assertEqual(len(results), 0)
 
 
 class StorageRootAPITests(TestCase):
@@ -93,7 +96,8 @@ class StorageRootAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 7)
+        results = response.json()['results']
+        self.assertEqual(len(results), 7)
 
     def test_get_detail(self):
         client = APIClient()
@@ -113,8 +117,9 @@ class StorageRootAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'DataRepository')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'DataRepository')
 
     def test_filter_by_root(self):
         client = APIClient()
@@ -124,8 +129,9 @@ class StorageRootAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'github')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'github')
 
     def test_filter_by_accessibility(self):
         client = APIClient()
@@ -135,7 +141,8 @@ class StorageRootAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 7)
+        results = response.json()['results']
+        self.assertEqual(len(results), 7)
 
 
 class StorageLocationAPITests(TestCase):
@@ -152,7 +159,8 @@ class StorageLocationAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 18)
+        results = response.json()['results']
+        self.assertEqual(len(results), 18)
 
     def test_get_detail(self):
         client = APIClient()
@@ -172,8 +180,9 @@ class StorageLocationAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['path'], 'master/SCRC/human/infection/SARS-CoV-2/latent-period/0.1.0.toml')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['path'], 'master/SCRC/human/infection/SARS-CoV-2/latent-period/0.1.0.toml')
 
     def test_filter_by_hash(self):
         client = APIClient()
@@ -183,8 +192,9 @@ class StorageLocationAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['path'], 'human/infection/SARS-CoV-2/scotland/cases_and_management/v0.1.0.h5')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['path'], 'human/infection/SARS-CoV-2/scotland/cases_and_management/v0.1.0.h5')
 
 
 class ObjectAPITests(TestCase):
@@ -201,7 +211,8 @@ class ObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 16)
+        results = response.json()['results']
+        self.assertEqual(len(results), 16)
 
     def test_get_detail(self):
         client = APIClient()
@@ -221,8 +232,9 @@ class ObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['storage_location'], 'http://testserver/api/storage_location/3/')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['storage_location'], 'http://testserver/api/storage_location/3/')
 
 
 class ObjectComponentAPITests(TestCase):
@@ -239,7 +251,8 @@ class ObjectComponentAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 32)
+        results = response.json()['results']
+        self.assertEqual(len(results), 32)
 
     def test_get_detail(self):
         client = APIClient()
@@ -259,8 +272,9 @@ class ObjectComponentAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'nhs_health_board/per_location/all_deaths')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'nhs_health_board/per_location/all_deaths')
 
 
 class IssueAPITests(TestCase):
@@ -277,7 +291,8 @@ class IssueAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 3)
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
 
     def test_get_detail(self):
         client = APIClient()
@@ -297,8 +312,9 @@ class IssueAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['description'], 'Test Issue 2')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['description'], 'Test Issue 2')
 
 
 class CodeRunAPITests(TestCase):
@@ -315,7 +331,8 @@ class CodeRunAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
 
     def test_get_detail(self):
         client = APIClient()
@@ -335,8 +352,9 @@ class CodeRunAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
 
     def test_filter_by_description(self):
         client = APIClient()
@@ -346,8 +364,9 @@ class CodeRunAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
 
 
 class SourceAPITests(TestCase):
@@ -364,7 +383,8 @@ class SourceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
     def test_get_detail(self):
         client = APIClient()
@@ -384,8 +404,9 @@ class SourceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'Scottish Government Open Data Repository')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'Scottish Government Open Data Repository')
 
 
 class ExternalObjectAPITests(TestCase):
@@ -402,7 +423,8 @@ class ExternalObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 3)
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
 
     def test_get_detail(self):
         client = APIClient()
@@ -422,8 +444,9 @@ class ExternalObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
 
     def test_filter_by_title(self):
         client = APIClient()
@@ -433,8 +456,9 @@ class ExternalObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
 
     def test_filter_by_version(self):
         client = APIClient()
@@ -444,8 +468,9 @@ class ExternalObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['doi_or_unique_name'], 'scottish coronavirus-covid-19-management-information')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['doi_or_unique_name'], 'scottish coronavirus-covid-19-management-information')
 
 
 class QualityControlledAPITests(TestCase):
@@ -462,7 +487,8 @@ class QualityControlledAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 3)
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
 
     def test_get_detail(self):
         client = APIClient()
@@ -489,7 +515,8 @@ class KeywordAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 5)
+        results = response.json()['results']
+        self.assertEqual(len(results), 5)
 
     def test_get_detail(self):
         client = APIClient()
@@ -509,8 +536,9 @@ class KeywordAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['keyphrase'], 'monoclonal antibodies')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['keyphrase'], 'monoclonal antibodies')
 
     def test_filter_by_keyphrase_glob(self):
         client = APIClient()
@@ -520,7 +548,8 @@ class KeywordAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
 
 class AuthorAPITests(TestCase):
@@ -537,7 +566,8 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 3)
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
 
     def test_get_detail(self):
         client = APIClient()
@@ -557,7 +587,8 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
     def test_filter_by_family_name_glob(self):
         client = APIClient()
@@ -567,8 +598,9 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['family_name'], 'Cipriani')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['family_name'], 'Cipriani')
 
     def test_filter_by_personal_name(self):
         client = APIClient()
@@ -578,8 +610,9 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['family_name'], 'Massabeti')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['family_name'], 'Massabeti')
 
     def test_filter_by_personal_name_glob(self):
         client = APIClient()
@@ -589,7 +622,8 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
 
 class LicenceAPITests(TestCase):
@@ -606,7 +640,8 @@ class LicenceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
 
     def test_get_detail(self):
         client = APIClient()
@@ -633,7 +668,8 @@ class NamespaceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
     def test_get_detail(self):
         client = APIClient()
@@ -653,8 +689,9 @@ class NamespaceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'simple_network_sim')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'simple_network_sim')
 
     def test_filter_by_name_glob(self):
         client = APIClient()
@@ -664,7 +701,8 @@ class NamespaceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 2)
+        results = response.json()['results']
+        self.assertEqual(len(results), 2)
 
 
 class DataProductAPITests(TestCase):
@@ -681,7 +719,8 @@ class DataProductAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 11)
+        results = response.json()['results']
+        self.assertEqual(len(results), 11)
 
     def test_get_detail(self):
         client = APIClient()
@@ -701,7 +740,8 @@ class DataProductAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 7)
+        results = response.json()['results']
+        self.assertEqual(len(results), 7)
 
     def test_filter_by_name(self):
         client = APIClient()
@@ -711,8 +751,9 @@ class DataProductAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'human/infection/SARS-CoV-2/latent-period')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'human/infection/SARS-CoV-2/latent-period')
 
     def test_filter_by_name_glob(self):
         client = APIClient()
@@ -722,7 +763,8 @@ class DataProductAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 7)
+        results = response.json()['results']
+        self.assertEqual(len(results), 7)
 
     def test_filter_by_version(self):
         client = APIClient()
@@ -732,7 +774,8 @@ class DataProductAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 11)
+        results = response.json()['results']
+        self.assertEqual(len(results), 11)
 
 
 class CodeRepoReleaseAPITests(TestCase):
@@ -749,7 +792,8 @@ class CodeRepoReleaseAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
 
     def test_get_detail(self):
         client = APIClient()
@@ -769,8 +813,9 @@ class CodeRepoReleaseAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'ScottishCovidResponse/SCRCdata')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'ScottishCovidResponse/SCRCdata')
 
     def test_filter_by_version(self):
         client = APIClient()
@@ -780,8 +825,9 @@ class CodeRepoReleaseAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['name'], 'ScottishCovidResponse/SCRCdata')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], 'ScottishCovidResponse/SCRCdata')
 
 
 class KeyvalueAPITests(TestCase):
@@ -798,7 +844,8 @@ class KeyvalueAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 4)
+        results = response.json()['results']
+        self.assertEqual(len(results), 4)
 
     def test_get_detail(self):
         client = APIClient()
@@ -818,8 +865,9 @@ class KeyvalueAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['key'], 'TestKey2')
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['key'], 'TestKey2')
 
 
 class TextFileAPITests(TestCase):
@@ -836,7 +884,8 @@ class TextFileAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(len(response.json()), 1)
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
 
     def test_get_detail(self):
         client = APIClient()
