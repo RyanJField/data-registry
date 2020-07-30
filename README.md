@@ -9,8 +9,8 @@ User documentation is available [here](docs/index.md).
 Development and maintenance guides are availabe in the Wiki.
 
 [travis-master-img]: https://img.shields.io/travis/ScottishCovidResponse/data-registry/master.svg?label=build-master
-[travis-master-url]: https://travis-ci.org/ScottishCovidResponse/data-registry.jl?branch=master
+[travis-master-url]: https://travis-ci.org/ScottishCovidResponse/data-registry.svg?branch=master
 
 [travis-develop-img]: https://img.shields.io/travis/ScottishCovidResponse/data-registry/develop.svg?label=build-develop
-[travis-develop-url]: https://travis-ci.org/ScottishCovidResponse/data-registry.jl?branch=develop
+[travis-develop-url]: https://travis-ci.org/ScottishCovidResponse/data-registry.svg?branch=develop
 
