@@ -19,7 +19,6 @@ lxml==4.5.1
 mysql-connector-python==8.0.20
 networkx==2.4
 oauthlib==3.1.0
-pkg-resources==0.0.0
 protobuf==3.12.2
 prov==1.5.3
 psycopg2-binary==2.8.5
