@@ -23,7 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '91qh0bw%vj8jd(+s1dos++=thx3v165*jlejlt9l-e&2b1*@ak'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+# DEBUG_PROPAGATE_EXCEPTIONS = True
 
 ALLOWED_HOSTS = ['data.scrc.uk', '127.0.0.1', 'localhost']
 
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'custom_user.apps.CustomUserConfig',
     'data_management.apps.DataManagementConfig',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +88,16 @@ WSGI_APPLICATION = 'drams.wsgi.application'
 GRAPPELLI_ADMIN_TITLE = 'SCRC DRAMS Admin'
 
 REST_FRAMEWORK = {
-    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
+    'DEFAULT_METADATA_CLASS': 'data_management.rest.metadata.CustomMetadata',
+    'DEFAULT_PAGINATION_CLASS': 'data_management.rest.pagination.CustomPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'data_management.rest.renderers.BrowsableAPIRenderer',
+    ]
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -104,6 +114,23 @@ DATABASES = {
     }
 }
 
+import sys
+if 'test' in sys.argv:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+    DATABASES['default']['NAME'] = os.path.join(BASE_DIR, 'test_db.sqlite3')
+
+# Caching
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': None,
+        'OPTIONS': {
+            'binary': True,
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

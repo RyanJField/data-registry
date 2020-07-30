@@ -13,6 +13,10 @@ TEXT_FIELD_LENGTH = 1024**2
 
 
 class BaseModel(ModelFieldRequiredMixin, models.Model):
+    """
+    Base model for all objects in the database. Used to defined common fields and functionality.
+    """
+    _field_names = None
     updated_by = models.ForeignKey(
             get_user_model(),
             on_delete=models.CASCADE,
@@ -24,11 +28,17 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
 
     EXTRA_DISPLAY_FIELDS = ()
     REQUIRED_FIELDS = ()
-    FILTERSET_FIELDS = ()
+    FILTERSET_FIELDS = '__all__'
     ADMIN_LIST_FIELDS = ()
 
     def reverse_name(self):
         return self.__class__.__name__.lower()
+
+    @classmethod
+    def field_names(cls):
+        if cls._field_names is None:
+            cls._field_names = tuple(field.name for field in cls._meta.get_fields() if field.name != 'id')
+        return cls._field_names
 
     class Meta:
         abstract = True
@@ -39,12 +49,19 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
 # Custom Fields
 
 class URIField(models.CharField):
+    """
+    A field type used to specify that a field holds a URI.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         super().__init__(*args, **kwargs)
 
 
 class NameField(models.CharField):
+    """
+    A field type used to specify that a field holds a simple name, one that we can apply a glob filter to
+    when filtering the query.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         kwargs['validators'] = (validators.NameValidator(),)
@@ -52,6 +69,9 @@ class NameField(models.CharField):
 
 
 class VersionField(models.CharField):
+    """
+    A field type used to specify that a field holds a semantic version.
+    """
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 1024
         kwargs['validators'] = (validators.VersionValidator(),)
@@ -85,7 +105,6 @@ class Issue(BaseModel):
     #     'last_updated',
     # )
     EXTRA_DISPLAY_FIELDS = ('object_issues', 'component_issues')
-    FILTERSET_FIELDS = ('severity',)
     SHORT_DESC_LENGTH = 40
 
     severity = models.PositiveSmallIntegerField(default=1)
@@ -148,15 +167,7 @@ class Object(BaseModel):
         'licences',
         'keywords',
     )
-    FILTERSET_FIELDS = (
-        'last_updated',
-        'updated_by',
-        'storage_location',
-        'data_product',
-        'code_repo_release',
-        'external_object',
-    )
-    ADMIN_LIST_FIELDS = ('name',)
+    ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
     storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
@@ -171,6 +182,29 @@ class Object(BaseModel):
                 return str(self.external_object)
             except ExternalObject.DoesNotExist:
                 return super().__str__()
+
+    def is_orphan(self):
+        """
+        Test is this object is connected to anything else.
+        """
+        if self.storage_location:
+            return False
+        try:
+            if self.data_product:
+                return False
+        except DataProduct.DoesNotExist:
+            pass
+        try:
+            if self.code_repo_release:
+                return False
+        except CodeRepoRelease.DoesNotExist:
+            pass
+        try:
+            if self.external_object:
+                return False
+        except ExternalObject.DoesNotExist:
+            pass
+        return True
 
     def __str__(self):
         return self.name()
@@ -201,7 +235,6 @@ class ObjectComponent(BaseModel):
 
     `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
     """
-    FILTERSET_FIELDS = ('name', 'last_updated', 'object')
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
 
@@ -248,7 +281,6 @@ class CodeRun(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
-    FILTERSET_FIELDS = ('run_date', 'description', 'last_updated')
     ADMIN_LIST_FIELDS = ('description',)
 
     code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=True, blank=True)
@@ -258,13 +290,6 @@ class CodeRun(BaseModel):
     description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('description',),
-                name='unique_code_run'),
-        ]
 
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
@@ -309,7 +334,7 @@ class StorageRoot(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('name', 'root', 'last_updated', 'accessibility')
+    EXTRA_DISPLAY_FIELDS = ('locations',)
     ADMIN_LIST_FIELDS = ('name',)
 
     PUBLIC = 0
@@ -319,7 +344,7 @@ class StorageRoot(BaseModel):
         (PRIVATE, 'Private'),
     )
     name = NameField(null=False, blank=False)
-    root = URIField(null=False, blank=False)
+    root = URIField(null=False, blank=False, unique=True)
     accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
 
     class Meta:
@@ -358,7 +383,6 @@ class StorageLocation(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'path', 'hash')
     ADMIN_LIST_FIELDS = ('storage_root', 'path')
 
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
@@ -397,7 +421,6 @@ class Source(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name', 'abbreviation')
     ADMIN_LIST_FIELDS = ('name',)
 
     name = NameField(null=False, blank=False)
@@ -448,7 +471,6 @@ class ExternalObject(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'doi_or_unique_name', 'release_date', 'title', 'version')
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
@@ -508,7 +530,6 @@ class Keyword(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'keyphrase')
     ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
@@ -544,7 +565,6 @@ class Author(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'family_name', 'personal_name')
     ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
@@ -572,7 +592,6 @@ class Licence(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated',)
     ADMIN_LIST_FIELDS = ('object',)
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
@@ -593,7 +612,6 @@ class Namespace(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name')
     ADMIN_LIST_FIELDS = ('name',)
 
     name = NameField(null=False, blank=False)
@@ -629,7 +647,6 @@ class DataProduct(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'namespace', 'name', 'version')
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
@@ -669,7 +686,6 @@ class CodeRepoRelease(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'name', 'version')
     ADMIN_LIST_FIELDS = ('name', 'version')
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
@@ -706,7 +722,6 @@ class KeyValue(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    FILTERSET_FIELDS = ('last_updated', 'key')
     ADMIN_LIST_FIELDS = ('object', 'key')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='metadata')
@@ -735,6 +750,16 @@ class TextFile(BaseModel):
     These objects are not linked to the rest of the schema but can be referenced by URL using the `StorageRoot` and
     `StorageLocation` objects. If this table is migrated to a dedicated data store then the `StorageRoot` can be updated
     and if the relative `StorageLocation` paths remain the same the generated paths should still be valid.
+
+    ### Writable Fields:
+    `text`: Free text field for the file contents
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `TextFile`, final integer is the `TextFile` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
     """
     text = models.TextField(max_length=TEXT_FIELD_LENGTH, null=False, blank=False)
 

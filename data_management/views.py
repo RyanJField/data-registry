@@ -1,9 +1,11 @@
 import os
+
 from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
+
 from collections import namedtuple
 
 from . import models
@@ -107,7 +109,7 @@ class IssueDetailView(generic.DetailView):
 
 
 def docs(request, name):
-    with open(os.path.join('docs', name + '.md')) as file:
+    with open(os.path.join('docs', name)) as file:
         text = file.read()
     ctx = {
         'text': text
