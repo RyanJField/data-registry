@@ -8,4 +8,4 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - python3 manage.py test nosetests --verbosity=1
+  - python3 manage.py test
