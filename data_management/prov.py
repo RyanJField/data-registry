@@ -54,7 +54,7 @@ def generate_prov_document(code_run):
         None,
         {
             prov.model.PROV_TYPE: 'run',
-            'run_identifier': code_run.run_identifier,
+            'description': code_run.description,
         }
     )
     prov_objects = {}

@@ -23,9 +23,26 @@
 <body>
 <div class="container">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand">SCRC data registration and management system</a>
+    <a class="navbar-brand" href="/">SCRC data registration and management system</a>
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Links</a>
+          <div class="dropdown-menu" aria-labbelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'docs_index' %}">Documentation</a>
+            <a class="dropdown-item" href="{{ request.scheme }}://{{ request.get_host }}/api/">REST API</a>
+            <a class="dropdown-item" href="{{ request.scheme }}://{{ request.get_host }}/static/images/schema.svg">Database Schema</a>
+            {% if user.is_authenticated %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'get_token' %}">Generate API Token</a>
+            <a class="dropdown-item" href="{% url 'revoke_token' %}">Revoke API Token</a>
+            {% endif %}
+            {% if user.is_staff %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/admin">Admin</a>
+            {% endif %}
+          </div>
+        </li>
       </ul>
       <span class="navbar-text">
             {% if user.is_authenticated %}
@@ -45,9 +62,32 @@
     </div>
   </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
+<script>
+  function dataProductsData(params, options) {
+    var url = 'tables/dataproducts'
+    $.get(url + '?' + $.param(params.data)).then(function (res) {
+      params.success(res)
+    })
+  }
+
+  function externalObjectsData(params, options) {
+    var url = 'tables/externalobjects'
+    $.get(url + '?' + $.param(params.data)).then(function (res) {
+      params.success(res)
+    })
+  }
+
+  function codeRepoReleasesData(params, options) {
+    var url = 'tables/codereporeleases'
+    $.get(url + '?' + $.param(params.data)).then(function (res) {
+      params.success(res)
+    })
+  }
+</script>
 </body>
 </html>
