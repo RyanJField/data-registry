@@ -109,8 +109,9 @@ def find_object_by_file_hash(file_hash, opts):
     object_id = url_to_id(object_data['url'])
     url = API_ROOT + DATA_PRODUCT_URL + '?format=json&object=%d' % object_id
     data_product = read_api(url, 'Could not find data product %s' % opts.data_product)
+    namespace = read_api(data_product['namespace'], 'Failed to read namespace %s' % data_product['namespace'])
 
-    data_product_name = '%s@%s' % (data_product['name'], data_product['version'])
+    data_product_name = '%s::%s@%s' % (namespace['name'], data_product['name'], data_product['version'])
 
     return data_product_name, object_data
 
@@ -123,8 +124,9 @@ def find_object_by_data_product(opts):
 
     data_product = read_api(url, 'Could not find data product %s' % opts.data_product)
     object_url = data_product['object']
+    namespace = read_api(data_product['namespace'], 'Failed to read namespace %s' % data_product['namespace'])
 
-    data_product_name = '%s@%s' % (data_product['name'], data_product['version'])
+    data_product_name = '%s::%s@%s' % (namespace['name'], data_product['name'], data_product['version'])
     object_data = read_api(object_url, 'Failed to read object_url %s' % object_url)
 
     return data_product_name, object_data
