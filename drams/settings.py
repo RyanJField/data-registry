@@ -119,11 +119,6 @@ DATABASES = {
     }
 }
 
-import sys
-if 'test' in sys.argv:
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
-    DATABASES['default']['NAME'] = os.path.join(BASE_DIR, 'test_db.sqlite3')
-
 # Caching
 
 CACHES = {
