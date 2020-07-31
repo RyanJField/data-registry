@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from . import models
+from data_management import models
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -40,7 +40,14 @@ class BaseSerializer(serializers.HyperlinkedModelSerializer):
         return expanded_fields + list(self.Meta.model.EXTRA_DISPLAY_FIELDS)
 
 
+class IssueSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = models.Issue
+
+
 for name, cls in models.all_models.items():
+    if name == 'Issue':
+        continue
     meta_cls = type('Meta', (BaseSerializer.Meta,), {'model': cls, 'read_only_fields': cls.EXTRA_DISPLAY_FIELDS})
     data = {'Meta': meta_cls}
     globals()[name + "Serializer"] = type(name + "Serializer", (BaseSerializer,), data)

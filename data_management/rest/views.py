@@ -5,10 +5,11 @@ from hashlib import sha1
 import hmac
 import time
 
-from django import forms
+from django import forms, db
 from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
 from rest_framework.response import Response
@@ -19,8 +20,14 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, HttpResponse, redirect
 
-from . import models, serializers
-from .prov import generate_prov_document, serialize_prov_document
+from data_management import models
+from data_management.rest import serializers
+from data_management.prov import generate_prov_document, serialize_prov_document
+
+
+class BadQuery(APIException):
+    status_code = 400
+    default_code = 'bad_query'
 
 
 class JPEGRenderer(renderers.BaseRenderer):
@@ -116,6 +123,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['username']
 
+    def list(self, request, *args, **kwargs):
+        if set(request.query_params.keys()) - {'username', 'cursor'}:
+            raise BadQuery(detail='Invalid query arguments, only query arguments [username] are allowed')
+        return super().list(request, *args, **kwargs)
+
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -125,6 +137,11 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        if set(request.query_params.keys()) - {'cursor'}:
+            raise BadQuery(detail='Invalid query arguments, no query arguments are allowed')
+        return super().list(request, *args, **kwargs)
 
 
 class APIIntegrityError(exceptions.APIException):
@@ -176,6 +193,8 @@ class CustomFilterSet(filterset.FilterSet):
     FILTER_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
     FILTER_DEFAULTS.update({
         models.NameField: {'filter_class': GlobFilter},
+        db.models.OneToOneField: {'filter_class': filters.NumberFilter},
+        db.models.ForeignKey: {'filter_class': filters.NumberFilter},
     })
 
 
@@ -199,24 +218,38 @@ class BaseViewSet(mixins.CreateModelMixin,
     filter_backends = [CustomDjangoFilterBackend]
     # lookup_field = 'name'
 
+    def list(self, request, *args, **kwargs):
+        if self.model.FILTERSET_FIELDS == '__all__':
+            filterset_fields = self.model.field_names() + ('cursor',)
+        else:
+            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor',)
+        if set(request.query_params.keys()) - set(filterset_fields):
+            args = ', '.join(filterset_fields)
+            raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         return self.model.objects.all()
 
+    def create(self, request, *args, **kwargs):
+        """
+        Customising the create method to raise a 409 on uniqueness validation failing.
+        """
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as ex:
+            name = list(ex.detail.keys())[0]
+            if ex.detail[name][0].code == 'unique':
+                raise APIIntegrityError('Field ' + name + ' must be unique')
+            else:
+                raise ex
+
     def perform_create(self, serializer):
         """
-        Customising the create to add the current user as the models updated_by.
+        Customising the save method to add the current user as the models updated_by.
         """
         try:
-            serializer.save(updated_by=self.request.user)
-        except IntegrityError as ex:
-            raise APIIntegrityError(str(ex))
-
-    def perform_update(self, serializer):
-        """
-        Customising the update to add the current user as the models updated_by.
-        """
-        try:
-            serializer.save(updated_by=self.request.user)
+            return serializer.save(updated_by=self.request.user)
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
@@ -250,7 +283,23 @@ class ObjectStorageView(views.APIView):
         url = self.create_url(name, 'PUT')
         return HttpResponse(url)
 
+class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
+    model = models.Issue
+    serializer_class = serializers.IssueSerializer
+    filterset_fields = models.Issue.FILTERSET_FIELDS
+    __doc__ = models.Issue.__doc__
+
+    def create(self, request, *args, **kwargs):
+        if 'object_issues' not in request.data:
+            request.data['object_issues'] = []
+        if 'component_issues' not in request.data:
+            request.data['component_issues'] = []
+        return super().create(request, *args, **kwargs)
+
+
 for name, cls in models.all_models.items():
+    if name == 'Issue':
+        continue
     data = {
         'model': cls,
         'serializer_class': getattr(serializers, name + 'Serializer'),
