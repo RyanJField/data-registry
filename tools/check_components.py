@@ -111,18 +111,7 @@ def find_namespace_id(opts):
     return url_to_id(namespace['url'])
 
 
-def main(args=None):
-    if args is None:
-        import sys
-        args = sys.argv[1:]
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--data_product', type=str, help='Registry data product to look up')
-    parser.add_argument('file', type=str, help='File to process')
-    parser.add_argument('-n', '--namespace', type=str, help='Namespace of data product')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Print verbose output')
-
-    opts = parser.parse_args(args)
+def check_file(opts):
     components = process(opts.file)
 
     if opts.data_product:
@@ -134,21 +123,18 @@ def main(args=None):
         object_data = find_object_by_file_hash(file_hash.hexdigest(), opts)
 
     component_urls = object_data['components']
-
     names = get_component_names(component_urls)
 
     if opts.verbose:
         print('File components:')
         for c in components:
-            print(c)
+            print('> %s' % c)
         print()
 
     errors = []
-
     for c in components:
         if c not in names:
             errors.append('File component %s not found in registry' % c)
-
     for n in names:
         if n not in components:
             errors.append('Registry component %s not found in file' % n)
@@ -158,7 +144,53 @@ def main(args=None):
     else:
         print('Errors found:')
         for e in errors:
-            print(e)
+            print('> %s ' % e)
+
+
+def get_status(opts):
+    object_data = find_object_by_data_product(opts)
+
+    storage_location_url = object_data['storage_location']
+    storage_location_data = read_api(storage_location_url, 'failed to read storage_location %s' % storage_location_url)
+
+    print('Data registry storage location hash:')
+    print('> %s' % storage_location_data['hash'])
+    print()
+
+    component_urls = object_data['components']
+    names = get_component_names(component_urls)
+    print('Data registry components:')
+    for n in names:
+        print('> %s' % n)
+
+
+def main(args=None):
+    if args is None:
+        import sys
+        args = sys.argv[1:]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true', help='Print verbose output')
+
+    subparsers = parser.add_subparsers(title='subcommands', dest='subcommand')
+
+    check_parser = subparsers.add_parser('check', help='check file contains against registry')
+    check_parser.add_argument('-d', '--data_product', type=str, help='Registry data product to look up')
+    check_parser.add_argument('-n', '--namespace', type=str, help='Namespace of data product')
+    check_parser.add_argument('file', type=str, help='File to process')
+
+    status_parser = subparsers.add_parser('status', help='print data registry entry for data product')
+    status_parser.add_argument('-n', '--namespace', type=str, help='Namespace of data product')
+    status_parser.add_argument('data_product', type=str, help='Registry data product to look up')
+
+    opts = parser.parse_args(args)
+
+    if opts.subcommand == 'check':
+        check_file(opts)
+    elif opts.subcommand == 'status':
+        get_status(opts)
+    else:
+        print('unknown command %s' % opts.subcommand)
 
 
 if __name__ == '__main__':
