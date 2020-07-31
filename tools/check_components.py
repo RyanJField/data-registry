@@ -48,7 +48,11 @@ def url_to_id(url):
     return int(url.split('/')[-2])
 
 
-def main(args):
+def main(args=None):
+    if args is None:
+        import sys
+        args = sys.argv[1:]
+
     parser = argparse.ArgumentParser()
     parser.add_argument('data_product', type=str, help='Registry data product to look up')
     parser.add_argument('file', type=str, help='File to process')
