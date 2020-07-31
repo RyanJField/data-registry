@@ -7,10 +7,10 @@ import html
 import hashlib
 
 API_ROOT = 'https://data.scrc.uk/api/'
-DATA_PRODUCT_URL = 'data_product/'
-NAMESPACE_URL = 'namespace/'
-STORAGE_LOCATION_URL = 'storage_location/'
-OBJECT_URL = 'object/'
+DATA_PRODUCT_ENDPOINT = 'data_product/'
+NAMESPACE_ENDPOINT = 'namespace/'
+STORAGE_LOCATION_ENDPOINT = 'storage_location/'
+OBJECT_ENDPOINT = 'object/'
 
 
 def is_leaf(node):
@@ -81,6 +81,8 @@ def read_api(url, error_message):
     if 'count' in data:
         if data['count'] == 0:
             raise Exception(error_message)
+        if data['count'] > 1:
+            raise Exception('multiple entries found for API query %s' % url)
         return data['results'][0]
 
     return data
@@ -98,16 +100,16 @@ def get_component_names(component_urls):
 
 
 def find_object_by_file_hash(file_hash, opts):
-    url = API_ROOT + STORAGE_LOCATION_URL + '?format=json&hash=%s' % html.escape(file_hash)
+    url = API_ROOT + STORAGE_LOCATION_ENDPOINT + '?format=json&hash=%s' % html.escape(file_hash)
 
     result = read_api(url, 'Could not find storage location with file hash matching %s' % opts.file)
     storage_location_id = url_to_id(result['url'])
 
-    url = API_ROOT + OBJECT_URL + '?format=json&storage_location=%d' % storage_location_id
+    url = API_ROOT + OBJECT_ENDPOINT + '?format=json&storage_location=%d' % storage_location_id
     object_data = read_api(url, 'Could not find object with storage_location %d' % storage_location_id)
 
     object_id = url_to_id(object_data['url'])
-    url = API_ROOT + DATA_PRODUCT_URL + '?format=json&object=%d' % object_id
+    url = API_ROOT + DATA_PRODUCT_ENDPOINT + '?format=json&object=%d' % object_id
     data_product = read_api(url, 'Could not find data product %s' % opts.data_product)
     namespace = read_api(data_product['namespace'], 'Failed to read namespace %s' % data_product['namespace'])
 
@@ -117,7 +119,7 @@ def find_object_by_file_hash(file_hash, opts):
 
 
 def find_object_by_data_product(opts):
-    url = API_ROOT + DATA_PRODUCT_URL + '?format=json&name=%s' % html.escape(opts.data_product)
+    url = API_ROOT + DATA_PRODUCT_ENDPOINT + '?format=json&name=%s' % html.escape(opts.data_product)
     if opts.namespace:
         namespace_id = find_namespace_id(opts)
         url += '&namespace=%d' % namespace_id
@@ -133,7 +135,7 @@ def find_object_by_data_product(opts):
 
 
 def find_namespace_id(opts):
-    url = API_ROOT + NAMESPACE_URL + '?format=json&name=%s' % html.escape(opts.namespace)
+    url = API_ROOT + NAMESPACE_ENDPOINT + '?format=json&name=%s' % html.escape(opts.namespace)
     namespace = read_api(url, 'Could not find namespace %s' % opts.namespace)
     return url_to_id(namespace['url'])
 
@@ -215,12 +217,15 @@ def main(args=None):
 
     opts = parser.parse_args(args)
 
-    if opts.subcommand == 'check':
-        check_file(opts)
-    elif opts.subcommand == 'status':
-        get_status(opts)
-    else:
-        print('unknown command %s' % opts.subcommand)
+    try:
+        if opts.subcommand == 'check':
+            check_file(opts)
+        elif opts.subcommand == 'status':
+            get_status(opts)
+        else:
+            print('unknown command %s' % opts.subcommand)
+    except Exception as ex:
+        print('error: %s' % str(ex))
 
 
 if __name__ == '__main__':
