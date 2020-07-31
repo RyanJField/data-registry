@@ -7,6 +7,7 @@ import html
 
 API_ROOT = 'https://data.scrc.uk/api/'
 DATA_PRODUCT_URL = 'data_product/'
+NAMESPACE_URL = 'namespace/'
 
 
 def is_leaf(node):
@@ -56,19 +57,40 @@ def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('data_product', type=str, help='Registry data product to look up')
     parser.add_argument('file', type=str, help='File to process')
+    parser.add_argument('-n', '--namespace', type=str, help='Namespace of data product')
 
     opts = parser.parse_args(args)
     components = process(opts.file)
 
-    r = requests.get(API_ROOT + DATA_PRODUCT_URL + '?format=json&name=%s' % html.escape(opts.data_product))
+    namespace_id = 0
+    if opts.namespace:
+        url = API_ROOT + NAMESPACE_URL + '?format=json&name=%s' % html.escape(opts.namespace)
+
+        r = requests.get(url)
+        if r.status_code != 200:
+            raise Exception(r.content)
+
+        result = r.json()
+        if not result or result['count'] == 0:
+            raise Exception('Could not namespace ' % opts.namespace)
+        if result['count'] > 1:
+            raise Exception('Multiple namespaces found for filter ' % opts.namespace)
+
+        namespace_id = url_to_id(result['results'][0]['url'])
+
+    url = API_ROOT + DATA_PRODUCT_URL + '?format=json&name=%s' % html.escape(opts.data_product)
+    if opts.namespace:
+        url += '&namespace=%d' % namespace_id
+
+    r = requests.get(url)
     if r.status_code != 200:
         raise Exception(r.content)
 
     result = r.json()
-    if not result:
+    if not result or result['count'] == 0:
         raise Exception('Could not find data product ' % opts.data_product)
 
-    data_product = result[0]
+    data_product = result['results'][0]
     object_url = data_product['object']
 
     r = requests.get(object_url)
