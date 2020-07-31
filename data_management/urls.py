@@ -27,6 +27,7 @@ urlpatterns = [
     path('tables/dataproducts', cache_page(300)(tables.data_product_table_data)),
     path('tables/externalobjects', cache_page(300)(tables.external_objects_table_data)),
     path('tables/codereporeleases', cache_page(300)(tables.code_repo_release_table_data)),
+    path('api/data/<path:name>', api_views.ObjectStorageView.as_view())
 ]
 
 

@@ -1,5 +1,9 @@
+from configparser import ConfigParser
 from copy import deepcopy
 import fnmatch
+from hashlib import sha1
+import hmac
+import time
 
 from django import forms, db
 from django_filters import filters
@@ -14,7 +18,7 @@ from django_filters.rest_framework import DjangoFilterBackend, filterset
 from django_filters import constants
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, HttpResponse, redirect
 
 from data_management import models
 from data_management.rest import serializers
@@ -249,6 +253,35 @@ class BaseViewSet(mixins.CreateModelMixin,
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
+class ObjectStorageView(views.APIView):
+    """
+    API views allowing users to upload and download data from object storage
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        self.config = ConfigParser()
+        self.config.read('/home/ubuntu/config.ini')
+        super().__init__(*args, **kwargs)
+
+    def create_url(self, path, method):
+        expiry_time = int(time.time()) + int(self.config['storage']['duration'])
+        path = '/v1/' + self.config['storage']['bucket'] + '/' + path
+        if method == 'GET':
+            hmac_body = '%s\n%s\n%s' % ('GET', expiry_time, path)
+        elif method == 'PUT':
+            hmac_body = '%s\n%s\n%s' % ('PUT', expiry_time, path)
+        sig = hmac.new(self.config['storage']['key'].encode('utf-8'), hmac_body.encode('utf-8'), sha1).hexdigest()
+        return '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (self.config['storage']['url'], path, sig, expiry_time)
+
+    def get(self, request, name):
+        url = self.create_url(name, 'GET')
+        return redirect(url)
+
+    def put(self, request, name):
+        url = self.create_url(name, 'PUT')
+        return HttpResponse(url)
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
