@@ -124,7 +124,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['username']
 
     def list(self, request, *args, **kwargs):
-        if set(request.query_params.keys()) - {'username', 'cursor'}:
+        if set(request.query_params.keys()) - {'username', 'cursor', 'format'}:
             raise BadQuery(detail='Invalid query arguments, only query arguments [username] are allowed')
         return super().list(request, *args, **kwargs)
 
@@ -139,7 +139,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        if set(request.query_params.keys()) - {'cursor'}:
+        if set(request.query_params.keys()) - {'cursor', 'format'}:
             raise BadQuery(detail='Invalid query arguments, no query arguments are allowed')
         return super().list(request, *args, **kwargs)
 
@@ -220,9 +220,9 @@ class BaseViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         if self.model.FILTERSET_FIELDS == '__all__':
-            filterset_fields = self.model.field_names() + ('cursor',)
+            filterset_fields = self.model.field_names() + ('cursor', 'format')
         else:
-            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor',)
+            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor', 'format')
         if set(request.query_params.keys()) - set(filterset_fields):
             args = ', '.join(filterset_fields)
             raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
@@ -253,6 +253,7 @@ class BaseViewSet(mixins.CreateModelMixin,
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
+
 class ObjectStorageView(views.APIView):
     """
     API views allowing users to upload and download data from object storage
@@ -282,6 +283,7 @@ class ObjectStorageView(views.APIView):
     def put(self, request, name):
         url = self.create_url(name, 'PUT')
         return HttpResponse(url)
+
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
