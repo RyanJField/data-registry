@@ -20,32 +20,47 @@ def is_leaf(node):
     return True
 
 
-def find_leaf_nodes(name, node, names):
+def get_node_type(node):
+    type = 'unknown'
+    for (name, child) in node.items():
+        if name == 'array':
+            type = 'array%s' % str(child.shape)
+        if name == 'table':
+            type = 'table'
+    return type
+
+
+def find_leaf_nodes(name, node, components):
     if isinstance(node, h5py.Group) and is_leaf(node):
-        names.append(name)
+        type = get_node_type(node)
+        components.append((name, type))
 
 
 def process_hdf5(file):
     h5file = h5py.File(file, 'r')
-    names = []
-    h5file.visititems(lambda name, node: find_leaf_nodes(name, node, names))
-    return names
+    components = []
+    h5file.visititems(lambda name, node: find_leaf_nodes(name, node, components))
+    return set(components)
 
 
 def process_toml(file):
     data = toml.load(file)
-    return list(data.keys())
+    components = []
+    for name, value in data.items():
+        type = value['type'] if 'type' in value else 'unknown'
+        components.append((name, type))
+    return components
 
 
 def process(file):
     _, ext = os.path.splitext(file)
     if ext == '.h5':
-        names = process_hdf5(file)
+        components = process_hdf5(file)
     elif ext in ('.txt', '.toml'):
-        names = process_toml(file)
+        components = process_toml(file)
     else:
         raise ValueError('Unknown file type')
-    return names
+    return components
 
 
 def url_to_id(url):
@@ -89,8 +104,15 @@ def find_object_by_file_hash(file_hash, opts):
     storage_location_id = url_to_id(result['url'])
 
     url = API_ROOT + OBJECT_URL + '?format=json&storage_location=%d' % storage_location_id
+    object_data = read_api(url, 'Could not find object with storage_location %d' % storage_location_id)
 
-    return read_api(url, 'Could not find object with storage_location %d' % storage_location_id)
+    object_id = url_to_id(object_data['url'])
+    url = API_ROOT + DATA_PRODUCT_URL + '?format=json&object=%d' % object_id
+    data_product = read_api(url, 'Could not find data product %s' % opts.data_product)
+
+    data_product_name = '%s@%s' % (data_product['name'], data_product['version'])
+
+    return data_product_name, object_data
 
 
 def find_object_by_data_product(opts):
@@ -102,7 +124,10 @@ def find_object_by_data_product(opts):
     data_product = read_api(url, 'Could not find data product %s' % opts.data_product)
     object_url = data_product['object']
 
-    return read_api(object_url, 'Failed to read object_url %s' % object_url)
+    data_product_name = '%s@%s' % (data_product['name'], data_product['version'])
+    object_data = read_api(object_url, 'Failed to read object_url %s' % object_url)
+
+    return data_product_name, object_data
 
 
 def find_namespace_id(opts):
@@ -115,32 +140,35 @@ def check_file(opts):
     components = process(opts.file)
 
     if opts.data_product:
-        object_data = find_object_by_data_product(opts)
+        data_product_name, object_data = find_object_by_data_product(opts)
     else:
         with open(opts.file, 'rb') as f:
             bytes = f.read()
         file_hash = hashlib.sha1(bytes)
-        object_data = find_object_by_file_hash(file_hash.hexdigest(), opts)
+        data_product_name, object_data = find_object_by_file_hash(file_hash.hexdigest(), opts)
 
     component_urls = object_data['components']
     names = get_component_names(component_urls)
 
     if opts.verbose:
         print('File components:')
-        for c in components:
-            print('> %s' % c)
+        for comp in components:
+            print('> %s [%s]' % (comp[0], comp[1]))
         print()
 
     errors = []
-    for c in components:
-        if c not in names:
-            errors.append('File component %s not found in registry' % c)
+    comp_names = [c[0] for c in components]
+
+    for comp_name in comp_names:
+        if comp_name not in names:
+            errors.append('File component %s not found in registry' % comp_name)
+
     for n in names:
-        if n not in components:
+        if n not in comp_names:
             errors.append('Registry component %s not found in file' % n)
 
     if not errors:
-        print('All components match those in database')
+        print('All components match those in database for %s' % data_product_name)
     else:
         print('Errors found:')
         for e in errors:
@@ -148,7 +176,7 @@ def check_file(opts):
 
 
 def get_status(opts):
-    object_data = find_object_by_data_product(opts)
+    data_product_name, object_data = find_object_by_data_product(opts)
 
     storage_location_url = object_data['storage_location']
     storage_location_data = read_api(storage_location_url, 'failed to read storage_location %s' % storage_location_url)
@@ -161,7 +189,7 @@ def get_status(opts):
     names = get_component_names(component_urls)
     print('Data registry components:')
     for n in names:
-        print('> %s' % n)
+        print('> %s:%s' % (data_product_name, n))
 
 
 def main(args=None):
