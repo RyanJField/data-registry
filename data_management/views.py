@@ -4,6 +4,7 @@ from django.shortcuts import render, HttpResponse
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
 from collections import namedtuple
@@ -16,15 +17,16 @@ def index(request):
     Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
     Releases.
     """
-    data_products = models.Object.objects.filter(data_product__isnull=False)
-    external_objects = models.Object.objects.filter(external_object__isnull=False)
-    code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
+    objects = models.Object.objects.filter(~Q(updated_by__username = 'Test'))
+    data_products = objects.filter(data_product__isnull=False)
+    external_objects = objects.filter(external_object__isnull=False)
+    code_repo_release = objects.filter(code_repo_release__isnull=False)
 
     ObjectData = namedtuple('object', 'name display_name count doc')
     object_data = [
-        ObjectData('objects', 'Object', models.Object.objects.count(), models.Object.__doc__)
+        ObjectData('objects', 'Object', objects.count(), models.Object.__doc__)
     ]
-    issues = models.Issue.objects.all()
+    issues = models.Issue.objects.filter(~Q(updated_by__username = 'Test'))
     ctx = {
         'objects': object_data,
         'issues': issues,
