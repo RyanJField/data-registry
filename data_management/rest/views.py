@@ -294,15 +294,7 @@ class ObjectStorageView(views.APIView):
     def check_object_permissions(self, request, name, exists=False):
         try:
             storage_root = models.StorageRoot.objects.get(Q(name=self.config['storage']['storage_root']))
-        except Exception:
-            return None
-
-        try:
             location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
-        except Exception:
-            return None
-
-        try:
             object = models.Object.objects.get(storage_location=location)
         except Exception:
             return None
@@ -321,7 +313,7 @@ class ObjectStorageView(views.APIView):
 
         if request.user.is_authenticated:
             return True
-
+         
         return False
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
