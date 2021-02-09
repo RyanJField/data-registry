@@ -278,7 +278,7 @@ class ObjectStorageView(views.APIView):
         return '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (self.config['storage']['url'], path, sig, expiry_time)
 
     def get(self, request, name):
-        check = self.check_object_permissions(name)
+        check = self.check_object_permissions(request, name)
         if check is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         elif not check:
@@ -286,12 +286,12 @@ class ObjectStorageView(views.APIView):
         return redirect(self.create_url(name, 'GET'))
 
     def post(self, request, name):
-        if self.check_object_permissions(name):
+        if self.check_object_permissions(request, name, True):
             return Response(status=status.HTTP_409_CONFLICT)
 
         return HttpResponse(self.create_url(name, 'PUT'))
 
-    def check_object_permissions(self, name):
+    def check_object_permissions(self, request, name, exists=False):
         try:
             storage_root = models.StorageRoot.objects.get(Q(name=self.config['storage']['storage_root']))
         except Exception:
@@ -307,7 +307,22 @@ class ObjectStorageView(views.APIView):
         except Exception:
             return None
 
-        return True
+        if exists:
+            return True
+
+        if object.metadata:
+            try:
+                keyvalue = object.metadata.get(Q(key='accessibility'))
+            except Exception:
+                pass
+            else:
+                if keyvalue.value == 'public' or (keyvalue.value == 'private' and request.user.is_authenticated):
+                    return True
+
+        if request.user.is_authenticated:
+            return True
+
+        return False
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
