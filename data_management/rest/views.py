@@ -285,7 +285,7 @@ class ObjectStorageView(views.APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         return redirect(self.create_url(name, 'GET'))
 
-    def put(self, request, name):
+    def post(self, request, name):
         url = self.create_url(name, 'PUT')
         return HttpResponse(url)
 
