@@ -19,6 +19,7 @@ from django_filters import constants
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, HttpResponse, redirect
+from django.db.models import Q
 
 from data_management import models
 from data_management.rest import serializers
@@ -259,7 +260,7 @@ class ObjectStorageView(views.APIView):
     API views allowing users to upload and download data from object storage
     """
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def __init__(self, *args, **kwargs):
         self.config = ConfigParser()
@@ -277,13 +278,34 @@ class ObjectStorageView(views.APIView):
         return '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (self.config['storage']['url'], path, sig, expiry_time)
 
     def get(self, request, name):
-        url = self.create_url(name, 'GET')
-        return redirect(url)
+        check = self.check_object_permissions(name)
+        if check is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        elif not check:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return redirect(self.create_url(name, 'GET'))
 
     def put(self, request, name):
         url = self.create_url(name, 'PUT')
         return HttpResponse(url)
 
+    def check_object_permissions(self, name):
+        try:
+            storage_root = models.StorageRoot.objects.get(Q(name=self.config['storage']['storage_root']))
+        except Exception:
+            return None
+
+        try:
+            location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
+        except Exception:
+            return None
+
+        try:
+            object = models.Object.objects.get(storage_location=location)
+        except Exception:
+            return None
+
+        return True
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
