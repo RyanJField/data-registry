@@ -286,8 +286,10 @@ class ObjectStorageView(views.APIView):
         return redirect(self.create_url(name, 'GET'))
 
     def post(self, request, name):
-        url = self.create_url(name, 'PUT')
-        return HttpResponse(url)
+        if self.check_object_permissions(name):
+            return Response(status=status.HTTP_409_CONFLICT)
+
+        return HttpResponse(self.create_url(name, 'PUT'))
 
     def check_object_permissions(self, name):
         try:
