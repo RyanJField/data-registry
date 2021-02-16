@@ -22,12 +22,10 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, HttpResponse, redirect
 from django.db.models import Q
 
-from data_management import models
+from data_management import models, object_storage, settings
 from data_management import object_storage
 from data_management.rest import serializers
 from data_management.prov import generate_prov_document, serialize_prov_document
-
-from . import settings
 
 
 class BadQuery(APIException):
