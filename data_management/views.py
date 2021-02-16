@@ -177,6 +177,7 @@ def external_object(request, doi, title, version):
     """
     Redirect to the URL of a file given the DOI or unique name, title and version
     """
+    # Even if the user specified "doi://" the server will only see "doi:/"
     doi = doi.replace('doi:/', 'doi://')
 
     # Find external object
