@@ -1,14 +1,18 @@
+from configparser import ConfigParser
 import os
 
-from django.shortcuts import render, HttpResponse
+from django.http import HttpResponseNotFound
+from django.shortcuts import render, HttpResponse, redirect
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
 from collections import namedtuple
 
 from . import models
+from . import object_storage
 
 
 def index(request):
@@ -124,3 +128,96 @@ def doc_index(request):
         'text': text
     }
     return render(request, 'data_management/docs.html', ctx)
+
+def get_data(request, name):
+    check = True
+    config = ConfigParser()
+    config.read('/home/ubuntu/config.ini')
+
+    try:
+        storage_root = models.StorageRoot.objects.get(Q(name=config['storage']['storage_root']))
+        location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
+        object = models.Object.objects.get(storage_location=location)
+    except Exception as err:
+        check = None
+
+    if object.metadata:
+        try:
+            keyvalue = object.metadata.get(Q(key='accessibility'))
+        except Exception:
+            pass
+        else:
+            if not request.user.is_authenticated and keyvalue.value == 'private':
+                check = False
+
+    if check is None:
+        return HttpResponseNotFound()
+    elif not check:
+        return HttpResponse(status=403)
+    return redirect(object_storage.create_url(name, 'GET'))
+
+def data_product(request, namespace, data_product_name, version):
+    """
+    Redirect to the URL of a file given the namespace, data product name and version
+    """
+    try:
+        namespace = models.Namespace.objects.get(Q(name=namespace))
+        data_product = models.DataProduct.objects.get(Q(name=data_product_name) & Q(namespace=namespace) & Q(version=version))
+    except Exception as err:
+        return HttpResponseNotFound()
+
+    if not data_product.object.storage_location:
+        return HttpResponseNotFound()
+
+    if 'root' in request.GET:
+        return HttpResponse(data_product.object.storage_location.storage_root.root)
+
+    return redirect(data_product.object.storage_location.full_uri())
+
+def external_object(request, doi, title, version):
+    """
+    Redirect to the URL of a file given the DOI or unique name, title and version
+    """
+    doi = doi.replace('doi:/', 'doi://')
+
+    # Find external object
+    try:
+        external_object = models.ExternalObject.objects.get(Q(doi_or_unique_name=doi) & Q(title=title) & Q(version=version))
+    except Exception:
+        return HttpResponseNotFound()
+
+    if 'source' not in request.GET:
+        # Return storage location, if it exists
+        try:
+            url = external_object.object.storage_location.full_uri()
+        except Exception:
+            pass
+        else:
+            if 'root' in request.GET:
+                return HttpResponse(external_object.object.storage_location.storage_root.root)
+            return redirect(url)
+
+        # Return website of original_store, if it exists
+        try:
+            url = external_object.original_store.full_uri()
+        except Exception:
+            pass
+        else:
+            if 'root' in request.GET:
+                return HttpResponse(external_object.original_store.storage_root.root)
+            return redirect(url)
+
+        # External object exists but there is no StorageLocation or original_store
+        return HttpResponse(status=204)
+
+    try:
+        url = external_object.source.website
+    except Exception:
+        pass
+    else:
+        if 'root' in request.GET:
+            return HttpResponse(status=204)
+        return redirect(url)
+
+    return HttpResponse(status=204)
+

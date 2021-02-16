@@ -4,6 +4,7 @@ import fnmatch
 from hashlib import sha1
 import hmac
 import time
+import uuid
 
 from django import forms, db
 from django_filters import filters
@@ -22,6 +23,7 @@ from django.shortcuts import get_object_or_404, HttpResponse, redirect
 from django.db.models import Q
 
 from data_management import models
+from data_management import object_storage
 from data_management.rest import serializers
 from data_management.prov import generate_prov_document, serialize_prov_document
 
@@ -254,67 +256,35 @@ class BaseViewSet(mixins.CreateModelMixin,
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
-
 class ObjectStorageView(views.APIView):
     """
-    API views allowing users to upload and download data from object storage
+    API views allowing users to upload data to object storage
     """
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def __init__(self, *args, **kwargs):
-        self.config = ConfigParser()
-        self.config.read('/home/ubuntu/config.ini')
-        super().__init__(*args, **kwargs)
+    def post(self, request, name=None):
+        if 'checksum' not in request.data:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def create_url(self, path, method):
-        expiry_time = int(time.time()) + int(self.config['storage']['duration'])
-        path = '/v1/' + self.config['storage']['bucket'] + '/' + path
-        if method == 'GET':
-            hmac_body = '%s\n%s\n%s' % ('GET', expiry_time, path)
-        elif method == 'PUT':
-            hmac_body = '%s\n%s\n%s' % ('PUT', expiry_time, path)
-        sig = hmac.new(self.config['storage']['key'].encode('utf-8'), hmac_body.encode('utf-8'), sha1).hexdigest()
-        return '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (self.config['storage']['url'], path, sig, expiry_time)
-
-    def get(self, request, name):
-        check = self.check_object_permissions(request, name)
-        if check is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        elif not check:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return redirect(self.create_url(name, 'GET'))
-
-    def post(self, request, name):
-        if self.check_object_permissions(request, name, True):
+        if self.check_hash(request.data['checksum']):
             return Response(status=status.HTTP_409_CONFLICT)
 
-        return HttpResponse(self.create_url(name, 'PUT'))
+        name = str(uuid.uuid4())
+        data = {'uuid': name, 'url': object_storage.create_url(name, 'PUT')}
+        return Response(data)
 
-    def check_object_permissions(self, request, name, exists=False):
+    def check_hash(self, checksum):
         try:
             storage_root = models.StorageRoot.objects.get(Q(name=self.config['storage']['storage_root']))
-            location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
-            object = models.Object.objects.get(storage_location=location)
-        except Exception:
-            return None
+            locations = models.StorageLocation.objects.filter(Q(storage_root=storage_root) & Q(hash=checksum))
+        except Exception as err:
+            return False
 
-        if exists:
-            return True
+        if not locations:
+            return False
 
-        if object.metadata:
-            try:
-                keyvalue = object.metadata.get(Q(key='accessibility'))
-            except Exception:
-                pass
-            else:
-                if keyvalue.value == 'public' or (keyvalue.value == 'private' and request.user.is_authenticated):
-                    return True
-
-        if request.user.is_authenticated:
-            return True
-         
-        return False
+        return True
 
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
