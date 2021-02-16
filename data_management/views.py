@@ -197,7 +197,7 @@ def external_object(request, doi, title, version):
                 return HttpResponse(external_object.object.storage_location.storage_root.root)
             return redirect(url)
 
-        # Return website of original_store, if it exists
+        # Return URL of original_store
         try:
             url = external_object.original_store.full_uri()
         except Exception:
@@ -210,6 +210,7 @@ def external_object(request, doi, title, version):
         # External object exists but there is no StorageLocation or original_store
         return HttpResponse(status=204)
 
+    # Return website of original_store, if it exists
     try:
         url = external_object.source.website
     except Exception:
