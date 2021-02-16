@@ -136,7 +136,7 @@ def get_data(request, name):
         storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
         location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
         object = models.Object.objects.get(storage_location=location)
-    except Exception as err:
+    except Exception:
         check = None
     else:
         if object.metadata:
@@ -162,7 +162,7 @@ def data_product(request, namespace, data_product_name, version):
     try:
         namespace = models.Namespace.objects.get(Q(name=namespace))
         data_product = models.DataProduct.objects.get(Q(name=data_product_name) & Q(namespace=namespace) & Q(version=version))
-    except Exception as err:
+    except Exception:
         return HttpResponseNotFound()
 
     if not data_product.object.storage_location:
