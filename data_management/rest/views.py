@@ -258,7 +258,7 @@ class BaseViewSet(mixins.CreateModelMixin,
 
 class ObjectStorageView(views.APIView):
     """
-    API views allowing users to upload data to object storage
+    API view allowing users to upload data to object storage
     """
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
