@@ -27,6 +27,8 @@ from data_management import object_storage
 from data_management.rest import serializers
 from data_management.prov import generate_prov_document, serialize_prov_document
 
+from . import settings
+
 
 class BadQuery(APIException):
     status_code = 400
@@ -276,7 +278,7 @@ class ObjectStorageView(views.APIView):
 
     def check_hash(self, checksum):
         try:
-            storage_root = models.StorageRoot.objects.get(Q(name=self.config['storage']['storage_root']))
+            storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
             locations = models.StorageLocation.objects.filter(Q(storage_root=storage_root) & Q(hash=checksum))
         except Exception as err:
             return False
