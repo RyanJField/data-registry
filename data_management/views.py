@@ -13,7 +13,7 @@ from collections import namedtuple
 
 from . import models
 from . import object_storage
-
+from . import settings
 
 def index(request):
     """
@@ -131,29 +131,28 @@ def doc_index(request):
 
 def get_data(request, name):
     check = True
-    config = ConfigParser()
-    config.read('/home/ubuntu/config.ini')
 
     try:
-        storage_root = models.StorageRoot.objects.get(Q(name=config['storage']['storage_root']))
+        storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
         location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
         object = models.Object.objects.get(storage_location=location)
     except Exception as err:
         check = None
-
-    if object.metadata:
-        try:
-            keyvalue = object.metadata.get(Q(key='accessibility'))
-        except Exception:
-            pass
-        else:
-            if not request.user.is_authenticated and keyvalue.value == 'private':
-                check = False
+    else:
+        if object.metadata:
+            try:
+                keyvalue = object.metadata.get(Q(key='accessibility'))
+            except Exception:
+                pass
+            else:
+                if not request.user.is_authenticated and keyvalue.value == 'private':
+                    check = False
 
     if check is None:
         return HttpResponseNotFound()
     elif not check:
         return HttpResponse(status=403)
+
     return redirect(object_storage.create_url(name, 'GET'))
 
 def data_product(request, namespace, data_product_name, version):
