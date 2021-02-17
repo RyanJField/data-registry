@@ -190,37 +190,22 @@ def external_object(request, doi, title, version):
 
     if 'source' not in request.GET:
         # Return storage location, if it exists
-        try:
-            url = external_object.object.storage_location.full_uri()
-        except:
-            pass
-        else:
+        if external_object.object.storage_location:
             if 'root' in request.GET:
                 return HttpResponse(external_object.object.storage_location.storage_root.root)
-            return redirect(url)
+            return redirect(external_object.object.storage_location.full_uri())
 
         # Return URL of original_store
-        try:
-            url = external_object.original_store.full_uri()
-        except:
-            pass
-        else:
+        if external_object.original_store:
             if 'root' in request.GET:
                 return HttpResponse(external_object.original_store.storage_root.root)
-            return redirect(url)
+            return redirect(external_object.original_store.full_uri())
 
         # External object exists but there is no StorageLocation or original_store
         return HttpResponse(status=204)
 
     # Return website of original_store, if it exists
-    try:
-        url = external_object.source.website
-    except:
-        pass
-    else:
-        if 'root' in request.GET:
-            return HttpResponse(status=204)
-        return redirect(url)
+    if external_object.source.website and 'root' not in request.GET:
+        return redirect(external_object.source.website)
 
     return HttpResponse(status=204)
-
