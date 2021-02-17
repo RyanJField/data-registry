@@ -130,22 +130,24 @@ def doc_index(request):
     return render(request, 'data_management/docs.html', ctx)
 
 def get_data(request, name):
+    """
+    Redirect to a temporary URL for accessing a file from object storage
+    """
     check = True
-
     try:
         storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
         location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
         object = models.Object.objects.get(storage_location=location)
-    except Exception:
+    except:
         check = None
     else:
         if object.metadata:
             try:
-                keyvalue = object.metadata.get(Q(key='accessibility'))
-            except Exception:
+                key_value = object.metadata.get(Q(key='accessibility'))
+            except:
                 pass
             else:
-                if not request.user.is_authenticated and keyvalue.value == 'private':
+                if not request.user.is_authenticated and key_value.value == 'private':
                     check = False
 
     if check is None:
@@ -162,7 +164,7 @@ def data_product(request, namespace, data_product_name, version):
     try:
         namespace = models.Namespace.objects.get(Q(name=namespace))
         data_product = models.DataProduct.objects.get(Q(name=data_product_name) & Q(namespace=namespace) & Q(version=version))
-    except Exception:
+    except:
         return HttpResponseNotFound()
 
     if not data_product.object.storage_location:
@@ -180,17 +182,17 @@ def external_object(request, doi, title, version):
     # Even if the user specified "doi://" the server will only see "doi:/"
     doi = doi.replace('doi:/', 'doi://')
 
-    # Find external object
+    # Find the external object
     try:
         external_object = models.ExternalObject.objects.get(Q(doi_or_unique_name=doi) & Q(title=title) & Q(version=version))
-    except Exception:
+    except:
         return HttpResponseNotFound()
 
     if 'source' not in request.GET:
         # Return storage location, if it exists
         try:
             url = external_object.object.storage_location.full_uri()
-        except Exception:
+        except:
             pass
         else:
             if 'root' in request.GET:
@@ -200,7 +202,7 @@ def external_object(request, doi, title, version):
         # Return URL of original_store
         try:
             url = external_object.original_store.full_uri()
-        except Exception:
+        except:
             pass
         else:
             if 'root' in request.GET:
@@ -213,7 +215,7 @@ def external_object(request, doi, title, version):
     # Return website of original_store, if it exists
     try:
         url = external_object.source.website
-    except Exception:
+    except:
         pass
     else:
         if 'root' in request.GET:

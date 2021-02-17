@@ -278,7 +278,7 @@ class ObjectStorageView(views.APIView):
         try:
             storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
             locations = models.StorageLocation.objects.filter(Q(storage_root=storage_root) & Q(hash=checksum))
-        except Exception as err:
+        except:
             return False
 
         if not locations:
