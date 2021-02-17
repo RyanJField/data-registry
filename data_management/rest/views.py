@@ -280,9 +280,9 @@ class ObjectStorageView(views.APIView):
             locations = models.StorageLocation.objects.filter(Q(storage_root=storage_root) & Q(hash=checksum))
         except:
             return False
-
-        if not locations:
-            return False
+        else:
+            if not locations:
+                return False
 
         return True
 
