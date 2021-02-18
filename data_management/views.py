@@ -179,8 +179,9 @@ def external_object(request, doi, title, version):
     """
     Redirect to the URL of a file given the DOI or unique name, title and version
     """
-    # Even if the user specified "doi://" the server will only see "doi:/"
-    doi = doi.replace('doi:/', 'doi://')
+    # Even if the user specified "doi://" sometimes the server will only see "doi:/"
+    if 'doi:/' in doi and 'doi://' not in doi:
+        doi = doi.replace('doi:/', 'doi://')
 
     # Find the external object
     try:
@@ -189,13 +190,17 @@ def external_object(request, doi, title, version):
         return HttpResponseNotFound()
 
     if 'source' in request.GET:
+        # Return an error if user has specified conflicting query parameters
+        if 'original' in request.GET or 'root' in request.GET:
+            return HttpResponse(status=400)
+
         # Use the website of source if it exists, otherwise return 204
-        if external_object.source.website and 'root' not in request.GET:
+        if external_object.source.website:
             return redirect(external_object.source.website)
         return HttpResponse(status=204)
 
-    # Use storage location if it exists
-    if external_object.object.storage_location:
+    # Use storage location if it exists and user has not requested the original_store
+    if external_object.object.storage_location and 'original' not in request.GET:
         if 'root' in request.GET:
             return HttpResponse(external_object.object.storage_location.storage_root.root)
         return redirect(external_object.object.storage_location.full_uri())
