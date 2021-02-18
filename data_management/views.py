@@ -188,24 +188,23 @@ def external_object(request, doi, title, version):
     except:
         return HttpResponseNotFound()
 
-    if 'source' not in request.GET:
-        # Return storage location, if it exists
-        if external_object.object.storage_location:
-            if 'root' in request.GET:
-                return HttpResponse(external_object.object.storage_location.storage_root.root)
-            return redirect(external_object.object.storage_location.full_uri())
-
-        # Return URL of original_store
-        if external_object.original_store:
-            if 'root' in request.GET:
-                return HttpResponse(external_object.original_store.storage_root.root)
-            return redirect(external_object.original_store.full_uri())
-
-        # External object exists but there is no StorageLocation or original_store
+    if 'source' in request.GET:
+        # Use the website of source if it exists, otherwise return 204
+        if external_object.source.website and 'root' not in request.GET:
+            return redirect(external_object.source.website)
         return HttpResponse(status=204)
 
-    # Return website of original_store, if it exists
-    if external_object.source.website and 'root' not in request.GET:
-        return redirect(external_object.source.website)
+    # Use storage location if it exists
+    if external_object.object.storage_location:
+        if 'root' in request.GET:
+            return HttpResponse(external_object.object.storage_location.storage_root.root)
+        return redirect(external_object.object.storage_location.full_uri())
 
+    # Use original_store if it exists
+    if external_object.original_store:
+        if 'root' in request.GET:
+            return HttpResponse(external_object.original_store.storage_root.root)
+        return redirect(external_object.original_store.full_uri())
+
+    # External object exists but there is no StorageLocation or original_store
     return HttpResponse(status=204)
