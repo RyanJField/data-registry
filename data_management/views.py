@@ -1,15 +1,19 @@
+from configparser import ConfigParser
 import os
 
-from django.shortcuts import render, HttpResponse
+from django.http import HttpResponseNotFound
+from django.shortcuts import render, HttpResponse, redirect
 from django.views import generic
 from django.utils.text import camel_case_to_spaces
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
 from collections import namedtuple
 
 from . import models
-
+from . import object_storage
+from . import settings
 
 def index(request):
     """
@@ -124,3 +128,88 @@ def doc_index(request):
         'text': text
     }
     return render(request, 'data_management/docs.html', ctx)
+
+def get_data(request, name):
+    """
+    Redirect to a temporary URL for accessing a file from object storage
+    """
+    check = True
+    try:
+        storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
+        location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
+        object = models.Object.objects.get(storage_location=location)
+    except:
+        check = None
+    else:
+        if object.metadata:
+            try:
+                key_value = object.metadata.get(Q(key='accessibility'))
+            except:
+                pass
+            else:
+                if not request.user.is_authenticated and key_value.value == 'private':
+                    check = False
+
+    if check is None:
+        return HttpResponseNotFound()
+    elif not check:
+        return HttpResponse(status=403)
+
+    return redirect(object_storage.create_url(name, 'GET'))
+
+def data_product(request, namespace, data_product_name, version):
+    """
+    Redirect to the URL of a file given the namespace, data product name and version
+    """
+    try:
+        namespace = models.Namespace.objects.get(Q(name=namespace))
+        data_product = models.DataProduct.objects.get(Q(name=data_product_name) & Q(namespace=namespace) & Q(version=version))
+    except:
+        return HttpResponseNotFound()
+
+    if not data_product.object.storage_location:
+        return HttpResponseNotFound()
+
+    if 'root' in request.GET:
+        return HttpResponse(data_product.object.storage_location.storage_root.root)
+
+    return redirect(data_product.object.storage_location.full_uri())
+
+def external_object(request, doi, title, version):
+    """
+    Redirect to the URL of a file given the DOI or unique name, title and version
+    """
+    # Even if the user specified "doi://" sometimes the server will only see "doi:/"
+    if 'doi:/' in doi and 'doi://' not in doi:
+        doi = doi.replace('doi:/', 'doi://')
+
+    # Find the external object
+    try:
+        external_object = models.ExternalObject.objects.get(Q(doi_or_unique_name=doi) & Q(title=title) & Q(version=version))
+    except:
+        return HttpResponseNotFound()
+
+    if 'source' in request.GET:
+        # Return an error if user has specified conflicting query parameters
+        if 'original' in request.GET or 'root' in request.GET:
+            return HttpResponse(status=400)
+
+        # Use the website of source if it exists, otherwise return 204
+        if external_object.source.website:
+            return redirect(external_object.source.website)
+        return HttpResponse(status=204)
+
+    # Use storage location if it exists and user has not requested the original_store
+    if external_object.object.storage_location and 'original' not in request.GET:
+        if 'root' in request.GET:
+            return HttpResponse(external_object.object.storage_location.storage_root.root)
+        return redirect(external_object.object.storage_location.full_uri())
+
+    # Use original_store if it exists
+    if external_object.original_store:
+        if 'root' in request.GET:
+            return HttpResponse(external_object.original_store.storage_root.root)
+        return redirect(external_object.original_store.full_uri())
+
+    # External object exists but there is no StorageLocation or original_store
+    return HttpResponse(status=204)
