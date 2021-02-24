@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db import models as db_models
+from django.contrib.admin import widgets
 
 from . import models
 
@@ -11,6 +13,11 @@ class BaseAdmin(admin.ModelAdmin):
     """
     readonly_fields = ('updated_by', 'last_updated')
     list_display = ('last_updated',)
+    formfield_overrides = {
+        db_models.OneToOneField: {'widget': widgets.AdminIntegerFieldWidget},
+        db_models.ForeignKey: {'widget': widgets.AdminIntegerFieldWidget},
+        db_models.ManyToManyField: {'widget': widgets.AdminIntegerFieldWidget},
+    }
 
     def save_model(self, request, obj, form, change):
         """

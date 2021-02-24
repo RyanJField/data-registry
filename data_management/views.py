@@ -34,7 +34,7 @@ def index(request):
         'external_objects': external_objects,
         'code_repo_release': code_repo_release,
     }
-    return render(request, 'data_management/index.html', ctx)
+    return render(request, 'data_management/index.html')
 
 
 def get_token(request):

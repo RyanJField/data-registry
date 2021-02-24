@@ -12,7 +12,8 @@ def data_product_table_data(request):
     sort = request.GET.get('sort', '') or 'name'
     order = request.GET.get('order', '') or 'asc'
     sign = '-' if order == 'desc' else ''
-    all_objects = models.DataProduct.objects.all().order_by(sign + sort)
+    all_objects = models.DataProduct.objects.filter(~Q(updated_by__username = 'Test')).order_by(sign + sort)
+    #all_objects = models.DataProduct.objects.all().order_by(sign + sort)
     if search:
         filtered_objects = all_objects.filter(
             Q(namespace__name__icontains=search) |
@@ -44,7 +45,8 @@ def external_objects_table_data(request):
     sort = request.GET.get('sort', '') or 'doi_or_unique_name'
     order = request.GET.get('order', '') or 'asc'
     sign = '-' if order == 'desc' else ''
-    all_objects = models.ExternalObject.objects.all().order_by(sign + sort)
+    all_objects = models.ExternalObject.objects.filter(~Q(updated_by__username = 'Test')).order_by(sign + sort)
+    #all_objects = models.ExternalObject.objects.all().order_by(sign + sort)
     if search:
         filtered_objects = all_objects.filter(
             Q(source__name__icontains=search) |
@@ -80,7 +82,8 @@ def code_repo_release_table_data(request):
     sort = request.GET.get('sort', '') or 'name'
     order = request.GET.get('order', '') or 'asc'
     sign = '-' if order == 'desc' else ''
-    all_objects = models.CodeRepoRelease.objects.all().order_by(sign + sort)
+    all_objects = models.CodeRepoRelease.objects.filter(~Q(updated_by__username = 'Test')).order_by(sign + sort)
+    #all_objects = models.CodeRepoRelease.objects.all().order_by(sign + sort)
     if search:
         filtered_objects = all_objects.filter(
             Q(name__icontains=search) |
