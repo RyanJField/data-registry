@@ -6,7 +6,7 @@ curl -i -X POST -H "Content-Type: application/json" \
      --data '{"checksum": "<checksum>"}' https://data.scrc.uk/api/data
 ```
 where `<token>` should be replaced with a valid access token and `<checksum>` should be replaced by the SHA-1 checksum of the file you want to upload. The Linux command
-`sha1sum` can be used to calculate the SHA-1 checksum
+`sha1sum` can be used to calculate the SHA-1 checksum.
 
 If there are no
 existing registered files with the specified checksum you will get a 200 OK response with a JSON body containing a `uuid` and `url`, e.g.
@@ -19,5 +19,5 @@ curl -i --upload-file <filename> "<url>"
 ```
 where <filename> should be replaced with the name of the file you want to upload and `<url>` should be replaced with the URL obtained in the previous step. The status code will be 201 if the file was uploaded successfully.
      
-The `StorageLocation` and `Object` should be created in the usual way. When creating the `StorageLocation` use `https://data.scrc.uk/api/storage_root/4472/` as the `StorageRoot`.
+The `StorageLocation` and `Object` should be created in the usual way. When creating the `StorageLocation` use https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`.
 
