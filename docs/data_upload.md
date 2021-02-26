@@ -17,7 +17,7 @@ The UUID is the unique identifier of the file and should be used as the `path` w
 ```
 curl -i --upload-file <filename> "<url>"
 ```
-where <filename> should be replaced with the name of the file you want to upload and `<url>` should be replaced with the URL obtained in the previous step. The status code will be 201 if the file was uploaded successfully.
+where `<filename>` should be replaced with the name of the file you want to upload and `<url>` should be replaced with the URL obtained in the previous step. The status code will be 201 if the file was uploaded successfully.
      
 The `StorageLocation` and `Object` should be created in the usual way. When creating the `StorageLocation` use https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`.
 
