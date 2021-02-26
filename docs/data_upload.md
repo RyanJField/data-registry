@@ -13,6 +13,8 @@ existing registered files with the specified checksum you will get a 200 OK resp
 ```
 {"uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef","url":"https://..."}
 ```
+If there is an existing file with the same checksum you will get a 409 CONFLICT response.
+
 The UUID is the unique identifier of the file and should be used as the `path` when creating a `StorageLocation`. The URL can be used to upload the file with a HTTP PUT, e.g.:
 ```
 curl -i --upload-file <filename> "<url>"
