@@ -21,3 +21,20 @@ where `<filename>` should be replaced with the name of the file you want to uplo
      
 The `StorageLocation` and `Object` should be created in the usual way. When creating the `StorageLocation` use https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`.
 
+# How to download data
+Firstly note that data can only be downloaded from the object store once the `StorageLocation` and `Object` have been created.
+
+Files can be downloaded from `https://data.scrc.uk/data/<uuid>`. This will redirect directly to the object storage.
+
+Aliases can also be used to download data. For data products use:
+```
+https://data.scrc.uk/data_product/<namespace>:<data product name>@<version>
+```
+and for external objects use:
+```
+https://data.scrc.uk/external_object/<doi_or_unique_name>:<title>@<version>
+```
+For external objects query parameters can be used to return different URLs:
+* **source**: returns the `Source` associated with the external object
+* **original**: returns the original store associated with the external object
+* **root**: returns the `StorageRoot` only
