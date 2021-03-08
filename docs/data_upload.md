@@ -5,13 +5,13 @@ curl -i -X POST -H "Content-Type: application/json" \
      -H "Authorization: token <token>" \
      --data '{"checksum": "<checksum>"}' https://data.scrc.uk/api/data
 ```
-where `<token>` should be replaced with a valid access token and `<checksum>` should be replaced by the SHA-1 checksum of the file you want to upload. The Linux command
-`sha1sum` can be used to calculate the SHA-1 checksum.
+where `<token>` should be replaced with a valid access token and `<checksum>` should be replaced by the SHA-1 checksum of the file you want to upload. The Linux command `sha1sum` can be used to calculate the SHA-1 checksum.
 
 If there are no
 existing registered files with the specified checksum you will get a 200 OK response with a JSON body containing a `uuid` and `url`, e.g.
 ```
-{"uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef","url":"https://..."}
+{"uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef",
+ "url":"https://..."}
 ```
 If there is an existing file with the same checksum you will get a 409 CONFLICT response.
 
@@ -21,7 +21,25 @@ curl -i --upload-file <filename> "<url>"
 ```
 where `<filename>` should be replaced with the name of the file you want to upload and `<url>` should be replaced with the URL obtained in the previous step. The status code will be 201 if the file was uploaded successfully.
      
-The `StorageLocation` and `Object` should be created in the usual way. When creating the `StorageLocation` use https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`.
+The `StorageLocation` should be created in the usual way, using https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`, i.e. POST the following JSON to https://data.scrc.uk/api/storage_location/:
+```
+{
+  "path": "<uuid>",
+  "hash": "<checksum>",
+  "storage_root": "https://data.scrc.uk/api/storage_root/4472/"
+}
+```
+where for the `path` the previously-obtained UUID should be used.
+
+Next the `Object` can be created. When creating an `Object` you should specify a `FileType`, e.g. POST the following JSON to https://data.scrc.uk/api/object/:
+```
+{
+  "description": "...",
+  "storage_location": "https://data.scrc.uk/api/storage_location/<ID>/",
+  "file_type": "https://data.scrc.uk/api/file_type/<ID>/"
+}
+```
+Existing file types are listed here: https://data.scrc.uk/api/file_type/.
 
 # How to download data
 Firstly note that data can only be downloaded from the object store once the `StorageLocation` and `Object` have been created.
