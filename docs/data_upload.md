@@ -41,7 +41,7 @@ Next the `Object` can be created. When creating an `Object` you should specify a
   "file_type": "https://data.scrc.uk/api/file_type/<ID>/"
 }
 ```
-Existing file types are listed here: https://data.scrc.uk/api/file_type/.
+Existing file types are listed here: https://data.scrc.uk/api/file_type/. New file types can be added by anyone if needed.
 
 # How to download data
 Firstly note that data can only be downloaded from the object store once the `StorageLocation` and `Object` have been created.
