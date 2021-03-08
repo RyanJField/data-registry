@@ -10,8 +10,10 @@ where `<token>` should be replaced with a valid access token and `<checksum>` sh
 If there are no
 existing registered files with the specified checksum you will get a 200 OK response with a JSON body containing a `uuid` and `url`, e.g.
 ```
-{"uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef",
- "url":"https://..."}
+{
+  "uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef",
+  "url":"https://..."
+}
 ```
 If there is an existing file with the same checksum you will get a 409 CONFLICT response.
 
