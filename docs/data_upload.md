@@ -1,4 +1,4 @@
-# How to upload data
+# How to upload data to the integrated object storage
 There are two steps required to upload data. Firstly you need to request an upload URL. For example:
 ```
 curl -i -X POST -H "Content-Type: application/json" \
