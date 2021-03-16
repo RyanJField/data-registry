@@ -155,7 +155,11 @@ def get_data(request, name):
     elif not check:
         return HttpResponse(status=403)
 
-    return redirect(object_storage.create_url(name, 'GET'))
+    filename = None
+    if object.file_type:
+        filename = '%s.%s' % (name, object.file_type.extension)
+
+    return redirect(object_storage.create_url(name, 'GET', filename))
 
 def data_product(request, namespace, data_product_name, version):
     """
