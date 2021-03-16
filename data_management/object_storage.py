@@ -4,7 +4,7 @@ import time
 
 from . import settings
 
-def create_url(path, method):
+def create_url(path, method, filename=None):
     expiry_time = int(time.time() + int(settings.CONFIG['SWIFT_DURATION']))
     path = '/v1/' + settings.CONFIG['SWIFT_BUCKET'] + '/' + path
     if method == 'GET':
@@ -12,4 +12,7 @@ def create_url(path, method):
     elif method == 'PUT':
         hmac_body = '%s\n%s\n%s' % ('PUT', expiry_time, path)
     sig = hmac.new(settings.CONFIG['SWIFT_KEY'].encode('utf-8'), hmac_body.encode('utf-8'), sha1).hexdigest()
-    return '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (settings.CONFIG['SWIFT_URL'], path, sig, expiry_time)
+    url = '%s%s?temp_url_sig=%s&temp_url_expires=%d' % (settings.CONFIG['SWIFT_URL'], path, sig, expiry_time)
+    if filename:
+        url = '%s&filename=%s' % (url, filename)
+    return url
