@@ -270,8 +270,7 @@ class ObjectStorageView(views.APIView):
         if self.check_hash(request.data['checksum']):
             return Response(status=status.HTTP_409_CONFLICT)
 
-        name = str(uuid.uuid4())
-        data = {'uuid': name, 'url': object_storage.create_url(name, 'PUT')}
+        data = {'url': object_storage.create_url(request.data['checksum'], 'PUT')}
         return Response(data)
 
     def check_hash(self, checksum):
