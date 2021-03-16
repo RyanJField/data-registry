@@ -1,4 +1,6 @@
-# How to upload data to the integrated object storage
+# Integrated object storage
+
+## Uploading data
 There are two steps required to upload data. Firstly you need to request an upload URL. For example:
 ```
 curl -i -X POST -H "Content-Type: application/json" \
@@ -42,7 +44,7 @@ Next the `Object` can be created. When creating an `Object` you should specify a
 ```
 Existing file types are listed here: https://data.scrc.uk/api/file_type/. New file types can be added by anyone if needed.
 
-# How to download data
+## Downloading data
 Firstly note that data can only be downloaded from the object store once the `StorageLocation` and `Object` have been created.
 
 Files can be downloaded from `https://data.scrc.uk/data/<checksum>`. This will redirect directly to the object storage.
