@@ -81,6 +81,34 @@ class VersionField(models.CharField):
 ###############################################################################
 # Traceablity objects
 
+class FileType(BaseModel):
+    """
+    ***The file type of an object.***
+
+    ### Writable Fields:
+    `name`: Name of the file type. Examples:
+
+    * Hierarchical Data Format version 5
+    * Comma-separated values file
+    * Microsoft Excel Open XML Spreadsheet
+
+    `extension`: Filename extension. Examples:
+
+    * h5
+    * csv
+    * xlsx
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `FileType`, final integer is the `FileType` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+
+    """
+    name = models.TextField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    extension = models.TextField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+
 class Issue(BaseModel):
     """
     ***A quality issue that can be attached to any `Object` or `ObjectComponent`.***
@@ -173,6 +201,7 @@ class Object(BaseModel):
     storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
                                             related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
 
     def name(self):
         if self.storage_location:
