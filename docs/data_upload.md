@@ -8,16 +8,15 @@ curl -i -X POST -H "Content-Type: application/json" \
 where `<token>` should be replaced with a valid access token and `<checksum>` should be replaced by the SHA-1 checksum of the file you want to upload. The Linux command `sha1sum` can be used to calculate the SHA-1 checksum.
 
 If there are no
-existing registered files with the specified checksum you will get a 200 OK response with a JSON body containing a `uuid` and `url`, e.g.
+existing registered files with the specified checksum you will get a 200 OK response with a JSON body containing a `url`, e.g.
 ```
 {
-  "uuid":"6d77339d-16a1-46b0-9293-5cf3aca298ef",
   "url":"https://..."
 }
 ```
 If there is an existing file with the same checksum you will get a 409 CONFLICT response.
 
-The UUID is the unique identifier of the file and should be used as the `path` when creating a `StorageLocation`. The URL can be used to upload the file with a HTTP PUT, e.g.:
+The URL can be used to upload the file with a HTTP PUT, e.g.:
 ```
 curl -i --upload-file <filename> "<url>"
 ```
@@ -26,12 +25,12 @@ where `<filename>` should be replaced with the name of the file you want to uplo
 The `StorageLocation` should be created in the usual way, using https://data.scrc.uk/api/storage_root/4472/ as the `StorageRoot`, e.g. POST the following JSON to https://data.scrc.uk/api/storage_location/:
 ```
 {
-  "path": "<uuid>",
+  "path": "<checksum>",
   "hash": "<checksum>",
   "storage_root": "https://data.scrc.uk/api/storage_root/4472/"
 }
 ```
-where for the `path` the previously-obtained UUID should be used.
+where for the checksum should be used for both the `path` and `hash`.
 
 Next the `Object` can be created. When creating an `Object` you should specify a `FileType`, e.g. POST the following JSON to https://data.scrc.uk/api/object/:
 ```
@@ -46,7 +45,7 @@ Existing file types are listed here: https://data.scrc.uk/api/file_type/. New fi
 # How to download data
 Firstly note that data can only be downloaded from the object store once the `StorageLocation` and `Object` have been created.
 
-Files can be downloaded from `https://data.scrc.uk/data/<uuid>`. This will redirect directly to the object storage.
+Files can be downloaded from `https://data.scrc.uk/data/<checksum>`. This will redirect directly to the object storage.
 
 Aliases can also be used to download data. For data products use:
 ```
