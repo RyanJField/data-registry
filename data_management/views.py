@@ -135,7 +135,7 @@ def get_data(request, name):
     """
     check = True
     try:
-        storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
+        storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG.get('storage', 'storage_root')))
         location = models.StorageLocation.objects.get(Q(storage_root=storage_root) & Q(path=name))
         object = models.Object.objects.get(storage_location=location)
     except:

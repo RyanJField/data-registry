@@ -275,7 +275,7 @@ class ObjectStorageView(views.APIView):
 
     def check_hash(self, checksum):
         try:
-            storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG['STORAGE_ROOT']))
+            storage_root = models.StorageRoot.objects.get(Q(name=settings.CONFIG.get('storage', 'storage_root')))
             locations = models.StorageLocation.objects.filter(Q(storage_root=storage_root) & Q(hash=checksum))
         except:
             return False
