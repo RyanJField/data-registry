@@ -21,6 +21,7 @@ networkx==2.4
 oauthlib==3.1.0
 protobuf==3.12.2
 prov==1.5.3
+psycopg2-binary==2.8.5
 pydot==1.4.1
 pyparsing==2.4.7
 python-dateutil==2.8.1
@@ -35,4 +36,5 @@ urllib3==1.25.9
 semver==2.10.2
 django-crispy-forms==1.9.2
 Markdown==3.2.2
+pylibmc==1.6.1
 django-nose==1.4.6
