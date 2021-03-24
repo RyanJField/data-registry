@@ -8,6 +8,8 @@ def main():
     registry_type = os.environ.get("SCRC_REGISTRY")
     if registry_type == "local":
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drams.local-settings')
+        os.environ.setdefault('DJANGO_SUPERUSER_USERNAME', 'admin')
+        os.environ.setdefault('DJANGO_SUPERUSER_PASSWORD', 'admin')
     else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drams.settings')
     try:
