@@ -5,7 +5,11 @@ import sys
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drams.settings')
+    registry_type = os.environ.get("SCRC_REGISTRY")
+    if registry_type == "local":
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drams.local-settings')
+    else:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drams.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
