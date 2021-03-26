@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir ~/.scrc
-SCRC_HOME=~/.scrc
+export SCRC_HOME=~/.scrc
 git clone -b local-registry https://github.com/ScottishCovidResponse/data-registry.git $SCRC_HOME
 python3 -m venv $SCRC_HOME/venv
 source $SCRC_HOME/venv/bin/activate
