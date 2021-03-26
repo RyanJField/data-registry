@@ -9,3 +9,4 @@ static/images/schema.*
 *.pyc
 venv
 .idea
+nohup.out
