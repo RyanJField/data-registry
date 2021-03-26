@@ -8,5 +8,5 @@ python -m pip install -r "$SCRC_HOME"/local-requirements.txt
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 export DJANGO_SUPERUSER_USERNAME=admin
 export DJANGO_SUPERUSER_PASSWORD=admin
-cd "$SCRC_HOME" || exit
+cd "$SCRC_HOME"/scripts || exit
 ./rebuild-local.sh
