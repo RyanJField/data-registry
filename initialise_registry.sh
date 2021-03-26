@@ -1,5 +1,5 @@
 #!/bin/bash
-export SCRC_HOME="{$SCRC_HOME:-$HOME/.scrc}" >> "$HOME"/.profile
+export SCRC_HOME=$HOME/.scrc
 mkdir "$SCRC_HOME"
 git clone -b local-registry https://github.com/ScottishCovidResponse/data-registry.git "$SCRC_HOME"
 python3 -m venv "$SCRC_HOME"/venv
