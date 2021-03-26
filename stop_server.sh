@@ -1,2 +1,2 @@
 #!/bin/bash
-ps -ef | grep "$SCRC_HOME/manage.py runserver" | grep -v grep | awk '{print $2}' | xargs kill
+pgrep -f "$SCRC_HOME/manage.py runserver" | xargs kill
