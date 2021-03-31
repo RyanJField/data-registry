@@ -263,14 +263,17 @@ class ObjectStorageView(views.APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def post(self, request, name=None):
-        if 'checksum' not in request.data:
+    def post(self, request, checksum=None):
+        if 'checksum' not in request.data and not checksum:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        if self.check_hash(request.data['checksum']):
+        if not checksum:
+            checksum = request.data['checksum']
+
+        if self.check_hash(checksum):
             return Response(status=status.HTTP_409_CONFLICT)
 
-        data = {'url': object_storage.create_url(request.data['checksum'], 'PUT')}
+        data = {'url': object_storage.create_url(checksum, 'PUT')}
         return Response(data)
 
     def check_hash(self, checksum):
