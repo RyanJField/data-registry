@@ -3,9 +3,8 @@
 ## Uploading data
 There are two steps required to upload data. Firstly you need to request an upload URL. For example:
 ```
-curl -i -X POST -H "Content-Type: application/json" \
-     -H "Authorization: token <token>" \
-     --data '{"checksum": "<checksum>"}' https://data.scrc.uk/api/data
+curl -i -X POST -H "Authorization: token <token>" \
+     https://data.scrc.uk/api/data/<checksum>
 ```
 where `<token>` should be replaced with a valid access token and `<checksum>` should be replaced by the SHA-1 checksum of the file you want to upload. The Linux command `sha1sum` can be used to calculate the SHA-1 checksum.
 
