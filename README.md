@@ -8,6 +8,17 @@ User documentation is available [here](docs/index.md).
 
 Development and maintenance guides are availabe in the Wiki.
 
+## local registry
+To initialise a local registry, run the following command from your terminal:
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ScottishCovidResponse/data-registry/local-registry/scripts/initialise_registry.sh)"
+```
+This will install the registry and all the related files will be stored in ~/.scrc
+
+To run the server, run the ~/.scrc/scripts/run_server.sh script, then navigate to 'localhost:8000' in your browser to check that the server is up and running.
+
+To stop the server, run the ~/.scrc/scripts/stop_server.sh script.
+
 [travis-master-img]: https://img.shields.io/travis/com/ScottishCovidResponse/data-registry/master?label=build-master
 [travis-master-url]: https://travis-ci.com/ScottishCovidResponse/data-registry?branch=master
 
