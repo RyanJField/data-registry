@@ -15,6 +15,7 @@ from . import models
 from . import object_storage
 from . import settings
 
+
 def index(request):
     """
     Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
@@ -129,6 +130,7 @@ def doc_index(request):
     }
     return render(request, os.path.join('data_management', 'docs.html'), ctx)
 
+
 def get_data(request, name):
     """
     Redirect to a temporary URL for accessing a file from object storage
@@ -161,6 +163,7 @@ def get_data(request, name):
 
     return redirect(object_storage.create_url(name, 'GET', filename))
 
+
 def data_product(request, namespace, data_product_name, version):
     """
     Redirect to the URL of a file given the namespace, data product name and version
@@ -178,6 +181,7 @@ def data_product(request, namespace, data_product_name, version):
         return HttpResponse(data_product.object.storage_location.storage_root.root)
 
     return redirect(data_product.object.storage_location.full_uri())
+
 
 def external_object(request, doi, title, version):
     """
