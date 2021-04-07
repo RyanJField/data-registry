@@ -1,4 +1,4 @@
-# data-registry
+# Data registry
 
 [![][travis-master-img]][travis-master-url] [![][travis-develop-img]][travis-develop-url]
 
@@ -13,4 +13,3 @@ Development and maintenance guides are availabe in the Wiki.
 
 [travis-develop-img]: https://img.shields.io/travis/com/ScottishCovidResponse/data-registry/develop?label=build-develop
 [travis-develop-url]: https://travis-ci.com/ScottishCovidResponse/data-registry?branch=develop
-
