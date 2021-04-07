@@ -36,7 +36,7 @@ def index(request):
         'external_objects': external_objects,
         'code_repo_release': code_repo_release,
     }
-    return render(request, 'data_management/index.html', ctx)
+    return render(request, os.path.join('data_management', 'index.html'), ctx)
 
 
 def get_token(request):
@@ -67,7 +67,7 @@ class BaseListView(generic.ListView):
     Base class for views for displaying a table of the database objects.
     """
     context_object_name = 'objects'
-    template_name = 'data_management/object_list.html'
+    template_name = os.path.join('data_management', 'object_list.html')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -118,16 +118,16 @@ def docs(request, name):
     ctx = {
         'text': text
     }
-    return render(request, 'data_management/docs.html', ctx)
+    return render(request, os.path.join('data_management', 'docs.html'), ctx)
 
 
 def doc_index(request):
-    with open('docs/index.md') as file:
+    with open(os.path.join('docs', 'index.md')) as file:
         text = file.read()
     ctx = {
         'text': text
     }
-    return render(request, 'data_management/docs.html', ctx)
+    return render(request, os.path.join('data_management', 'docs.html'), ctx)
 
 def get_data(request, name):
     """
