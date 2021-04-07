@@ -473,7 +473,7 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of `ExternalObject`
+    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the triple (`doi_or_unique_name`, `title`, `version`)
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
