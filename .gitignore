@@ -10,3 +10,4 @@ static/images/schema.*
 venv
 .idea
 nohup.out
+token.txt
