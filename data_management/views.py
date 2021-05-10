@@ -15,6 +15,7 @@ from . import models
 from . import object_storage
 from . import settings
 
+
 def index(request):
     """
     Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
@@ -35,8 +36,9 @@ def index(request):
         'data_products': data_products,
         'external_objects': external_objects,
         'code_repo_release': code_repo_release,
+        'remote_registry': settings.REMOTE_REGISTRY,
     }
-    return render(request, 'data_management/index.html', ctx)
+    return render(request, os.path.join('data_management', 'index.html'), ctx)
 
 
 def get_token(request):
@@ -67,7 +69,7 @@ class BaseListView(generic.ListView):
     Base class for views for displaying a table of the database objects.
     """
     context_object_name = 'objects'
-    template_name = 'data_management/object_list.html'
+    template_name = os.path.join('data_management', 'object_list.html')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -118,16 +120,17 @@ def docs(request, name):
     ctx = {
         'text': text
     }
-    return render(request, 'data_management/docs.html', ctx)
+    return render(request, os.path.join('data_management', 'docs.html'), ctx)
 
 
 def doc_index(request):
-    with open('docs/index.md') as file:
+    with open(os.path.join('docs', 'index.md')) as file:
         text = file.read()
     ctx = {
         'text': text
     }
-    return render(request, 'data_management/docs.html', ctx)
+    return render(request, os.path.join('data_management', 'docs.html'), ctx)
+
 
 def get_data(request, name):
     """
@@ -161,6 +164,7 @@ def get_data(request, name):
 
     return redirect(object_storage.create_url(name, 'GET', filename))
 
+
 def data_product(request, namespace, data_product_name, version):
     """
     Redirect to the URL of a file given the namespace, data product name and version
@@ -178,6 +182,7 @@ def data_product(request, namespace, data_product_name, version):
         return HttpResponse(data_product.object.storage_location.storage_root.root)
 
     return redirect(data_product.object.storage_location.full_uri())
+
 
 def external_object(request, doi, title, version):
     """

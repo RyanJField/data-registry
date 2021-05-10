@@ -9,3 +9,5 @@ static/images/schema.*
 *.pyc
 venv
 .idea
+output.log
+token.txt
