@@ -9,5 +9,5 @@ static/images/schema.*
 *.pyc
 venv
 .idea
-nohup.out
+output.log
 token.txt
