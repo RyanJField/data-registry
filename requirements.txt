@@ -10,7 +10,7 @@ django-dynamic-model-validation==0.1.13
 django-extensions==2.2.9
 django-filter==2.3.0
 django-grappelli==2.14.2
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 future==0.17.1
 gunicorn==20.0.4
 idna==2.9
