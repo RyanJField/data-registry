@@ -1,3 +1,4 @@
+{% load socialaccount %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
@@ -43,6 +44,16 @@
           </div>
         </li>
       </ul>
+      {% if remote_registry %}
+      <span class="navbar-text">
+            {% if user.is_authenticated %}
+            Logged in as: {{ user.username }}
+            <a href="logout">logout</a>
+            {% else %}
+            <a href="{% provider_login_url 'github' %}">Log in or sign up using GitHub</a>
+            {% endif %}
+      </span>
+      {% endif %}
     </div>
   </nav>
   <div class="row justify-content-center">

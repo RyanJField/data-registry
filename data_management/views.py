@@ -36,6 +36,7 @@ def index(request):
         'data_products': data_products,
         'external_objects': external_objects,
         'code_repo_release': code_repo_release,
+        'remote_registry': settings.REMOTE_REGISTRY,
     }
     return render(request, os.path.join('data_management', 'index.html'), ctx)
 
