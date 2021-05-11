@@ -109,6 +109,13 @@ class FileType(BaseModel):
     name = models.TextField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     extension = models.TextField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'extension'),
+                name='unique_file_type_extension'),
+        ]
+
 class Issue(BaseModel):
     """
     ***A quality issue that can be attached to any `Object` or `ObjectComponent`.***
