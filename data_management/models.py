@@ -321,7 +321,7 @@ class CodeRun(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
 
-    `unique_id`: Unique identifier of the `Object`
+    `unique_id`: Unique identifier of the `CodeRun`
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
     ADMIN_LIST_FIELDS = ('description',)
