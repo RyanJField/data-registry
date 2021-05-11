@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
 from django.urls import reverse
@@ -176,6 +178,8 @@ class Object(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
 
+    `unique_id`: Unique identifier of the `Object`
+
     `components`: List of `ObjectComponents` API URLs associated with this `Object`
 
     `data_product`: The `DataProduct` API URL if one is associated with this `Object`
@@ -209,6 +213,7 @@ class Object(BaseModel):
                                             related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def name(self):
         if self.storage_location:
@@ -315,6 +320,8 @@ class CodeRun(BaseModel):
     `last_updated`: Datetime that this record was last updated
 
     `updated_by`: Reference to the user that updated this record
+
+    `unique_id`: Unique identifier of the `Object`
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
     ADMIN_LIST_FIELDS = ('description',)
@@ -326,6 +333,7 @@ class CodeRun(BaseModel):
     description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
