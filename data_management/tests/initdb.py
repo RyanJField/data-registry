@@ -416,9 +416,9 @@ def init_db(test=True):
         version='0.1.0',
     )
 
-    Author.objects.create(updated_by=user, object=o_paper, family_name='Valenti', personal_name='Ivana')
-    Author.objects.create(updated_by=user, object=o_paper, family_name='Cipriani', personal_name='Maria Stella')
-    Author.objects.create(updated_by=user, object=o_paper, family_name='Massabeti', personal_name='Rosanna')
+    Author.objects.create(updated_by=user, family_name='Valenti', personal_name='Ivana')
+    Author.objects.create(updated_by=user, family_name='Cipriani', personal_name='Maria Stella')
+    Author.objects.create(updated_by=user, family_name='Massabeti', personal_name='Rosanna')
 
     crr_code = CodeRepoRelease.objects.create(
         updated_by=user,
