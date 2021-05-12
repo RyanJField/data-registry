@@ -171,14 +171,14 @@ class Object(BaseModel):
 
     `issues` (*optional*): List of `Issues` URLs to associate with this `Object`
 
+    `unique_id` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `Object`, final integer is the `Object` id
 
     `last_updated`: Datetime that this record was last updated
 
     `updated_by`: Reference to the user that updated this record
-
-    `unique_id`: Unique identifier of the `Object`
 
     `components`: List of `ObjectComponents` API URLs associated with this `Object`
 
@@ -314,14 +314,14 @@ class CodeRun(BaseModel):
 
     `outputs`: List of `ObjectComponent` that the `CodeRun` produced as outputs
 
+    `unique_id` (*optional*): UUID of the `CodeRun`. If not specified a UUID is generated automatically.
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `ModelRun`, final integer is the `ModelRun` id
 
     `last_updated`: Datetime that this record was last updated
 
     `updated_by`: Reference to the user that updated this record
-
-    `unique_id`: Unique identifier of the `CodeRun`
     """
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
     ADMIN_LIST_FIELDS = ('description',)
