@@ -131,6 +131,8 @@ class Issue(BaseModel):
 
     `component_issues`: List of `ObjectComponent` URLs which the `Issue` is associated with
 
+    `unique_id` (*optional*): UUID of the `Issue`. If not specified a UUID is generated automatically.
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `Issue`, final integer is the `Issue` id
 
@@ -146,6 +148,7 @@ class Issue(BaseModel):
 
     severity = models.PositiveSmallIntegerField(default=1)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=False, blank=False)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
 
     def short_desc(self):
         if self.description is None:
