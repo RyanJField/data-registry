@@ -159,6 +159,35 @@ class Issue(BaseModel):
         return '%s [Severity %s]' % (self.short_desc(), self.severity)
 
 
+class Author(BaseModel):
+    """
+    ***Authors that can be associated with an `Object` usually for use with `ExternalObject`s to record paper authors,
+    etc.***
+
+    ### Writable Fields:
+    `family_name`: Family name of the `Author`
+
+    `personal_name`: Personal name of the `Author`
+
+    `unique_id` (*optional*): UUID of the `Author`. If not specified a UUID is generated automatically.
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Author`, final integer is the `Author` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
+    ADMIN_LIST_FIELDS = ('family_name', 'personal_name')
+
+    family_name = NameField(null=False, blank=False)
+    personal_name = NameField(null=False, blank=False)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+
+    def __str__(self):
+        return '%s, %s' % (self.family_name, self.personal_name)
+
+
 class Object(BaseModel):
     """
     ***Core traceability object used to represent any data object such `DataProduct`, `CodeRepoRelease`, etc. ***
@@ -170,6 +199,8 @@ class Object(BaseModel):
      this object, if applicable
 
     `issues` (*optional*): List of `Issues` URLs to associate with this `Object`
+
+    `authors` (*optional*): List of `Author` URLs associated with this `Object`
 
     `unique_id` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
 
@@ -190,8 +221,6 @@ class Object(BaseModel):
 
     `quality_control`: The `QualityControl` API URL if one is associated with this `Object`
 
-    `authors`: List of `Author` API URLs associated with this `Object`
-
     `licences`: List of `Licence` API URLs associated with this `Object`
 
     `keywords`: List of `Keyword` API URLs associated with this `Object`
@@ -202,7 +231,6 @@ class Object(BaseModel):
         'code_repo_release',
         'external_object',
         'quality_control',
-        'authors',
         'licences',
         'keywords',
     )
@@ -214,6 +242,7 @@ class Object(BaseModel):
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
     unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+    authors = models.ManyToManyField(Author, related_name='object_authors', blank=True)
 
     def name(self):
         if self.storage_location:
@@ -588,35 +617,6 @@ class Keyword(BaseModel):
 
     def __str__(self):
         return self.keyphrase
-
-
-class Author(BaseModel):
-    """
-    ***Authors that can be associated with an `Object` usually for use with `ExternalObject`s to record paper authors,
-    etc.***
-
-    ### Writable Fields:
-    `object`: API URL of the associated `Object`
-
-    `family_name`: Family name of the `Author`
-
-    `personal_name`: Personal name of the `Author`
-
-    ### Read-only Fields:
-    `url`: Reference to the instance of the `Author`, final integer is the `Author` id
-
-    `last_updated`: Datetime that this record was last updated
-
-    `updated_by`: Reference to the user that updated this record
-    """
-    ADMIN_LIST_FIELDS = ('object', 'family_name', 'personal_name')
-
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors')
-    family_name = NameField(null=False, blank=False)
-    personal_name = NameField(null=False, blank=False)
-
-    def __str__(self):
-        return '%s, %s' % (self.family_name, self.personal_name)
 
 
 class Licence(BaseModel):
