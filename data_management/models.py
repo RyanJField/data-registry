@@ -200,7 +200,7 @@ class Object(BaseModel):
 
     `issues` (*optional*): List of `Issues` URLs to associate with this `Object`
 
-    `authors` (*optional*): List of `Author` URLs associated with this `Object`
+    `authors` (*optional*): List of `Author` URLs to associate with this `Object`
 
     `unique_id` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
 
