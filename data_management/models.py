@@ -213,7 +213,7 @@ class Object(BaseModel):
                                             related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
 
     def name(self):
         if self.storage_location:
@@ -333,7 +333,7 @@ class CodeRun(BaseModel):
     description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
 
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
