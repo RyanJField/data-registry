@@ -162,6 +162,38 @@ class Issue(BaseModel):
         return '%s [Severity %s]' % (self.short_desc(), self.severity)
 
 
+class Organisation(BaseModel):
+    """
+    ***Organisations that can be associated with an `Author`.
+    ### Writable Fields:
+    `name`: Name of the `Organisation`
+
+    `ror_id` (*optional*): Unique 9-character string representing the ROR ID of the `Organisation` (https://ror.org)
+
+    `uuid` (*optional*): UUID of the `Organisation`. If not specified a UUID is generated automatically.
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `Organisation`, final integer is the `Organisation` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
+    EXTRA_DISPLAY_FIELDS = (
+        'ror_url',
+    )
+
+    name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
+    ror_id = models.CharField(max_length=9, null=True, blank=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
+
+    def ror_url(self):
+        if self.ror_id:
+            return 'https://ror.org/%s' % self.ror_id
+        else:
+            return None
+
+
 class Author(BaseModel):
     """
     ***Authors that can be associated with an `Object` usually for use with `ExternalObject`s to record paper authors,
@@ -189,6 +221,9 @@ class Author(BaseModel):
 
     def __str__(self):
         return '%s, %s' % (self.family_name, self.personal_name)
+
+
+
 
 
 class Object(BaseModel):
