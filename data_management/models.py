@@ -1,4 +1,4 @@
-import uuid
+from uuid import uuid4
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
@@ -131,7 +131,7 @@ class Issue(BaseModel):
 
     `component_issues`: List of `ObjectComponent` URLs which the `Issue` is associated with
 
-    `unique_id` (*optional*): UUID of the `Issue`. If not specified a UUID is generated automatically.
+    `uuid` (*optional*): UUID of the `Issue`. If not specified a UUID is generated automatically.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `Issue`, final integer is the `Issue` id
@@ -148,7 +148,7 @@ class Issue(BaseModel):
 
     severity = models.PositiveSmallIntegerField(default=1)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=False, blank=False)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def short_desc(self):
         if self.description is None:
@@ -172,7 +172,7 @@ class Author(BaseModel):
 
     `personal_name`: Personal name of the `Author`
 
-    `unique_id` (*optional*): UUID of the `Author`. If not specified a UUID is generated automatically.
+    `uuid` (*optional*): UUID of the `Author`. If not specified a UUID is generated automatically.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `Author`, final integer is the `Author` id
@@ -185,7 +185,7 @@ class Author(BaseModel):
 
     family_name = NameField(null=False, blank=False)
     personal_name = NameField(null=False, blank=False)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def __str__(self):
         return '%s, %s' % (self.family_name, self.personal_name)
@@ -205,7 +205,7 @@ class Object(BaseModel):
 
     `authors` (*optional*): List of `Author` URLs to associate with this `Object`
 
-    `unique_id` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
+    `uuid` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `Object`, final integer is the `Object` id
@@ -244,7 +244,7 @@ class Object(BaseModel):
                                             related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
     authors = models.ManyToManyField(Author, related_name='object_authors', blank=True)
 
     def name(self):
@@ -346,7 +346,7 @@ class CodeRun(BaseModel):
 
     `outputs`: List of `ObjectComponent` that the `CodeRun` produced as outputs
 
-    `unique_id` (*optional*): UUID of the `CodeRun`. If not specified a UUID is generated automatically.
+    `uuid` (*optional*): UUID of the `CodeRun`. If not specified a UUID is generated automatically.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `ModelRun`, final integer is the `ModelRun` id
@@ -365,7 +365,7 @@ class CodeRun(BaseModel):
     description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
