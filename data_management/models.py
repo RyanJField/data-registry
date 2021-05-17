@@ -168,7 +168,7 @@ class Organisation(BaseModel):
     ### Writable Fields:
     `name`: Name of the `Organisation`
 
-    `ror_id` (*optional*): Unique 9-character string representing the ROR ID of the `Organisation` (https://ror.org)
+    `ror` (*optional*): Unique 9-character string representing the ROR ID of the `Organisation` (https://ror.org)
 
     `uuid` (*optional*): UUID of the `Organisation`. If not specified a UUID is generated automatically.
 
@@ -184,12 +184,12 @@ class Organisation(BaseModel):
     )
 
     name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
-    ror_id = models.CharField(max_length=9, null=True, blank=True, unique=True)
+    ror = models.CharField(max_length=9, null=True, blank=True, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def ror_url(self):
-        if self.ror_id:
-            return 'https://ror.org/%s' % self.ror_id
+        if self.ror:
+            return 'https://ror.org/%s' % self.ror
         else:
             return None
 
