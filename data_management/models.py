@@ -325,7 +325,8 @@ class Object(BaseModel):
 
 
 class ObjectAuthorOrg(BaseModel):
-    """A combination of an `Author` and list of `Organisation`s associated with a particular `Object`.***
+    """
+    ***A combination of an `Author` and list of `Organisation`s associated with a particular `Object`.***
 
     ### Writable Fields:
     `object`: The API URL of the `Object` to associate with this `ObjectAuthorOrg`
