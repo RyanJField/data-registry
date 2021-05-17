@@ -275,6 +275,7 @@ class Object(BaseModel):
         'code_repo_release',
         'external_object',
         'quality_control',
+        'authors',
         'licences',
         'keywords',
     )
@@ -286,7 +287,6 @@ class Object(BaseModel):
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
-    authors = models.ManyToManyField(Author, related_name='object_authors', blank=True)
 
     def name(self):
         if self.storage_location:
@@ -322,6 +322,35 @@ class Object(BaseModel):
 
     def __str__(self):
         return self.name()
+
+
+class ObjectAuthorOrg(BaseModel):
+    """A combination of an `Author` and list of `Organisation`s associated with a particular `Object`.***
+
+    ### Writable Fields:
+    `object`: The API URL of the `Object` to associate with this `ObjectAuthorOrg`
+
+    `author`: The API URL of the `Author` to associated with this `ObjectAuthorOrg`
+
+    `organisations`: List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `ObjectAuthorOrg`, final integer is the `ObjectAuthorOrg` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
+    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors', null=False)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
+    organisations = models.ManyToManyField(Organisation, blank=False)
+
+    #class Meta:
+    #    constraints = [
+    #        models.UniqueConstraint(
+    #            fields=('object', 'author'),
+    #            name='unique_object_author'),
+    #    ]
 
 
 class ObjectComponent(BaseModel):
