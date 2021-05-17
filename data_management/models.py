@@ -100,6 +100,8 @@ class FileType(BaseModel):
     * csv
     * xlsx
 
+    The combination of `name` and `extension` are enforced to be unique.
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `FileType`, final integer is the `FileType` id
 
@@ -115,7 +117,7 @@ class FileType(BaseModel):
         constraints = [
             models.UniqueConstraint(
                 fields=('name', 'extension'),
-                name='unique_file_type_extension'),
+                name='unique_file_type_name_extension'),
         ]
 
 class Issue(BaseModel):
