@@ -204,6 +204,8 @@ class Author(BaseModel):
 
     `personal_name`: Personal name of the `Author`
 
+    `orcid` (*optional*): ORCID iD of the `Author`
+
     `uuid` (*optional*): UUID of the `Author`. If not specified a UUID is generated automatically.
 
     ### Read-only Fields:
@@ -217,13 +219,17 @@ class Author(BaseModel):
 
     family_name = NameField(null=False, blank=False)
     personal_name = NameField(null=False, blank=False)
+    orcid = models.CharField(max_length=19, null=True, blank=True, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def __str__(self):
         return '%s, %s' % (self.family_name, self.personal_name)
 
-
-
+    def orcid_url(self):
+        if self.orcid:
+            return 'https://orcid.org/%s' % self.orcid
+        else:
+            return None
 
 
 class Object(BaseModel):
