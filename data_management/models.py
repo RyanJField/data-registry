@@ -348,12 +348,12 @@ class ObjectAuthorOrg(BaseModel):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
     organisations = models.ManyToManyField(Organisation, blank=False)
 
-    #class Meta:
-    #    constraints = [
-    #        models.UniqueConstraint(
-    #            fields=('object', 'author'),
-    #            name='unique_object_author'),
-    #    ]
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('object', 'author'),
+                name='unique_object_author'),
+        ]
 
 
 class ObjectComponent(BaseModel):
