@@ -164,7 +164,7 @@ class Issue(BaseModel):
 
 class Organisation(BaseModel):
     """
-    ***Organisations that can be associated with an `Author`.
+    ***Organisations that can be associated with an `Author`.***
     ### Writable Fields:
     `name`: Name of the `Organisation`
 
