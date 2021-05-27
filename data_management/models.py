@@ -449,7 +449,7 @@ class CodeRun(BaseModel):
     def __str__(self):
         if self.code_repo:
             return '%s run %s' % (self.code_repo, self.description)
-        return self.run_identifier
+        return self.uuid
 
 
 ###############################################################################
