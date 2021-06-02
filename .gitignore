@@ -9,5 +9,7 @@ static/images/schema.*
 *.pyc
 venv
 .idea
+.vscode
+danteconfig
 output.log
 token.txt
