@@ -3,13 +3,13 @@
 ## Installation
 To initialise a local registry, run the following command from your terminal:
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ScottishCovidResponse/data-registry/local-registry/scripts/initialise_registry.sh)"
+/bin/bash -c "$(curl -fsSL https://data.scrc.uk/static/localregistry.sh)"
 ```
 This will install the registry and all the related files will be stored in `~/.scrc`.
 
-To run the server, run the `~/.scrc/scripts/run_server.sh` script, then navigate to http://localhost:8000 in your browser to check that the server is up and running.
+To run the server, run the `~/.scrc/scripts/run_scrc_server` script, then navigate to http://localhost:8000 in your browser to check that the server is up and running.
 
-To stop the server, run the `~/.scrc/scripts/stop_server.sh` script.
+To stop the server, run the `~/.scrc/scripts/stop_scrc_server` script.
 
 ## Logging in
 Go to http://localhost:8000/admin in your browser. Login with username `admin` and password `admin`. You can now click on **View site** to return to http://localhost:8000/.
