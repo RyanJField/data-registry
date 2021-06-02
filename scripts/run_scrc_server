@@ -4,3 +4,11 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 SCRC_HOME="$(dirname "${DIR}")"
 nohup "$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py runserver > $SCRC_HOME/output.log &
 unset DJANGO_SETTINGS_MODULE
+
+{ timeout 30 bash -c 'until echo > /dev/tcp/localhost/8000; do sleep 0.5; done'; } > /dev/null 2>&1
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo Error starting local registry
+else
+    echo Local registry now accepting connections on http://localhost:8000
+fi
