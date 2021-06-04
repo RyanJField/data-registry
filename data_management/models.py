@@ -623,7 +623,7 @@ class ExternalObject(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
 
-    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='external_object')
+    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='external_objects')
     doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
