@@ -276,7 +276,7 @@ class Object(BaseModel):
         'components',
         'data_product',
         'code_repo_release',
-        'external_object',
+        'external_objects',
         'quality_control',
         'authors',
         'licences',
@@ -317,7 +317,7 @@ class Object(BaseModel):
         except CodeRepoRelease.DoesNotExist:
             pass
         try:
-            if self.external_object:
+            if self.external_objects:
                 return False
         except ExternalObject.DoesNotExist:
             pass
