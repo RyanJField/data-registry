@@ -264,7 +264,7 @@ class Object(BaseModel):
 
     `code_repo_release`: The `CodeRepoRelease` API URL if one is associated with this `Object`
 
-    `external_object`: The `ExternalObject` API URL if one is associated with this `Object`
+    `external_objects`: The `ExternalObject`s API URL if one is associated with this `Object`
 
     `quality_control`: The `QualityControl` API URL if one is associated with this `Object`
 
@@ -276,7 +276,7 @@ class Object(BaseModel):
         'components',
         'data_product',
         'code_repo_release',
-        'external_object',
+        'external_objects',
         'quality_control',
         'authors',
         'licences',
@@ -296,7 +296,7 @@ class Object(BaseModel):
             return str(self.storage_location)
         else:
             try:
-                return str(self.external_object)
+                return str(','.join(object for object in self.external_objects.all()))
             except ExternalObject.DoesNotExist:
                 return super().__str__()
 
@@ -317,7 +317,7 @@ class Object(BaseModel):
         except CodeRepoRelease.DoesNotExist:
             pass
         try:
-            if self.external_object:
+            if self.external_objects:
                 return False
         except ExternalObject.DoesNotExist:
             pass
