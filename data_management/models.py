@@ -285,8 +285,8 @@ class Object(BaseModel):
     ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
-    storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
-                                            related_name='location_for_object')
+    storage_location = models.ForeignKey('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
+                                         related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
