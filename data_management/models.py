@@ -336,7 +336,7 @@ class ObjectAuthorOrg(BaseModel):
 
     `author`: The API URL of the `Author` to associated with this `ObjectAuthorOrg`
 
-    `organisations`: List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
+    `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `ObjectAuthorOrg`, final integer is the `ObjectAuthorOrg` id
@@ -347,7 +347,7 @@ class ObjectAuthorOrg(BaseModel):
     """
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors', null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
-    organisations = models.ManyToManyField(Organisation, blank=False)
+    organisations = models.ManyToManyField(Organisation, null=True, blank=True)
 
     class Meta:
         constraints = [
