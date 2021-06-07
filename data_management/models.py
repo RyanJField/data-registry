@@ -369,6 +369,8 @@ class ObjectComponent(BaseModel):
 
     `description` (*optional*): Free text description of the `ObjectComponent`
 
+    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not (default is `False`)
+
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
     ### Read-only Fields:
@@ -389,6 +391,7 @@ class ObjectComponent(BaseModel):
     name = NameField(null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    whole_object = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
