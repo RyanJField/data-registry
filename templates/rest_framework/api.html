@@ -19,6 +19,7 @@ SCRC data registration and management system REST API
 {% endblock %}
 
 {% block userlinks %}
+{% if remote_registry %}
   <span class="navbar-text">
     {% if user.is_authenticated %}
     Logged in as: {{ user.username }}
@@ -27,6 +28,7 @@ SCRC data registration and management system REST API
     <a href="{% provider_login_url 'github' %}">Log in or sign up using GitHub</a>
     {% endif %}
   </span>
+{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
