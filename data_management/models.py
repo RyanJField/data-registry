@@ -296,7 +296,7 @@ class Object(BaseModel):
             return str(self.storage_location)
         else:
             try:
-                return str(self.external_object)
+                return str(','.join(object for object in self.external_objects.all()))
             except ExternalObject.DoesNotExist:
                 return super().__str__()
 
