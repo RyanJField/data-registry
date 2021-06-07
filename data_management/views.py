@@ -198,16 +198,6 @@ def external_object(request, doi, title, version):
     except:
         return HttpResponseNotFound()
 
-    if 'source' in request.GET:
-        # Return an error if user has specified conflicting query parameters
-        if 'original' in request.GET or 'root' in request.GET:
-            return HttpResponse(status=400)
-
-        # Use the website of source if it exists, otherwise return 204
-        if external_object.source.website:
-            return redirect(external_object.source.website)
-        return HttpResponse(status=204)
-
     # Use storage location if it exists and user has not requested the original_store
     if external_object.object.storage_location and 'original' not in request.GET:
         if 'root' in request.GET:
