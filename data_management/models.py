@@ -748,6 +748,14 @@ class DataProduct(BaseModel):
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = NameField(null=False, blank=False)
     version = VersionField(null=True, blank=True)
+    internal_format = models.BooleanField()
+
+    def is_internal_format(self):
+        return any([component.whole_object == False for component in self.object.components.all])
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.internal_format = self.is_internal_format()
 
     class Meta:
         constraints = [
