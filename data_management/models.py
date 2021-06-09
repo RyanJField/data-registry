@@ -347,7 +347,7 @@ class ObjectAuthorOrg(BaseModel):
     """
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors', null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
-    organisations = models.ManyToManyField(Organisation, null=True, blank=True)
+    organisations = models.ManyToManyField(Organisation, blank=True)
 
     class Meta:
         constraints = [
