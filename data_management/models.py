@@ -735,7 +735,8 @@ class DataProduct(BaseModel):
 
     `namespace`: API URL of the `Namespace` of the `DataProduct`
 
-    `internal_format`: Indicates whether the `DataProduct` is in one of the internal formats
+    `internal_format` (*optional*): Indicates whether the `DataProduct` is in one of the internal formats. This field is
+                                    filled automatically.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `DataProduct`, final integer is the `DataProduct` id
