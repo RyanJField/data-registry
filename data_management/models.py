@@ -285,8 +285,8 @@ class Object(BaseModel):
     ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
     issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
-    storage_location = models.OneToOneField('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
-                                            related_name='location_for_object')
+    storage_location = models.ForeignKey('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
+                                         related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
@@ -336,7 +336,7 @@ class ObjectAuthorOrg(BaseModel):
 
     `author`: The API URL of the `Author` to associated with this `ObjectAuthorOrg`
 
-    `organisations`: List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
+    `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `ObjectAuthorOrg`, final integer is the `ObjectAuthorOrg` id
@@ -347,7 +347,7 @@ class ObjectAuthorOrg(BaseModel):
     """
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors', null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
-    organisations = models.ManyToManyField(Organisation, blank=False)
+    organisations = models.ManyToManyField(Organisation, null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -369,6 +369,8 @@ class ObjectComponent(BaseModel):
 
     `description` (*optional*): Free text description of the `ObjectComponent`
 
+    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not (default is `False`)
+
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
     ### Read-only Fields:
@@ -389,6 +391,7 @@ class ObjectComponent(BaseModel):
     name = NameField(null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    whole_object = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -553,44 +556,9 @@ class StorageLocation(BaseModel):
         return self.full_uri()
 
 
-class Source(BaseModel):
-    """
-    ***Primary source of data being using by models. For example a paper or government website.***
-
-    ### Writable Fields:
-    `name`: Name of the `Source`, unique in the context of `Source`
-
-    `abbreviation`: Common abbreviation of the `Source`
-
-    `website` (*optional*): Website URL associated with the data source
-
-    ### Read-only Fields:
-    `url`: Reference to the instance of the `Source`, final integer is the `Source` id
-
-    `last_updated`: Datetime that this record was last updated
-
-    `updated_by`: Reference to the user that updated this record
-    """
-    ADMIN_LIST_FIELDS = ('name',)
-
-    name = NameField(null=False, blank=False)
-    abbreviation = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
-    website = models.URLField(null=True, blank=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('name',),
-                name='unique_source'),
-        ]
-
-    def __str__(self):
-        return self.name
-
-
 class ExternalObject(BaseModel):
     """
-    *** An external data object, i.e. one that has comes from a `Source` rather than being generated as part of the
+    *** An external data object, i.e. one that has comes from somewhere other than being generated as part of the
       modelling pipeline.***
 
     ### Writable Fields:
@@ -607,8 +575,6 @@ class ExternalObject(BaseModel):
     `version`: `ExternalObject` version identifier
 
     `object`: API URL of the associated `Object`
-
-    `source`: API URL of the associated `Source`
 
     `original_store` (*optional*): `StorageLocation` that references the original location of this `ExternalObject`.
     For example, if the original data location could be transient and so the data has been copied to a more robust
@@ -629,7 +595,6 @@ class ExternalObject(BaseModel):
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
-    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='external_objects')
     original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
     version = VersionField(null=True, blank=True)
 
@@ -726,6 +691,10 @@ class Namespace(BaseModel):
     ### Writable Fields:
     `name`: The `Namespace` name
 
+    `full_name`: The full name of the `Namespace`
+
+    `website` (*optional*): Website URL associated with the `Namespace`
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `Namespace`, final integer is the `Namespace` id
 
@@ -733,15 +702,20 @@ class Namespace(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    ADMIN_LIST_FIELDS = ('name',)
+    ADMIN_LIST_FIELDS = ('name', 'full_name', 'website')
 
     name = NameField(null=False, blank=False)
+    full_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    website = models.URLField(null=True, blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=('name',),
-                name='unique_namespace'),
+                name='unique_name'),
+            models.UniqueConstraint(
+                fields=('full_name',),
+                name='unique_full_name'),
         ]
 
     def __str__(self):
@@ -761,6 +735,9 @@ class DataProduct(BaseModel):
 
     `namespace`: API URL of the `Namespace` of the `DataProduct`
 
+    `internal_format` (*optional*): Indicates whether the `DataProduct` is in one of the internal formats. This field is
+                                    filled automatically.
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `DataProduct`, final integer is the `DataProduct` id
 
@@ -774,6 +751,14 @@ class DataProduct(BaseModel):
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
     name = NameField(null=False, blank=False)
     version = VersionField(null=True, blank=True)
+    internal_format = models.BooleanField()
+
+    def is_internal_format(self):
+        return any([component.whole_object == False for component in self.object.components.all])
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.internal_format = self.is_internal_format()
 
     class Meta:
         constraints = [
