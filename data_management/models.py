@@ -845,31 +845,6 @@ class KeyValue(BaseModel):
         return self.key
 
 
-###############################################################################
-# General text storage
-
-class TextFile(BaseModel):
-    """
-    ***Table for storing general small text files in the database.***
-
-    This is should only be using for storing scripts which are a few lines in length and do not have a home elsewhere.
-    These objects are not linked to the rest of the schema but can be referenced by URL using the `StorageRoot` and
-    `StorageLocation` objects. If this table is migrated to a dedicated data store then the `StorageRoot` can be updated
-    and if the relative `StorageLocation` paths remain the same the generated paths should still be valid.
-
-    ### Writable Fields:
-    `text`: Free text field for the file contents
-
-    ### Read-only Fields:
-    `url`: Reference to the instance of the `TextFile`, final integer is the `TextFile` id
-
-    `last_updated`: Datetime that this record was last updated
-
-    `updated_by`: Reference to the user that updated this record
-    """
-    text = models.TextField(max_length=TEXT_FIELD_LENGTH, null=False, blank=False)
-
-
 def _is_base_model_subclass(name, cls):
     """
     Test if given class is a non-abstract subclasses of BaseModel
