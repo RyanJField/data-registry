@@ -691,7 +691,7 @@ class Namespace(BaseModel):
     ### Writable Fields:
     `name`: The `Namespace` name
 
-    `full_name`: The full name of the `Namespace`
+    `full_name` (*optional*): The full name of the `Namespace`
 
     `website` (*optional*): Website URL associated with the `Namespace`
 
@@ -705,7 +705,7 @@ class Namespace(BaseModel):
     ADMIN_LIST_FIELDS = ('name', 'full_name', 'website')
 
     name = NameField(null=False, blank=False)
-    full_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    full_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
     website = models.URLField(null=True, blank=True)
 
     class Meta:
