@@ -562,7 +562,7 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the triple (`doi_or_unique_name`, `title`, `version`)
+    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the (`doi_or_unique_name`, `title`)
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
@@ -571,8 +571,6 @@ class ExternalObject(BaseModel):
     `title`: Title of the `ExternalObject`
 
     `description` (*optional*):  Free text description of the `ExternalObject`
-
-    `version`: `ExternalObject` version identifier
 
     `object`: API URL of the associated `Object`
 
@@ -587,7 +585,7 @@ class ExternalObject(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title', 'version')
+    ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title')
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='external_objects')
     doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
@@ -596,17 +594,16 @@ class ExternalObject(BaseModel):
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
-    version = VersionField(null=True, blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('doi_or_unique_name', 'title', 'version'),
+                fields=('doi_or_unique_name', 'title'),
                 name='unique_external_object'),
         ]
 
     def __str__(self):
-        return '%s %s version %s' % (self.doi_or_unique_name, self.title, self.version)
+        return '%s %s' % (self.doi_or_unique_name, self.title)
 
 
 class QualityControlled(BaseModel):
