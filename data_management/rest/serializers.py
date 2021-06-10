@@ -45,8 +45,21 @@ class IssueSerializer(BaseSerializer):
         model = models.Issue
 
 
+class DataProductSerializer(BaseSerializer):
+    internal_format = serializers.SerializerMethodField()
+
+    class Meta(BaseSerializer.Meta):
+        model = models.DataProduct
+        fields = '__all__'
+
+    def get_internal_format(self, obj):
+        internal_format = serializers.BooleanField()
+        internal_format = any([component.whole_object == False for component in obj.object.components.all()])
+        return internal_format
+
+
 for name, cls in models.all_models.items():
-    if name == 'Issue':
+    if name in ('Issue', 'DataProduct'):
         continue
     meta_cls = type('Meta', (BaseSerializer.Meta,), {'model': cls, 'read_only_fields': cls.EXTRA_DISPLAY_FIELDS})
     data = {'Meta': meta_cls}

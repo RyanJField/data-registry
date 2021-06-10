@@ -256,6 +256,7 @@ class BaseViewSet(mixins.CreateModelMixin,
         except IntegrityError as ex:
             raise APIIntegrityError(str(ex))
 
+
 class ObjectStorageView(views.APIView):
     """
     API view allowing users to upload data to object storage
@@ -288,6 +289,7 @@ class ObjectStorageView(views.APIView):
 
         return True
 
+
 class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     model = models.Issue
     serializer_class = serializers.IssueSerializer
@@ -302,8 +304,15 @@ class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
         return super().create(request, *args, **kwargs)
 
 
+class DataProductViewSet(BaseViewSet, mixins.UpdateModelMixin):
+    model = models.DataProduct
+    serializer_class = serializers.DataProductSerializer
+    filterset_fields = models.DataProduct.FILTERSET_FIELDS
+    __doc__ = models.DataProduct.__doc__
+
+
 for name, cls in models.all_models.items():
-    if name == 'Issue':
+    if name in ('Issue', 'DataProduct'):
         continue
     data = {
         'model': cls,
