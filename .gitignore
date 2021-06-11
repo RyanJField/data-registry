@@ -13,3 +13,4 @@ venv
 danteconfig
 output.log
 token.txt
+*.dot
