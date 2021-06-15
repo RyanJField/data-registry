@@ -6,6 +6,8 @@ The SCRC data registry is a Django website and REST API which is used by the dat
 
 User documentation is available [here](docs/index.md).
 
+Information on how to run the local registry is available at [https://fairdatapipeline.github.io/docs/local_registry/](https://fairdatapipeline.github.io/docs/local_registry/).
+
 Installation, development and maintenance guides are available in the [Wiki](https://github.com/ScottishCovidResponse/data-registry/wiki.
 
 [travis-master-img]: https://img.shields.io/travis/com/ScottishCovidResponse/data-registry/master?label=build-master
