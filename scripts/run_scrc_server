@@ -12,7 +12,7 @@ else
     echo Local registry now accepting connections on http://localhost:8000
 fi
 
-python3 manage.py get_token > "$SCRC_HOME"/token
+"$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py get_token > "$SCRC_HOME"/token
 chmod 600 "$SCRC_HOME"/token
 echo An access token for the REST API is available in the file "$SCRC_HOME"/token
 
