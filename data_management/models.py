@@ -249,6 +249,8 @@ class Object(BaseModel):
     `authors` (*optional*): List of `Author` URLs to associate with this `Object`
 
     `uuid` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
+    
+    `file_type` (*optional*): `FileType` of this `Object`
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `Object`, final integer is the `Object` id
