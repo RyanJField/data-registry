@@ -9,8 +9,4 @@ class Command(BaseCommand):
         user_model = get_user_model()
         user = user_model.objects.get_by_natural_key('admin')
         token = Token.objects.get_or_create(user=user)
-
-        token_filename = os.path.join(os.environ['SCRC_HOME'], 'token')
-        with open(token_filename, 'w') as fh:
-            fh.write(str(token[0]))
-        os.chmod(token_filename, 0o600)
+        print(token[0])
