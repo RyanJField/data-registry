@@ -471,10 +471,9 @@ class StorageRoot(BaseModel):
     * file:///someroot/ (file://C:\)
     * github://org:repo@sha/ (github://org:repo/ (master))
 
-    `accessibility` (*optional*): Integer value for the Accessibility enum:
+    `public` (*optional*): Boolean indicating whether the `StorageRoot` is public or not (by default this is `True`)
 
-    * 0: Public (*default*) - the storage root is completely pubic with no provisos for use
-    * 1: Private - the storage root is for inaccessible data or there are provisos attached to the data use
+    `local` (*optional*): Boolean indicating whether the `StorageRoot` is local or not (by default this is `False`)
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `StorageRoot`, final integer is the `StorageRoot` id
@@ -486,25 +485,17 @@ class StorageRoot(BaseModel):
     EXTRA_DISPLAY_FIELDS = ('locations',)
     ADMIN_LIST_FIELDS = ('name',)
 
-    PUBLIC = 0
-    PRIVATE = 1
-    CHOICES = (
-        (PUBLIC, 'Public'),
-        (PRIVATE, 'Private'),
-    )
     name = NameField(null=False, blank=False)
     root = URIField(null=False, blank=False, unique=True)
-    accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
+    public = models.BooleanField(default=True)
+    local = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('name',),
+                fields=('name', 'public'),
                 name='unique_storage_root'),
         ]
-
-    def is_public(self):
-        return self.accessibility == self.PUBLIC
 
     def __str__(self):
         return self.name
