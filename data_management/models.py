@@ -463,7 +463,8 @@ class StorageRoot(BaseModel):
 
     ### Writable Fields:
 
-    `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation` `path` produces a complete URI to a file. Examples:
+    `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation`
+    `path` produces a complete URI to a file. Examples:
 
     * https://somewebsite.com/
     * ftp://host/ (ftp://username:password@host:port/)
