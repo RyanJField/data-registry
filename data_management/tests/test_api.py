@@ -368,47 +368,6 @@ class CodeRunAPITests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['description'], 'Script run to upload and process scottish coronavirus-covid-19-management-information')
 
-
-class SourceAPITests(TestCase):
-
-    def setUp(self):
-        self.user = get_user_model().objects.create(username='Test User')
-        init_db()
-
-    def test_get_list(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('source-list')
-        response = client.get(url, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 2)
-
-    def test_get_detail(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('source-detail', kwargs={'pk': 1})
-        response = client.get(url, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['name'], 'Journal of Population Therapeutics and Clinical Pharmacology')
-
-    def test_filter_by_name(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('source-list')
-        response = client.get(url, data={'name': 'Scottish Government Open Data Repository'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['name'], 'Scottish Government Open Data Repository')
-
-
 class ExternalObjectAPITests(TestCase):
 
     def setUp(self):
@@ -459,18 +418,6 @@ class ExternalObjectAPITests(TestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['doi_or_unique_name'], '10.15586/jptcp.v27iSP1.691')
-
-    def test_filter_by_version(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('externalobject-list')
-        response = client.get(url, data={'version': '20100710.0'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['doi_or_unique_name'], 'scottish coronavirus-covid-19-management-information')
 
 
 class QualityControlledAPITests(TestCase):
@@ -869,33 +816,3 @@ class KeyvalueAPITests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['key'], 'TestKey2')
 
-
-class TextFileAPITests(TestCase):
-
-    def setUp(self):
-        self.user = get_user_model().objects.create(username='Test User')
-        init_db()
-
-    def test_get_list(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('textfile-list')
-        response = client.get(url, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 1)
-
-    def test_get_detail(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('textfile-detail', kwargs={'pk': 1})
-        response = client.get(url, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(
-            response.json()['text'],
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam cursus.'
-        )
