@@ -462,19 +462,14 @@ class StorageRoot(BaseModel):
     ***The root location of a storage cache where model files are stored.***
 
     ### Writable Fields:
-    `name`: Name of the `StorageRoot`, unique in the context of `StorageRoot`
 
-    `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation`
-
-    `path` produces a complete URI to a file. Examples:
+    `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation` `path` produces a complete URI to a file. Examples:
 
     * https://somewebsite.com/
     * ftp://host/ (ftp://username:password@host:port/)
     * ssh://host/
     * file:///someroot/ (file://C:\)
     * github://org:repo@sha/ (github://org:repo/ (master))
-
-    `public` (*optional*): Boolean indicating whether the `StorageRoot` is public or not (by default this is `True`)
 
     `local` (*optional*): Boolean indicating whether the `StorageRoot` is local or not (by default this is `False`)
 
@@ -486,22 +481,19 @@ class StorageRoot(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
     EXTRA_DISPLAY_FIELDS = ('locations',)
-    ADMIN_LIST_FIELDS = ('name',)
 
-    name = NameField(null=False, blank=False)
     root = URIField(null=False, blank=False, unique=True)
-    public = models.BooleanField(default=True)
     local = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('name', 'public'),
+                fields=('root', 'local'),
                 name='unique_storage_root'),
         ]
 
     def __str__(self):
-        return self.name
+        return self.root
 
 
 class StorageLocation(BaseModel):
