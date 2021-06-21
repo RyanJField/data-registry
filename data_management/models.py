@@ -185,7 +185,7 @@ class Organisation(BaseModel):
     )
 
     name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
-    ror = models.CharField(max_length=9, null=True, blank=True, unique=True)
+    ror = models.CharField(max_length=9, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def ror_url(self):
@@ -221,7 +221,7 @@ class Author(BaseModel):
 
     family_name = NameField(null=False, blank=False)
     personal_name = NameField(null=False, blank=False)
-    orcid = models.CharField(max_length=19, null=True, blank=True, unique=True)
+    orcid = models.CharField(max_length=19, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def __str__(self):
