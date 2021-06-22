@@ -188,20 +188,6 @@ def init_db(test=True):
         storage_root=sr_textfiles,
     )
 
-    src_pop = Source.objects.create(
-        updated_by=user,
-        name='Journal of Population Therapeutics and Clinical Pharmacology',
-        abbreviation='J Popul Ther Clin Pharmacol',
-        website='https://www.jptcp.com/index.php/jptcp',
-    )
-
-    src_scot = Source.objects.create(
-        updated_by=user,
-        name='Scottish Government Open Data Repository',
-        abbreviation='Scottish Government Open Data Repository',
-        website='https://statistics.gov.scot/',
-    )
-
     o_paper = Object.objects.create(updated_by=user)
 
     o_repo_prob = Object.objects.create(updated_by=user, storage_location=sl_repo_prob)
@@ -300,9 +286,7 @@ def init_db(test=True):
         release_date=parser.isoparse('2010-07-09T12:00Z'),
         title='scottish deaths-involving-coronavirus-covid-19',
         description='scottish deaths-involving-coronavirus-covid-19 dataset',
-        source=src_scot,
-        original_store=sl_scot,
-        version='20100709.0',
+        original_store=sl_scot
     )
 
     ExternalObject.objects.create(
@@ -311,9 +295,7 @@ def init_db(test=True):
         doi_or_unique_name='10.15586/jptcp.v27iSP1.691',
         release_date=parser.isoparse('2020-01-01T12:00Z'),
         title='Covid-19: A systemic disease treated with a wide-ranging approach: A case report',
-        description='''At the end of December 2019, the Health Commission of the city of Wuhan, China, alerted the World Health Organization (WHO) to a pneumonia cluster in the city. The cause was identified as being a new virus, later named SARS-CoV-2. We can distinguish three clinical phases of the disease with a distinct pathogenesis, manifestations and prognosis. Here, we describe the case of a 45-year-old male, successfully treated for Coronavirus disease (COVID-19). The patient was feeling sick in early April 2020; he had a fever and pharyngodynia. When he came to our COVID hospital, his breathing was normal. The nasopharyngeal swab specimen turned out positive. High-resolution computed tomography (HRCT) showed mild interstitial pneumonia. The patient was admitted to our department and treated with hydroxychloroquine, ritonavir, darunavir, azithromycin and enoxaparin. On day seven of the disease, the patient's respiratory condition got worse as he was developing acute respiratory distress syndrome (ARDS). He was given tocilizumab and corticosteroids and was immediately treated with non-invasive mechanical ventilation (NIMV). His condition improved, and in the ensuing days, the treatment gradually switched to a high-flow nasal cannula (HFNC); after 18 days, the patient's clinical condition was good.The successful results we have been able to obtain are closely associated with avoidance of invasive ventilation that may lead to intensive care unit (ICU)-related superinfections. In our opinion, it is fundamental to understand that COVID-19 is a systemic disease that is a consequence of an overwhelming inflammatory response, which can cause severe medical conditions, even in young patients.''',
-        source=src_pop,
-        version='1.0',
+        description='''At the end of December 2019, the Health Commission of the city of Wuhan, China, alerted the World Health Organization (WHO) to a pneumonia cluster in the city. The cause was identified as being a new virus, later named SARS-CoV-2. We can distinguish three clinical phases of the disease with a distinct pathogenesis, manifestations and prognosis. Here, we describe the case of a 45-year-old male, successfully treated for Coronavirus disease (COVID-19). The patient was feeling sick in early April 2020; he had a fever and pharyngodynia. When he came to our COVID hospital, his breathing was normal. The nasopharyngeal swab specimen turned out positive. High-resolution computed tomography (HRCT) showed mild interstitial pneumonia. The patient was admitted to our department and treated with hydroxychloroquine, ritonavir, darunavir, azithromycin and enoxaparin. On day seven of the disease, the patient's respiratory condition got worse as he was developing acute respiratory distress syndrome (ARDS). He was given tocilizumab and corticosteroids and was immediately treated with non-invasive mechanical ventilation (NIMV). His condition improved, and in the ensuing days, the treatment gradually switched to a high-flow nasal cannula (HFNC); after 18 days, the patient's clinical condition was good.The successful results we have been able to obtain are closely associated with avoidance of invasive ventilation that may lead to intensive care unit (ICU)-related superinfections. In our opinion, it is fundamental to understand that COVID-19 is a systemic disease that is a consequence of an overwhelming inflammatory response, which can cause severe medical conditions, even in young patients.'''
     )
 
     ExternalObject.objects.create(
@@ -323,9 +305,7 @@ def init_db(test=True):
         release_date=parser.isoparse('2010-07-10T18:38:00Z'),
         title='scottish coronavirus-covid-19-management-information',
         description='scottish coronavirus-covid-19-management-information dataset',
-        source=src_scot,
-        original_store=sl_scot,
-        version='20100710.0',
+        original_store=sl_scot
     )
 
     DataProduct.objects.create(
@@ -420,7 +400,9 @@ def init_db(test=True):
     a2 = Author.objects.create(updated_by=user, family_name='Cipriani', personal_name='Maria Stella')
     a3 = Author.objects.create(updated_by=user, family_name='Massabeti', personal_name='Rosanna')
 
-    o_paper.authors.set([a1, a2, a3])
+    oao1 = ObjectAuthorOrg.objects.create(updated_by=user, author=a1, object=o_paper)
+    oao2 = ObjectAuthorOrg.objects.create(updated_by=user, author=a2, object=o_paper)
+    oao3 = ObjectAuthorOrg.objects.create(updated_by=user, author=a3, object=o_paper)
 
     crr_code = CodeRepoRelease.objects.create(
         updated_by=user,
@@ -467,11 +449,6 @@ def init_db(test=True):
     KeyValue.objects.create(updated_by=user, object=o_paper, key='TestKey2', value='TestValue2')
     KeyValue.objects.create(updated_by=user, object=o_paper, key='TestKey3', value='TestValue3')
     KeyValue.objects.create(updated_by=user, object=o_paper, key='TestKey4', value='TestValue4')
-
-    TextFile.objects.create(
-        updated_by=user,
-        text='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam cursus.'
-    )
 
     if test:
         Issue.objects.create(updated_by=user, severity=3, description="Test Issue 1")
