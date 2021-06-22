@@ -1,0 +1,14 @@
+#!/bin/bash
+export DJANGO_SETTINGS_MODULE="drams.vagrant-settings"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+SCRC_HOME="$(dirname "${DIR}")"
+nohup "$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py runserver 0.0.0.0:8000 > $SCRC_HOME/output.log &
+unset DJANGO_SETTINGS_MODULE
+
+{ bash -c 'until curl http://192.168.20.10:8000; do sleep 0.5; done'; } > /dev/null 2>&1
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo Error starting local registry
+else
+    echo Local registry now accepting connections on http://192.168.20.10:8000
+fi
