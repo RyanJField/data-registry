@@ -309,8 +309,20 @@ class DataProductViewSet(BaseViewSet, mixins.UpdateModelMixin):
     __doc__ = models.DataProduct.__doc__
 
 
+class CodeRunViewSet(BaseViewSet, mixins.UpdateModelMixin):
+    model = models.CodeRun
+    serializer_class = serializers.CodeRunSerializer
+    filterset_fields = models.CodeRun.FILTERSET_FIELDS
+    __doc__ = models.CodeRun.__doc__
+
+    def create(self, request, *args, **kwargs):
+        if 'prov_report' not in request.data:
+            request.data['prov_report'] = []
+        return super().create(request, *args, **kwargs)
+
+
 for name, cls in models.all_models.items():
-    if name in ('Issue', 'DataProduct'):
+    if name in ('Issue', 'DataProduct', 'CodeRun'):
         continue
     data = {
         'model': cls,
