@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -39,8 +41,12 @@ class BaseSerializer(serializers.HyperlinkedModelSerializer):
         expanded_fields = super().get_field_names(declared_fields, info)
         return expanded_fields + list(self.Meta.model.EXTRA_DISPLAY_FIELDS)
 
+class BaseSerializerUUID(BaseSerializer):
+    uuid = serializers.UUIDField(initial=uuid4, default=uuid4)
 
-class IssueSerializer(BaseSerializer):
+
+class IssueSerializer(BaseSerializerUUID):
+
     class Meta(BaseSerializer.Meta):
         model = models.Issue
 
@@ -61,6 +67,12 @@ class DataProductSerializer(BaseSerializer):
 for name, cls in models.all_models.items():
     if name in ('Issue', 'DataProduct'):
         continue
-    meta_cls = type('Meta', (BaseSerializer.Meta,), {'model': cls, 'read_only_fields': cls.EXTRA_DISPLAY_FIELDS})
+
+    if name in ('Author', 'Organisation', 'Object', 'CodeRun'):
+        serializer = BaseSerializerUUID
+    else:
+        serializer = BaseSerializer
+
+    meta_cls = type('Meta', (serializer.Meta,), {'model': cls, 'read_only_fields': cls.EXTRA_DISPLAY_FIELDS})
     data = {'Meta': meta_cls}
-    globals()[name + "Serializer"] = type(name + "Serializer", (BaseSerializer,), data)
+    globals()[name + "Serializer"] = type(name + "Serializer", (serializer,), data)
