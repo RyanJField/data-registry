@@ -45,6 +45,11 @@ class IssueSerializer(BaseSerializer):
         model = models.Issue
 
 
+class CodeRunSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = models.CodeRun
+
+
 class DataProductSerializer(BaseSerializer):
     internal_format = serializers.SerializerMethodField()
 
@@ -59,7 +64,7 @@ class DataProductSerializer(BaseSerializer):
 
 
 for name, cls in models.all_models.items():
-    if name in ('Issue', 'DataProduct'):
+    if name in ('Issue', 'DataProduct', 'CodeRun'):
         continue
     meta_cls = type('Meta', (BaseSerializer.Meta,), {'model': cls, 'read_only_fields': cls.EXTRA_DISPLAY_FIELDS})
     data = {'Meta': meta_cls}
