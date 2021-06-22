@@ -130,8 +130,6 @@ class Issue(BaseModel):
 
     `description`: Free text description of the `Issue`
 
-    `object_issues`: List of `Object` URLs which the `Issue` is associated with
-
     `component_issues`: List of `ObjectComponent` URLs which the `Issue` is associated with
 
     `uuid` (*optional*): UUID of the `Issue`. If not specified a UUID is generated automatically.
@@ -144,7 +142,7 @@ class Issue(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
 
-    EXTRA_DISPLAY_FIELDS = ('object_issues', 'component_issues')
+    EXTRA_DISPLAY_FIELDS = ('component_issues',)
     SHORT_DESC_LENGTH = 40
 
     severity = models.PositiveSmallIntegerField(default=1)
@@ -244,8 +242,6 @@ class Object(BaseModel):
     `storage_location` (*optional*): The URL of the `StorageLocation` which is the location of the physical data of
      this object, if applicable
 
-    `issues` (*optional*): List of `Issues` URLs to associate with this `Object`
-
     `authors` (*optional*): List of `Author` URLs to associate with this `Object`
 
     `uuid` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
@@ -285,7 +281,6 @@ class Object(BaseModel):
     )
     ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
-    issues = models.ManyToManyField(Issue, related_name='object_issues', blank=True)
     storage_location = models.ForeignKey('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
                                          related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)

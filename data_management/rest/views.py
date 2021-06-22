@@ -297,8 +297,6 @@ class IssueViewSet(BaseViewSet, mixins.UpdateModelMixin):
     __doc__ = models.Issue.__doc__
 
     def create(self, request, *args, **kwargs):
-        if 'object_issues' not in request.data:
-            request.data['object_issues'] = []
         if 'component_issues' not in request.data:
             request.data['component_issues'] = []
         return super().create(request, *args, **kwargs)
