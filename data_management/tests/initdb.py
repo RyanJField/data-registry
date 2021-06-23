@@ -396,9 +396,9 @@ def init_db(test=True):
         version='0.1.0',
     )
 
-    a1 = Author.objects.create(updated_by=user, family_name='Valenti', personal_name='Ivana')
-    a2 = Author.objects.create(updated_by=user, family_name='Cipriani', personal_name='Maria Stella')
-    a3 = Author.objects.create(updated_by=user, family_name='Massabeti', personal_name='Rosanna')
+    a1 = Author.objects.create(updated_by=user, family_name='Valenti', given_names='Ivana')
+    a2 = Author.objects.create(updated_by=user, family_name='Cipriani', given_names='Maria Stella')
+    a3 = Author.objects.create(updated_by=user, family_name='Massabeti', given_names='Rosanna')
 
     oao1 = ObjectAuthorOrg.objects.create(updated_by=user, author=a1, object=o_paper)
     oao2 = ObjectAuthorOrg.objects.create(updated_by=user, author=a2, object=o_paper)
