@@ -38,4 +38,3 @@ django-crispy-forms==1.9.2
 Markdown==3.2.2
 pylibmc==1.6.1
 django-nose==1.4.6
-whitenoise==5.2.0
