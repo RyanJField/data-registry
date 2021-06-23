@@ -22,43 +22,36 @@ def init_db(test=True):
 
     sr_jptcp = StorageRoot.objects.create(
         updated_by=user,
-        name='https://jptcp.com/',
         root='https://jptcp.com/',
     )
 
     sr_repo = StorageRoot.objects.create(
         updated_by=user,
-        name='DataRepository',
         root='https://raw.githubusercontent.com/ScottishCovidResponse/DataRepository/',
     )
 
     sr_github = StorageRoot.objects.create(
         updated_by=user,
-        name='github',
         root='https://github.com',
     )
 
     sr_textfiles = StorageRoot.objects.create(
         updated_by=user,
-        name='text_file',
         root='https://data.scrc.uk/api/text_file/',
     )
 
     sr_scot = StorageRoot.objects.create(
         updated_by=user,
-        name='Scottish Government Open Data Repository',
         root='https://statistics.gov.scot/sparql.csv?query=',
     )
 
     sr_boydorr = StorageRoot.objects.create(
         updated_by=user,
-        name='boydorr',
         root='ftp://boydorr.gla.ac.uk/scrc/',
     )
 
     sr_temp = StorageRoot.objects.create(
         updated_by=user,
-        name='temporary_data',
         root='https://raw.githubusercontent.com/ScottishCovidResponse/temporary_data/master/',
     )
 
