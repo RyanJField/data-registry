@@ -549,11 +549,11 @@ class AuthorAPITests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['family_name'], 'Cipriani')
 
-    def test_filter_by_given_names(self):
+    def test_filter_by_first_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'given_names': 'Rosanna'}, format='json')
+        response = client.get(url, data={'first_name': 'Rosanna'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
@@ -561,11 +561,11 @@ class AuthorAPITests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['family_name'], 'Massabeti')
 
-    def test_filter_by_given_names_glob(self):
+    def test_filter_by_first_name_glob(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'given_names': '*na'}, format='json')
+        response = client.get(url, data={'first_name': '*na'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
