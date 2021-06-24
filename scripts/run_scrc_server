@@ -1,7 +1,9 @@
 #!/bin/bash
+ORIGINAL_PWD=`pwd`
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 SCRC_HOME="$(dirname "${DIR}")"
+cd $SCRC_HOME
 nohup "$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py runserver > $SCRC_HOME/output.log 2>&1 &
 
 { bash -c 'until curl http://localhost:8000; do sleep 0.5; done'; } > /dev/null 2>&1
@@ -17,3 +19,4 @@ chmod 600 "$SCRC_HOME"/token
 echo An access token for the REST API is available in the file "$SCRC_HOME"/token
 
 unset DJANGO_SETTINGS_MODULE
+cd $ORIGINAL_PWD
