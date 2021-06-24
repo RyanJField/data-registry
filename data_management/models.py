@@ -201,7 +201,7 @@ class Author(BaseModel):
     ### Writable Fields:
     `family_name`: Family name of the `Author`
 
-    `given_names`: Given name(s) of the `Author`
+    `first_name`: First name(s) of the `Author`
 
     `orcid` (*optional*): ORCID iD of the `Author`
 
@@ -214,16 +214,16 @@ class Author(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    ADMIN_LIST_FIELDS = ('family_name', 'given_names')
+    ADMIN_LIST_FIELDS = ('family_name', 'first_name')
     EXTRA_DISPLAY_FIELDS = ('orcid_url',)
 
     family_name = NameField(null=False, blank=False)
-    given_names = NameField(null=False, blank=False)
+    first_name = NameField(null=False, blank=False)
     orcid = models.CharField(max_length=19, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def __str__(self):
-        return '%s, %s' % (self.family_name, self.given_names)
+        return '%s, %s' % (self.family_name, self.first_name)
 
     def orcid_url(self):
         if self.orcid:
