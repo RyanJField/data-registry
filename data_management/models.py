@@ -651,6 +651,8 @@ class Licence(BaseModel):
 
     `licence_info`: Free text field to store the information about the `Licence`
 
+    `identifier` (*optional*): URL of the `Licence`
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `Licence`, final integer is the `Licence` id
 
@@ -662,6 +664,7 @@ class Licence(BaseModel):
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
     licence_info = models.TextField()
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
 
 
 class Namespace(BaseModel):
