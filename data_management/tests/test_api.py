@@ -626,7 +626,7 @@ class NamespaceAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['name'], 'SCRC')
+        self.assertEqual(response.json()['name'], 'FAIR')
 
     def test_filter_by_name(self):
         client = APIClient()

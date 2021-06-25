@@ -269,7 +269,7 @@ def init_db(test=True):
 
     ObjectComponent.objects.create(updated_by=user, object=o_temp_mixing, name='mixing-matrix')
 
-    n_scrc = Namespace.objects.create(updated_by=user, name='SCRC')
+    n_fair = Namespace.objects.create(updated_by=user, name='FAIR')
 
     n_simp = Namespace.objects.create(updated_by=user, name='simple_network_sim')
 
@@ -311,7 +311,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_repo_prob,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/symptom-probability',
         version='0.1.0',
     )
@@ -319,7 +319,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_repo_delay,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/symptom-delay',
         version='0.1.0',
     )
@@ -327,7 +327,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_repo_infect,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/infectious-duration',
         version='0.1.0',
     )
@@ -335,7 +335,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_repo_latent,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/latent-period',
         version='0.1.0',
     )
@@ -343,7 +343,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_repo_asym,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/asymptomatic-period',
         version='0.1.0',
     )
@@ -351,7 +351,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_boy_mort_h5,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/scotland/cases_and_management',
         version='0.1.0',
     )
@@ -359,7 +359,7 @@ def init_db(test=True):
     DataProduct.objects.create(
         updated_by=user,
         object=o_boy_cases_h5,
-        namespace=n_scrc,
+        namespace=n_fair,
         name='human/infection/SARS-CoV-2/scotland/mortality',
         version='0.1.0',
     )
