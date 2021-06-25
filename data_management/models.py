@@ -167,7 +167,7 @@ class Organisation(BaseModel):
     ### Writable Fields:
     `name`: Name of the `Organisation`
 
-    `ror` (*optional*): Unique 9-character string representing the ROR ID of the `Organisation` (https://ror.org)
+    `identifier` (*optional*): Full URL of the identifer representing `Organisation` (e.g. ROR ID)
 
     `uuid` (*optional*): UUID of the `Organisation`. If not specified a UUID is generated automatically.
 
@@ -178,19 +178,10 @@ class Organisation(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    EXTRA_DISPLAY_FIELDS = (
-        'ror_url',
-    )
 
     name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
-    ror = models.CharField(max_length=9, null=True, blank=False, unique=True)
+    identifier = models.CharField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
-
-    def ror_url(self):
-        if self.ror:
-            return 'https://ror.org/%s' % self.ror
-        else:
-            return None
 
 
 class Author(BaseModel):
