@@ -365,7 +365,7 @@ class UserAuthorOrg(BaseModel):
     ### Writable Fields:
     `user`: The API URL of the `User` to associate with this `UserAuthorOrg`
 
-    `author`: The API URL of the `Author` to associated with this `UserAuthorOrg`
+    `author`: The API URL of the `Author` to associate with this `UserAuthorOrg`
 
     `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `UserAuthorOrg`
 
