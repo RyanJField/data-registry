@@ -337,6 +337,29 @@ class ObjectAuthorOrg(BaseModel):
         ]
 
 
+class UserAuthorOrg(BaseModel):
+    """
+    ***A combination of an `Author` and list of `Organisation`s associated with a particular user.***
+
+    ### Writable Fields:
+    `user`: The API URL of the `User` to associate with this `UserAuthorOrg`
+
+    `author`: The API URL of the `Author` to associate with this `UserAuthorOrg`
+
+    `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `UserAuthorOrg`
+
+    ### Read-only Fields:
+    `url`: Reference to the instance of the `UserAuthorOrg`, final integer is the `UserAuthorOrg` id
+
+    `last_updated`: Datetime that this record was last updated
+
+    `updated_by`: Reference to the user that updated this record
+    """
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='users', null=False, unique=True)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
+    organisations = models.ManyToManyField(Organisation, blank=True)
+
+
 class ObjectComponent(BaseModel):
     """
     ***A component of a `Object` being used as the input to a `CodeRun` or produced as an output from a
