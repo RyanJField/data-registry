@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from . import models
 
-admin.site.site_header = 'SCRC Data Management'
+admin.site.site_header = 'FAIR Data Management'
 
 
 class BaseAdmin(admin.ModelAdmin):

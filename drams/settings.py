@@ -92,7 +92,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'drams.wsgi.application'
 
-GRAPPELLI_ADMIN_TITLE = 'SCRC DRAMS Admin'
+GRAPPELLI_ADMIN_TITLE = 'FAIR DRAMS Admin'
 
 REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'data_management.rest.metadata.CustomMetadata',
