@@ -649,7 +649,7 @@ class NamespaceAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 1)
 
 
 class DataProductAPITests(TestCase):
