@@ -180,7 +180,7 @@ class Organisation(BaseModel):
     """
 
     name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
-    identifier = models.CharField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
 
@@ -209,7 +209,7 @@ class Author(BaseModel):
 
     family_name = NameField(null=False, blank=False)
     given_name = NameField(null=False, blank=False)
-    identifier = models.CharField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def __str__(self):
