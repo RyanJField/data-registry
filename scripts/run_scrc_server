@@ -2,9 +2,9 @@
 ORIGINAL_PWD=`pwd`
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-SCRC_HOME="$(dirname "${DIR}")"
-cd $SCRC_HOME
-nohup "$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py runserver > $SCRC_HOME/output.log 2>&1 &
+FAIR_HOME="$(dirname "${DIR}")"
+cd $FAIR_HOME
+nohup "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py runserver > $FAIR_HOME/output.log 2>&1 &
 
 { bash -c 'until curl http://localhost:8000; do sleep 0.5; done'; } > /dev/null 2>&1
 retVal=$?
@@ -14,9 +14,9 @@ else
     echo Local registry now accepting connections on http://localhost:8000
 fi
 
-"$SCRC_HOME"/venv/bin/python "$SCRC_HOME"/manage.py get_token > "$SCRC_HOME"/token
-chmod 600 "$SCRC_HOME"/token
-echo An access token for the REST API is available in the file "$SCRC_HOME"/token
+"$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py get_token > "$FAIR_HOME"/token
+chmod 600 "$FAIR_HOME"/token
+echo An access token for the REST API is available in the file "$FAIR_HOME"/token
 
 unset DJANGO_SETTINGS_MODULE
 cd $ORIGINAL_PWD

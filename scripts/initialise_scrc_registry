@@ -1,13 +1,13 @@
 #!/bin/bash
-export SCRC_HOME=$HOME/.fair/registry
-mkdir -p "$SCRC_HOME"
-git clone -b local-registry https://github.com/ScottishCovidResponse/data-registry.git "$SCRC_HOME"
-python3 -m venv "$SCRC_HOME"/venv
-source "$SCRC_HOME"/venv/bin/activate
+export FAIR_HOME=$HOME/.fair/registry
+mkdir -p "$FAIR_HOME"
+git clone -b local-registry https://github.com/ScottishCovidResponse/data-registry.git "$FAIR_HOME"
+python3 -m venv "$FAIR_HOME"/venv
+source "$FAIR_HOME"/venv/bin/activate
 python -m pip install --upgrade pip wheel
-python -m pip install -r "$SCRC_HOME"/local-requirements.txt
+python -m pip install -r "$FAIR_HOME"/local-requirements.txt
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 export DJANGO_SUPERUSER_USERNAME=admin
 export DJANGO_SUPERUSER_PASSWORD=admin
-cd "$SCRC_HOME"/scripts || exit
+cd "$FAIR_HOME"/scripts || exit
 ./rebuild-local.sh
