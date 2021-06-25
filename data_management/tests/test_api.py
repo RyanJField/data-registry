@@ -644,7 +644,7 @@ class NamespaceAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('namespace-list')
-        response = client.get(url, data={'name': '[sS]*'}, format='json')
+        response = client.get(url, data={'name': '[fF]*'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
