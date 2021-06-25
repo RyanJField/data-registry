@@ -615,6 +615,8 @@ class Keyword(BaseModel):
 
     `keyphrase`: Free text field for the key phrase to associate with the `Object`
 
+    `identifier` (*optional*): URL of ontology annotation to associate with this `Keyword`
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `Keyword`, final integer is the `Keyword` id
 
@@ -626,6 +628,7 @@ class Keyword(BaseModel):
 
     object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
     keyphrase = NameField(null=False, blank=False)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
 
     class Meta:
         constraints = [
