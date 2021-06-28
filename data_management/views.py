@@ -22,7 +22,7 @@ def index(request):
     Releases.
     """
     data_products = models.Object.objects.filter(data_product__isnull=False)
-    external_objects = models.Object.objects.filter(external_objects__isnull=False)
+    external_objects = models.DataProduct.objects.filter(external_objects__isnull=False)
     code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
 
     ObjectData = namedtuple('object', 'name display_name count doc')

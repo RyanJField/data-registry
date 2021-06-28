@@ -63,11 +63,10 @@ def external_objects_table_data(request):
         'totalNotFiltered': all_objects.count(),
         'rows': [
             {
-                'source': str(obj.source),
-                'doi_or_unique_name': '<a href="object/%d">%s</a>' % (obj.object.id, obj.doi_or_unique_name),
+                'doi_or_unique_name': '<a href="data_product/%d">%s</a>' % (obj.data_product.id, obj.doi_or_unique_name),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
-                'version': obj.version,
+                'version': obj.data_product.version,
             } for obj in page_objects
         ],
     })
