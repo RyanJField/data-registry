@@ -521,7 +521,7 @@ class StorageLocation(BaseModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('storage_root', 'path', 'hash', 'public'),
+                fields=('storage_root', 'hash', 'public'),
                 name='unique_storage_location'),
         ]
 
