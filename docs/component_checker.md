@@ -1,14 +1,14 @@
 # Component Checker
 
 A script for processing data product files to display their components and check if they are registered in the
-data registry is available [here](https://github.com/ScottishCovidResponse/data-registry/tree/master/tools).
+data registry is available [here](https://github.com/FAIRDataPipeline/data-registry/tree/master/tools).
 
 ## Installing
 
 You can install this script by checking out the data-registry code and using pip:
 
 ```
-git checkout git@github.com:ScottishCovidResponse/data-registry.git
+git checkout git@github.com:FAIRDataPipeline/data-registry.git
 cd data-registry/tools
 pip install .
 ```
