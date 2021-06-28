@@ -483,13 +483,6 @@ class StorageRoot(BaseModel):
     root = URIField(null=False, blank=False, unique=True)
     local = models.BooleanField(default=False)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('root', 'local'),
-                name='unique_storage_root'),
-        ]
-
     def __str__(self):
         return self.root
 
