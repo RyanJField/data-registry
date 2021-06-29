@@ -605,8 +605,14 @@ class DataProduct(BaseModel):
     `last_updated`: Datetime that this record was last updated
 
     `updated_by`: Reference to the user that updated this record
+
+    `external_objects`: List of `ExternalObject` API URLs associated with this `DataProduct`
     """
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
+
+    EXTRA_DISPLAY_FIELDS = (
+        'external_objects',
+    )
 
     object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
