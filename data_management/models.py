@@ -268,6 +268,13 @@ class Object(BaseModel):
     file_type = models.ForeignKey(FileType, on_delete=models.PROTECT, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Create ObjectComponent representing the whole object
+        myself = Object.objects.get(id=self.id)
+        ObjectComponent.objects.create(name='whole_object', whole_object=True, object=myself, updated_by=myself.updated_by)
+
     def name(self):
         if self.storage_location:
             return str(self.storage_location)
