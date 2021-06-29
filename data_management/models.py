@@ -21,7 +21,7 @@ class BaseModel(ModelFieldRequiredMixin, models.Model):
     _field_names = None
     updated_by = models.ForeignKey(
             get_user_model(),
-            on_delete=models.CASCADE,
+            on_delete=models.PROTECT,
             related_name='%(app_label)s_%(class)s_updated',
             editable=False,
             verbose_name='last updated by',
@@ -265,10 +265,10 @@ class Object(BaseModel):
     )
     ADMIN_LIST_FIELDS = ('name', 'is_orphan')
 
-    storage_location = models.ForeignKey('StorageLocation', on_delete=models.CASCADE, null=True, blank=True,
+    storage_location = models.ForeignKey('StorageLocation', on_delete=models.PROTECT, null=True, blank=True,
                                          related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
-    file_type = models.ForeignKey(FileType, on_delete=models.CASCADE, null=True, blank=True)
+    file_type = models.ForeignKey(FileType, on_delete=models.PROTECT, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def name(self):
@@ -325,8 +325,8 @@ class ObjectAuthorOrg(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='authors', null=False)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='authors', null=False)
+    author = models.ForeignKey(Author, on_delete=models.PROTECT, null=False, blank=False)
     organisations = models.ManyToManyField(Organisation, blank=True)
 
     class Meta:
@@ -355,8 +355,8 @@ class UserAuthorOrg(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='users', null=False, unique=True)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=False, blank=False)
+    user = models.OneToOneField(get_user_model(), on_delete=models.PROTECT, related_name='users', null=False, unique=True)
+    author = models.ForeignKey(Author, on_delete=models.PROTECT, null=False, blank=False)
     organisations = models.ManyToManyField(Organisation, blank=True)
 
 
@@ -390,7 +390,7 @@ class ObjectComponent(BaseModel):
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
 
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='components', null=False)
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='components', null=False)
     name = NameField(null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
@@ -438,9 +438,9 @@ class CodeRun(BaseModel):
     EXTRA_DISPLAY_FIELDS = ('prov_report',)
     ADMIN_LIST_FIELDS = ('description',)
 
-    code_repo = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='code_repo_of', null=True, blank=True)
-    model_config = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='config_of', null=True, blank=True)
-    submission_script = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='submission_script_of', null=False, blank=False)
+    code_repo = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='code_repo_of', null=True, blank=True)
+    model_config = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='config_of', null=True, blank=True)
+    submission_script = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='submission_script_of', null=False, blank=False)
     run_date = models.DateTimeField(null=False, blank=False)
     description = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     inputs = models.ManyToManyField(ObjectComponent, related_name='inputs_of', blank=True)
@@ -523,7 +523,7 @@ class StorageLocation(BaseModel):
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
     hash = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     public = models.BooleanField(default=True)
-    storage_root = models.ForeignKey(StorageRoot, on_delete=models.CASCADE, related_name='locations')
+    storage_root = models.ForeignKey(StorageRoot, on_delete=models.PROTECT, related_name='locations')
 
     class Meta:
         constraints = [
@@ -570,13 +570,13 @@ class ExternalObject(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title')
 
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='external_objects')
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='external_objects')
     doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
-    original_store = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='original_store_of', null=True, blank=True)
+    original_store = models.ForeignKey(StorageLocation, on_delete=models.PROTECT, related_name='original_store_of', null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -605,7 +605,7 @@ class QualityControlled(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('object',)
 
-    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='quality_control')
+    object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='quality_control')
 
 
 class Keyword(BaseModel):
@@ -629,7 +629,7 @@ class Keyword(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('object', 'keyphrase')
 
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='keywords')
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='keywords')
     keyphrase = NameField(null=False, blank=False)
     identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
 
@@ -665,7 +665,7 @@ class Licence(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('object',)
 
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='licences')
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='licences')
     licence_info = models.TextField()
     identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
 
@@ -730,8 +730,8 @@ class DataProduct(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
-    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
-    namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
+    object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
+    namespace = models.ForeignKey(Namespace, on_delete=models.PROTECT, related_name='data_products')
     name = NameField(null=False, blank=False)
     version = VersionField(null=True, blank=True)
 
@@ -769,7 +769,7 @@ class CodeRepoRelease(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('name', 'version')
 
-    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='code_repo_release')
+    object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='code_repo_release')
     name = NameField(null=False, blank=False)
     version = VersionField()
     website = models.URLField(null=True, blank=True)
@@ -805,7 +805,7 @@ class KeyValue(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('object', 'key')
 
-    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name='metadata')
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='metadata')
     key = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
     value = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
 
