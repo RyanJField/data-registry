@@ -8,7 +8,7 @@ setup(
     description='Data Registry Component Checker',
     author='Jonathan Hollocombe',
     author_email='Jonathan.Hollocombe@ukaea.uk',
-    url='https://github.com/ScottishCovidResponse/data-registry',
+    url='https://github.com/FAIRDataPipeline/data-registry',
     py_modules=['check_components'],
     install_requires=[
         'h5py (>=2.10.0)',

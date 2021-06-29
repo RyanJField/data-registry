@@ -26,19 +26,19 @@ cp ~vagrant/.ssh/authorized_keys /root/.ssh
 apt-get update -y
 apt-get install -y python3-venv graphviz
 
-export SCRC_HOME=/code/data-registry
-rm -rf "$SCRC_HOME"/venv
-python3 -m venv "$SCRC_HOME"/venv
-source "$SCRC_HOME"/venv/bin/activate
+export FAIR_HOME=/code/data-registry
+rm -rf "$FAIR_HOME"/venv
+python3 -m venv "$FAIR_HOME"/venv
+source "$FAIR_HOME"/venv/bin/activate
 
 python -m pip install --upgrade pip wheel
-python -m pip install -r "$SCRC_HOME"/local-requirements.txt
+python -m pip install -r "$FAIR_HOME"/local-requirements.txt
 
 export DJANGO_SETTINGS_MODULE="drams.vagrant-settings"
 export DJANGO_SUPERUSER_USERNAME=admin
 export DJANGO_SUPERUSER_PASSWORD=admin
 
-cd "$SCRC_HOME"/scripts || exit
+cd "$FAIR_HOME"/scripts || exit
 
 ./rebuild-local.sh
 ./run_scrc_server_vagrant

@@ -466,10 +466,8 @@ class StorageRoot(BaseModel):
     ***The root location of a storage cache where model files are stored.***
 
     ### Writable Fields:
-    `name`: Name of the `StorageRoot`, unique in the context of `StorageRoot`
 
     `root`: URI (including protocol) to the root of a `StorageLocation`, which when prepended to a `StorageLocation`
-
     `path` produces a complete URI to a file. Examples:
 
     * https://somewebsite.com/
@@ -478,10 +476,7 @@ class StorageRoot(BaseModel):
     * file:///someroot/ (file://C:\)
     * github://org:repo@sha/ (github://org:repo/ (master))
 
-    `accessibility` (*optional*): Integer value for the Accessibility enum:
-
-    * 0: Public (*default*) - the storage root is completely pubic with no provisos for use
-    * 1: Private - the storage root is for inaccessible data or there are provisos attached to the data use
+    `local` (*optional*): Boolean indicating whether the `StorageRoot` is local or not (by default this is `False`)
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `StorageRoot`, final integer is the `StorageRoot` id
@@ -491,30 +486,12 @@ class StorageRoot(BaseModel):
     `updated_by`: Reference to the user that updated this record
     """
     EXTRA_DISPLAY_FIELDS = ('locations',)
-    ADMIN_LIST_FIELDS = ('name',)
 
-    PUBLIC = 0
-    PRIVATE = 1
-    CHOICES = (
-        (PUBLIC, 'Public'),
-        (PRIVATE, 'Private'),
-    )
-    name = NameField(null=False, blank=False)
     root = URIField(null=False, blank=False, unique=True)
-    accessibility = models.SmallIntegerField(choices=CHOICES, default=PUBLIC)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('name',),
-                name='unique_storage_root'),
-        ]
-
-    def is_public(self):
-        return self.accessibility == self.PUBLIC
+    local = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.root
 
 
 class StorageLocation(BaseModel):
@@ -530,6 +507,8 @@ class StorageLocation(BaseModel):
     sha1 of all files in the directory (excluding .git and things referenced in .gitignore), but needs to be OS independent
     (order matters) and things like logging output might affect it...*
 
+    `public` (*optional*): Boolean indicating whether the `StorageLocation` is public or not (default is `True`)
+
     `store_root`: Reference to the `StorageRoot` to append the `path` to.
 
     ### Read-only Fields:
@@ -543,12 +522,13 @@ class StorageLocation(BaseModel):
 
     path = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False)
     hash = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    public = models.BooleanField(default=True)
     storage_root = models.ForeignKey(StorageRoot, on_delete=models.PROTECT, related_name='locations')
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('storage_root', 'path', 'hash'),
+                fields=('storage_root', 'hash', 'public'),
                 name='unique_storage_location'),
         ]
 

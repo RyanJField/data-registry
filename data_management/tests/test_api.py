@@ -107,19 +107,7 @@ class StorageRootAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['name'], 'https://jptcp.com/')
-
-    def test_filter_by_name(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('storageroot-list')
-        response = client.get(url, data={'name': 'DataRepository'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['name'], 'DataRepository')
+        self.assertEqual(response.json()['root'], 'https://jptcp.com/')
 
     def test_filter_by_root(self):
         client = APIClient()
@@ -131,19 +119,7 @@ class StorageRootAPITests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['name'], 'github')
-
-    def test_filter_by_accessibility(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('storageroot-list')
-        response = client.get(url, data={'accessibility': '0'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 7)
-
+        self.assertEqual(results[0]['root'], 'https://github.com')
 
 class StorageLocationAPITests(TestCase):
 

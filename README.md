@@ -10,7 +10,7 @@ Information on how to run the local registry is available at [https://fairdatapi
 
 Alternativley you can run the local registry in a local VM using [Vagrant](https://www.vagrantup.com) with the included Vagrantfile.
 
-Installation, development and maintenance guides are available in the [Wiki](https://github.com/ScottishCovidResponse/data-registry/wiki).
+Installation, development and maintenance guides are available in the [Wiki](https://github.com/FAIRDataPipeline/data-registry/wiki).
 
 [travis-master-img]: https://img.shields.io/travis/com/ScottishCovidResponse/data-registry/master?label=build-master
 [travis-master-url]: https://travis-ci.com/ScottishCovidResponse/data-registry?branch=master
