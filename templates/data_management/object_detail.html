@@ -41,6 +41,49 @@
         <dt class="col-sm-3">Data Product Version</dt>
         <dd class="col-sm-9">{{ object.data_product.version }}</dd>
       {% endif %}
+
+      {% if object.external_object %}
+        <dt class="col-sm-3">External Object DOI or Unique Name</dt>
+        <dd class="col-sm-9">{{ object.external_object.doi_or_unique_name }}</dd>
+
+        <dt class="col-sm-3">External Object Primary Source</dt>
+        <dd class="col-sm-9">{{ object.external_object.primary_not_supplement }}</dd>
+
+        <dt class="col-sm-3">External Object Release Date</dt>
+        <dd class="col-sm-9">{{ object.external_object.release_date }}</dd>
+
+        <dt class="col-sm-3">External Object Title</dt>
+        <dd class="col-sm-9">{{ object.external_object.title }}</dd>
+
+        <dt class="col-sm-3">External Object Description</dt>
+        <dd class="col-sm-9">{{ object.external_object.description }}</dd>
+
+        <dt class="col-sm-3">External Object Source</dt>
+        <dd class="col-sm-9">{{ object.external_object.source }}</dd>
+
+        <dt class="col-sm-3">External Object Original Store</dt>
+        <dd class="col-sm-9">{{ object.external_object.original_store }}</dd>
+
+        <dt class="col-sm-3">External Object Version</dt>
+        <dd class="col-sm-9">{{ object.external_object.version }}</dd>
+      {% endif %}
+      
+      {% if object.file_type %}
+        <dt class="col-sm-3">File type</dt>
+        <dd class="col-sm-9">{{ object.file_type.name }}</dd>
+      {% endif %}
+      
+    {% if object.storage_location %}
+    {% if object.data_product %}
+    <dt class="col-sm-3">Download</dt>
+    <dd class="col-sm-9"><a href="https://data.scrc.uk/data_product/{{ object.data_product.namespace }}:{{ object.data_product.name }}@{{ object.data_product.version }}">https://data.scrc.uk/data_product/{{ object.data_product.namespace }}:{{ object.data_product.name }}@{{ object.data_product.version }}</a></dd>
+    {% endif %}
+    {% if object.external_object %}
+    <dt class="col-sm-3">Download</dt>
+    <dd class="col-sm-9"><a href="https://data.scrc.uk/external_object/{{ object.external_object.doi_or_unique_name }}:{{ object.external_object.title }}@{{ object.external_object.version }}">https://data.scrc.uk/external_object/{{ object.external_object.doi_or_unique_name }}:{{ object.external_object.title }}@{{ object.external_object.version }}</a></dd>
+    {% endif %}
+    {% endif %}      
+      
     </dl>
 
     {% if object.licences.count %}
