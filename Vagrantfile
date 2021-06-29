@@ -41,7 +41,7 @@ export DJANGO_SUPERUSER_PASSWORD=admin
 cd "$FAIR_HOME"/scripts || exit
 
 ./rebuild-local.sh
-./run_scrc_server_vagrant
+./start_fair_registry_vagrant
 
 SHELL
 

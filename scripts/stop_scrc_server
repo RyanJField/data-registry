@@ -1,4 +1,0 @@
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-FAIR_HOME="$(dirname "${DIR}")"
-pgrep -f "$FAIR_HOME/manage.py runserver" | xargs kill
