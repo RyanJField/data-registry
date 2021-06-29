@@ -594,8 +594,8 @@ class DataProduct(BaseModel):
         'external_objects',
     )
 
-    object = models.OneToOneField(Object, on_delete=models.CASCADE, related_name='data_product')
-    namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, related_name='data_products')
+    object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
+    namespace = models.ForeignKey(Namespace, on_delete=models.PROTECT, related_name='data_products')
     name = NameField(null=False, blank=False)
     version = VersionField(null=True, blank=True)
 
