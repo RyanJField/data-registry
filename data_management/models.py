@@ -273,7 +273,7 @@ class Object(BaseModel):
 
         # Create ObjectComponent representing the whole object
         myself = Object.objects.get(id=self.id)
-        ObjectComponent.objects.create(name='whole_object', whole_object=True, object=myself, updated_by=myself.updated_by)
+        ObjectComponent.objects.create(name='whole_object', object=myself, updated_by=myself.updated_by)
 
     def name(self):
         if self.storage_location:
@@ -368,8 +368,6 @@ class ObjectComponent(BaseModel):
 
     `description` (*optional*): Free text description of the `ObjectComponent`
 
-    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not (default is `False`)
-
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
     ### Read-only Fields:
@@ -382,15 +380,16 @@ class ObjectComponent(BaseModel):
     `input_of`: List of `CodeRun` that the `ObjectComponent` is being used as an input to
 
     `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
+
+    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not
     """
     ADMIN_LIST_FIELDS = ('object', 'name')
-    EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
+    EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of', 'whole_object')
 
     object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='components', null=False)
     name = NameField(null=False, blank=False)
     issues = models.ManyToManyField(Issue, related_name='component_issues', blank=True)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
-    whole_object = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -401,6 +400,11 @@ class ObjectComponent(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def whole_object(self):
+        if self.name == 'whole_object':
+            return True
+        return False
 
 
 class CodeRun(BaseModel):
