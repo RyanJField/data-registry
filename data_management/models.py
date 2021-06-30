@@ -268,6 +268,13 @@ class Object(BaseModel):
     file_type = models.ForeignKey(FileType, on_delete=models.PROTECT, null=True, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Create ObjectComponent representing the whole object
+        myself = Object.objects.get(id=self.id)
+        ObjectComponent.objects.create(name='whole_object', object=myself, whole_object=True, updated_by=myself.updated_by)
+
     def name(self):
         if self.storage_location:
             return str(self.storage_location)
@@ -361,8 +368,6 @@ class ObjectComponent(BaseModel):
 
     `description` (*optional*): Free text description of the `ObjectComponent`
 
-    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not (default is `False`)
-
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
     ### Read-only Fields:
@@ -375,6 +380,8 @@ class ObjectComponent(BaseModel):
     `input_of`: List of `CodeRun` that the `ObjectComponent` is being used as an input to
 
     `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
+
+    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not
     """
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
