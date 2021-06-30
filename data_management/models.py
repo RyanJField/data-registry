@@ -405,7 +405,7 @@ class CodeRun(BaseModel):
 
     `description` (*optional*): Free text description of the `CodeRun`
 
-    `code_repo` (*optional*):  Reference to the `Object` associated with the `CodeRepoRelease` that was run
+    `code_repo` (*optional*):  Reference to the `Object` associated with the `StorageLocation` where the code repository is stored
 
     `model_config`: Reference to the `Object` for the YAML configuration used for the `CodeRun`
 
