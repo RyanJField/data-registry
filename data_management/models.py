@@ -370,7 +370,7 @@ class ObjectComponent(BaseModel):
 
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
-    `whole_object (*optional*)`: Specifies if this `ObjectComponent` refers to the whole object or not (by default this is `False`)
+    `whole_object` (*optional*): Specifies if this `ObjectComponent` refers to the whole object or not (by default this is `False`)
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `ObjectComponent`, final integer is the `ObjectComponent` id
