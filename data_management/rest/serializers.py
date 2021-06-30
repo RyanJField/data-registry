@@ -55,6 +55,8 @@ class CodeRunSerializer(BaseSerializer):
     class Meta(BaseSerializer.Meta):
         model = models.CodeRun
 
+    uuid = serializers.UUIDField(initial=uuid4, default=uuid4)
+
 
 class DataProductSerializer(BaseSerializer):
     internal_format = serializers.SerializerMethodField()
@@ -73,7 +75,7 @@ for name, cls in models.all_models.items():
     if name in ('Issue', 'DataProduct', 'CodeRun'):
         continue
 
-    if name in ('Author', 'Organisation', 'Object', 'CodeRun'):
+    if name in ('Author', 'Organisation', 'Object'):
         serializer = BaseSerializerUUID
     else:
         serializer = BaseSerializer
