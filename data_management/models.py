@@ -370,6 +370,8 @@ class ObjectComponent(BaseModel):
 
     `issues` (*optional*): List of `Issues` URLs to associate with this `ObjectComponent`
 
+    `whole_object (*optional*)`: Specifies if this `ObjectComponent` refers to the whole object or not (by default this is `False`)
+
     ### Read-only Fields:
     `url`: Reference to the instance of the `ObjectComponent`, final integer is the `ObjectComponent` id
 
@@ -380,8 +382,6 @@ class ObjectComponent(BaseModel):
     `input_of`: List of `CodeRun` that the `ObjectComponent` is being used as an input to
 
     `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
-
-    `whole_object`: Specifies if this `ObjectComponent` refers to the whole object or not
     """
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
