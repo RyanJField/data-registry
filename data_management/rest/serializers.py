@@ -64,6 +64,7 @@ class DataProductSerializer(BaseSerializer):
     class Meta(BaseSerializer.Meta):
         model = models.DataProduct
         fields = '__all__'
+        read_only_fields = model.EXTRA_DISPLAY_FIELDS
 
     def get_internal_format(self, obj):
         internal_format = serializers.BooleanField()
