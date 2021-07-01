@@ -505,7 +505,7 @@ class StorageLocation(BaseModel):
 
     `public` (*optional*): Boolean indicating whether the `StorageLocation` is public or not (default is `True`)
 
-    `store_root`: Reference to the `StorageRoot` to append the `path` to.
+    `storage_root`: Reference to the `StorageRoot` to append the `path` to.
 
     ### Read-only Fields:
     `url`: Reference to the instance of the `StorageLocation`, final integer is the `StorageLocation` id
