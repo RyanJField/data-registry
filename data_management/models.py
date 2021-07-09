@@ -226,8 +226,6 @@ class Object(BaseModel):
     `storage_location` (*optional*): The URL of the `StorageLocation` which is the location of the physical data of
      this object, if applicable
 
-    `authors` (*optional*): List of `Author` URLs to associate with this `Object`
-
     `uuid` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
     
     `file_type` (*optional*): `FileType` of this `Object`
@@ -242,6 +240,8 @@ class Object(BaseModel):
     `components`: List of `ObjectComponents` API URLs associated with this `Object`
 
     `data_product`: The `DataProduct` API URL if one is associated with this `Object`
+
+    `authors`: List of `ObjectAuthorOrg` URLs associated with this `Object`
 
     `code_repo_release`: The `CodeRepoRelease` API URL if one is associated with this `Object`
 
