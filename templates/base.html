@@ -34,8 +34,8 @@
             <a class="dropdown-item" href="{{ request.scheme }}://{{ request.get_host }}/static/images/schema.svg">Database Schema</a>
             {% if user.is_authenticated %}
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'get_token' %}">Generate API Token</a>
-            <a class="dropdown-item" href="{% url 'revoke_token' %}">Revoke API Token</a>
+            <a class="dropdown-item" data-toggle="modal" data-target="#create-token" href="{% url 'get_token' %}">Generate API Token</a>
+            <a class="dropdown-item" data-toggle="modal" data-target="#revoke-token" href="{% url 'revoke_token' %}">Revoke API Token</a>
             {% endif %}
             {% if user.is_staff %}
             <div class="dropdown-divider"></div>
@@ -61,6 +61,44 @@
       {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap4.html" %}
       {% block content %}
       {% endblock %}
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="create-token" tabindex="-1" role="dialog" aria-labelledby="createTokenLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createTokenLabel">API token</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      Your token is:
+      <div class="replace">
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="revoke-token" tabindex="-1" role="dialog" aria-labelledby="revokeTokenLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="revokeTokenLabel">API token</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      Your token has been revoked.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>
@@ -90,6 +128,14 @@
       params.success(res)
     })
   }
+
+  $('#create-token').on('show.bs.modal', function (event) {
+    $(this).find('.replace').load(event.relatedTarget.href);
+  });
+
+  $('#revoke-token').on('show.bs.modal', function (event) {
+    $(this).find('.modal-body').load(event.relatedTarget.href);
+  });
 </script>
 </body>
 </html>
