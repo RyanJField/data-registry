@@ -1,25 +1,19 @@
-from configparser import ConfigParser
 from copy import deepcopy
 import fnmatch
-from hashlib import sha1
-import hmac
-import time
-import uuid
 
 from django import forms, db
-from django_filters import filters
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import renderer_classes
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status
+from rest_framework import viewsets, permissions, views, renderers, mixins, exceptions, status, filters as rest_filters
 from rest_framework.response import Response
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend, filterset
-from django_filters import constants
+from django_filters import constants, filters
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, HttpResponse, redirect
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from data_management import models, object_storage, settings
@@ -218,14 +212,14 @@ class BaseViewSet(mixins.CreateModelMixin,
     """
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [CustomDjangoFilterBackend]
-    # lookup_field = 'name'
+    filter_backends = [CustomDjangoFilterBackend, rest_filters.OrderingFilter]
+    ordering = ['-id']
 
     def list(self, request, *args, **kwargs):
         if self.model.FILTERSET_FIELDS == '__all__':
-            filterset_fields = self.model.field_names() + ('cursor', 'format')
+            filterset_fields = self.model.field_names() + ('cursor', 'format', 'ordering', 'page_size')
         else:
-            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor', 'format')
+            filterset_fields = self.model.FILTERSET_FIELDS + ('cursor', 'format', 'ordering', 'page_size')
         if set(request.query_params.keys()) - set(filterset_fields):
             args = ', '.join(filterset_fields)
             raise BadQuery(detail='Invalid query arguments, only query arguments [%s] are allowed' % args)
