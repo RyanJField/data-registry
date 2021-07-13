@@ -3,7 +3,7 @@ from rest_framework import pagination, response
 
 
 class CustomPagination(pagination.CursorPagination):
-    # ordering = '-id'
+    ordering = '-id'
     page_size_query_param = 'page_size'
 
     def paginate_queryset(self, queryset, request, view=None):
