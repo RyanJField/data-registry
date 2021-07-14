@@ -194,7 +194,7 @@ def external_object(request, doi, title, version):
 
     # Find the external object
     try:
-        external_object = models.ExternalObject.objects.get(Q(doi_or_unique_name=doi) & Q(title=title) & Q(version=version))
+        external_object = models.ExternalObject.objects.get(Q(other_unique_name=doi) & Q(title=title) & Q(version=version))
     except:
         return HttpResponseNotFound()
 

@@ -41,14 +41,14 @@ def external_objects_table_data(request):
     size = int(request.GET.get('limit', 25))
     offset = int(request.GET.get('offset', 25))
     search = request.GET.get('search', None)
-    sort = request.GET.get('sort', '') or 'doi_or_unique_name'
+    sort = request.GET.get('sort', '') or 'other_unique_name'
     order = request.GET.get('order', '') or 'asc'
     sign = '-' if order == 'desc' else ''
     all_objects = models.ExternalObject.objects.all().order_by(sign + sort)
     if search:
         filtered_objects = all_objects.filter(
             Q(source__name__icontains=search) |
-            Q(doi_or_unique_name__icontains=search) |
+            Q(other_unique_name__icontains=search) |
             Q(release_date__icontains=search) |
             Q(title__icontains=search) |
             Q(version__icontains=search)
@@ -63,7 +63,7 @@ def external_objects_table_data(request):
         'totalNotFiltered': all_objects.count(),
         'rows': [
             {
-                'doi_or_unique_name': '<a href="data_product/%d">%s</a>' % (obj.data_product.id, obj.doi_or_unique_name),
+                'other_unique_name': '<a href="data_product/%d">%s</a>' % (obj.data_product.id, obj.other_unique_name),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
                 'version': obj.data_product.version,

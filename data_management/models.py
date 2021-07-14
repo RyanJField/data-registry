@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from dynamic_validator import ModelFieldRequiredMixin
@@ -623,7 +624,9 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the (`doi_or_unique_name`, `title`)
+    `identifier` (*optional*): Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`
+
+    `other_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the (`other_unique_name`, `title`)
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
@@ -646,10 +649,11 @@ class ExternalObject(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title')
+    ADMIN_LIST_FIELDS = ('other_unique_name', 'title')
 
     data_product = models.ForeignKey(DataProduct, on_delete=models.PROTECT, related_name='external_objects')
-    doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, unique=True)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
@@ -659,12 +663,19 @@ class ExternalObject(BaseModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('doi_or_unique_name', 'title'),
+                fields=('other_unique_name', 'title'),
                 name='unique_external_object'),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_identifier_or_other_unique_name",
+                check=(
+                    models.Q(identifier__isnull=True, other_unique_name__isnull=False)
+                    | models.Q(identifier__isnull=False, other_unique_name__isnull=True)
+                ),
+            )
         ]
 
     def __str__(self):
-        return '%s %s' % (self.doi_or_unique_name, self.title)
+        return '%s %s' % (self.other_unique_name, self.title)
 
 
 class QualityControlled(BaseModel):
