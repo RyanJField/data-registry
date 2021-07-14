@@ -652,8 +652,8 @@ class ExternalObject(BaseModel):
     ADMIN_LIST_FIELDS = ('other_unique_name', 'title')
 
     data_product = models.ForeignKey(DataProduct, on_delete=models.PROTECT, related_name='external_objects')
-    other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True)
-    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, unique=True)
+    other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, unique=True, blank=True)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
