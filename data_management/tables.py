@@ -49,6 +49,7 @@ def external_objects_table_data(request):
         filtered_objects = all_objects.filter(
             Q(source__name__icontains=search) |
             Q(other_unique_name__icontains=search) |
+            Q(identifier__icontains=search) |
             Q(release_date__icontains=search) |
             Q(title__icontains=search) |
             Q(version__icontains=search)
