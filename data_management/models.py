@@ -670,7 +670,6 @@ class ExternalObject(BaseModel):
                 check=(
                     models.Q(identifier__isnull=True, other_unique_name__isnull=False)
                     | models.Q(identifier__isnull=False, other_unique_name__isnull=True)
-                    | models.Q(identifier__isnull=False, other_unique_name__isnull=False)
                 ),
             )
         ]
