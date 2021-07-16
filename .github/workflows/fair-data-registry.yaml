@@ -1,21 +1,6 @@
 name: FAIR Data Registry
 on: [push]
 jobs:
-  deploy-local-registry:
-    name: Deploy local registry on ${{ matrix.os }} with Python ${{ matrix.python }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python: ["3.7"]
-    steps:
-      - uses: actions/setup-python@v2
-      - name: Deploy registry
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/main/static/localregistry.sh)"
-      - name: Start registry
-        run: ~/.fair/registry/scripts/start_fair_registry
-      - name: Stop registry
-        run: ~/.fair/registry/scripts/stop_fair_registry
   test:
     name: Test ${{ matrix.os }} with Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
