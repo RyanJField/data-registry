@@ -2,7 +2,7 @@ name: FAIR Data Registry
 on: [push]
 jobs:
   test:
-    name: Test ${{ matrix.os }} (Python ${{ matrix.python }})
+    name: Test ${{ matrix.os }} with Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -15,6 +15,6 @@ jobs:
       - name: Install Python dependencies
         uses: py-actions/py-dependency-install@v2
         with:
-          path: "requirements.txt"
+          path: "local-requirements.txt"
       - name: Run Tests
         run: python manage.py test --settings drams.test-settings
