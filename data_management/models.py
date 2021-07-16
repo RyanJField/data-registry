@@ -626,7 +626,7 @@ class ExternalObject(BaseModel):
     ### Writable Fields:
     `identifier` (*optional*): Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`
 
-    `other_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the (`other_unique_name`, `title`)
+    `other_unique_name`: Name of the `ExternalObject`, unique in the context of the (`other_unique_name`, `title`)
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
