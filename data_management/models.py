@@ -684,7 +684,10 @@ class ExternalObject(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return '%s %s' % (self.other_unique_name, self.title)
+        if self.other_unique_name:
+            return '%s %s %s' % (self.other_unique_name, self.title, self.version)
+        else:
+            return '%s %s %s' % (self.identifier, self.title, self.version)
 
 
 class QualityControlled(BaseModel):
