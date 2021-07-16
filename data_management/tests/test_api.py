@@ -230,7 +230,7 @@ class ObjectComponentAPITests(TestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 48)
 
-    def test_get_detail(self):
+    def test_get_detail_whole_object(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('objectcomponent-detail', kwargs={'pk': 1})
@@ -239,6 +239,16 @@ class ObjectComponentAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         self.assertEqual(response.json()['name'], 'whole_object')
+
+    def test_get_detail(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('objectcomponent-detail', kwargs={'pk': 17})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'symptom-probability')
 
     def test_filter_by_name(self):
         client = APIClient()
