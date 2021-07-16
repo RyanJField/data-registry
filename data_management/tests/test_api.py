@@ -375,7 +375,7 @@ class ExternalObjectAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('externalobject-list')
-        response = client.get(url, data={'other_unique_name': '10.15586/jptcp.v27iSP1.691'}, format='json')
+        response = client.get(url, data={'identifier': 'https://dx.doi.org/10.15586%2Fjptcp.v27iSP1.691'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
@@ -791,4 +791,3 @@ class KeyvalueAPITests(TestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['key'], 'TestKey2')
-
