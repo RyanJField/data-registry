@@ -510,13 +510,13 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['family_name'], 'Valenti')
+        self.assertEqual(response.json()['name'], 'Ivana Valenti')
 
     def test_filter_by_family_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'family_name': '*ti'}, format='json')
+        response = client.get(url, data={'name': '*ti'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
@@ -527,36 +527,25 @@ class AuthorAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'family_name': 'Cipriani'}, format='json')
+        response = client.get(url, data={'name': '*Cipriani'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['family_name'], 'Cipriani')
+        self.assertEqual(results[0]['name'], 'Maria Cipriani')
 
     def test_filter_by_given_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'given_name': 'Rosanna'}, format='json')
+        response = client.get(url, data={'name': 'Rosanna*'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['family_name'], 'Massabeti')
-
-    def test_filter_by_given_name_glob(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('author-list')
-        response = client.get(url, data={'given_name': '*na'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['name'], 'Rosanna Massabeti')
 
 
 class LicenceAPITests(TestCase):
