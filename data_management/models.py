@@ -182,7 +182,7 @@ class Author(BaseModel):
     """
     ADMIN_LIST_FIELDS = ('name', 'identifier')
 
-    name = NameField(null=True, blank=True)
+    name = NameField(null=True, blank=False)
     identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
@@ -193,7 +193,7 @@ class Author(BaseModel):
                 check=(
                     models.Q(identifier__isnull=True, name__isnull=False)
                     | models.Q(identifier__isnull=False, name__isnull=True)
-                    | models.Q(identifier__isnull=True, name__isnull=True)
+                    | models.Q(identifier__isnull=False, name__isnull=False)
                 ),
             )
         ]
