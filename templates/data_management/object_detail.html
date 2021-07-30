@@ -100,10 +100,10 @@
     <h3>Authors</h3>
     <dl class="row">
       {% for author in object.authors.all %}
-      <dt class="col-sm-3">Family Name</dt>
-      <dd class="col-sm-9">{{ author.family_name }}</dd>
-      <dt class="col-sm-3">First Name</dt>
-      <dd class="col-sm-9">{{ author.given_name }}</dd>
+      <dt class="col-sm-3">Name</dt>
+      <dd class="col-sm-9">{{ author.name }}</dd>
+      <dt class="col-sm-3">Identifier</dt>
+      <dd class="col-sm-9">{{ author.identifier }}</dd>
       {% endfor %}
     </dl>
     {% endif %}

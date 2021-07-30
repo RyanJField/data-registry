@@ -181,7 +181,14 @@ def init_db(test=True):
         storage_root=sr_textfiles,
     )
 
+    a1 = Author.objects.create(updated_by=user, name='Ivana Valenti')
+    a2 = Author.objects.create(updated_by=user, name='Maria Cipriani')
+    a3 = Author.objects.create(updated_by=user, name='Rosanna Massabeti')
+
     o_paper = Object.objects.create(updated_by=user)
+    o_paper.authors.add(a1)
+    o_paper.authors.add(a2)
+    o_paper.authors.add(a3)
 
     o_repo_prob = Object.objects.create(updated_by=user, storage_location=sl_repo_prob)
     o_repo_delay = Object.objects.create(updated_by=user, storage_location=sl_repo_delay)
@@ -395,14 +402,6 @@ def init_db(test=True):
         name='human/population',
         version='0.1.0',
     )
-
-    a1 = Author.objects.create(updated_by=user, family_name='Valenti', given_name='Ivana')
-    a2 = Author.objects.create(updated_by=user, family_name='Cipriani', given_name='Maria Stella')
-    a3 = Author.objects.create(updated_by=user, family_name='Massabeti', given_name='Rosanna')
-
-    oao1 = ObjectAuthorOrg.objects.create(updated_by=user, author=a1, object=o_paper)
-    oao2 = ObjectAuthorOrg.objects.create(updated_by=user, author=a2, object=o_paper)
-    oao3 = ObjectAuthorOrg.objects.create(updated_by=user, author=a3, object=o_paper)
 
     crr_code = CodeRepoRelease.objects.create(
         updated_by=user,
