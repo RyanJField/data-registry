@@ -83,7 +83,11 @@
     {% endif %}
     {% if object.external_object %}
     <dt class="col-sm-3">Download</dt>
+    {% if object.external_object.other_unique_name %}
     <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.external_object.other_unique_name }}:{{ object.external_object.title }}@{{ object.external_object.version }}">link</a></dd>
+    {% else %}
+    <dd class="col-sm-9"><a href="{{ object.external_object.identifier }}">link</a></dd>
+    {% endif %}
     {% endif %}
     {% endif %}      
       
