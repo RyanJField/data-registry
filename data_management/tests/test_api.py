@@ -393,7 +393,7 @@ class ExternalObjectAPITests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['other_unique_name'], '10.15586/jptcp.v27iSP1.691')
+        self.assertEqual(results[0]['identifier`], 'https://dx.doi.org/10.15586%2Fjptcp.v27iSP1.691')
 
 
 class QualityControlledAPITests(TestCase):
