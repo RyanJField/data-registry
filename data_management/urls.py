@@ -28,7 +28,7 @@ urlpatterns = [
     path('tables/externalobjects', cache_page(300)(tables.external_objects_table_data)),
     path('tables/codereporeleases', cache_page(300)(tables.code_repo_release_table_data)),
     path('data_product/<str:namespace>:<path:data_product_name>@<str:version>', views.data_product),
-    path('external_object/<path:doi>:<path:title>@<str:version>', views.external_object),
+    path('external_object/<path:other_unique_name>:<path:title>@<str:version>', views.external_object),
     path('data/<str:name>', views.get_data),
     path('api/data/<str:checksum>', api_views.ObjectStorageView.as_view()),
     path('api/data', api_views.ObjectStorageView.as_view())
