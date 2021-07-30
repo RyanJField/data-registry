@@ -43,11 +43,15 @@
       {% endif %}
 
       {% if object.data_product.external_object %}
+        {% if object.data_product.external_object.identifier %}
         <dt class="col-sm-3">External Object Identifier</dt>
         <dd class="col-sm-9">{{ object.data_product.external_object.identifier }}</dd>
+	{% endif %}
       
+	{% if object.data_product.external_object.other_unique_name %}
         <dt class="col-sm-3">External Object Other Unique Name</dt>
         <dd class="col-sm-9">{{ object.data_product.external_object.other_unique_name }}</dd>
+	{% endif %}
 
         <dt class="col-sm-3">External Object Primary Source</dt>
         <dd class="col-sm-9">{{ object.data_product.external_object.primary_not_supplement }}</dd>
