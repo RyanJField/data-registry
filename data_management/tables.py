@@ -65,7 +65,7 @@ def external_objects_table_data(request):
         'rows': [
             {
                 'identifier': obj.identifier,
-                'other_unique_name': '<a href="data_product/%d">%s</a>' % (obj.data_product.id, obj.other_unique_name),
+                'other_unique_name': '<a href="object/%d">%s</a>' % (obj.data_product.id, obj.other_unique_name),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
                 'version': obj.data_product.version,
