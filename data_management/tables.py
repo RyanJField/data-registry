@@ -41,7 +41,7 @@ def external_objects_table_data(request):
     size = int(request.GET.get('limit', 25))
     offset = int(request.GET.get('offset', 25))
     search = request.GET.get('search', None)
-    sort = request.GET.get('sort', '') or 'other_unique_name'
+    sort = request.GET.get('sort', '') or 'identifier'
     order = request.GET.get('order', '') or 'asc'
     sign = '-' if order == 'desc' else ''
     all_objects = models.ExternalObject.objects.all().order_by(sign + sort)
