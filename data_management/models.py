@@ -653,7 +653,7 @@ class ExternalObject(BaseModel):
 
     `version`: Version identifier of the `DataProduct` associated with this `ExternalObject`
     """
-    ADMIN_LIST_FIELDS = ('other_unique_name', 'title', 'version')
+    ADMIN_LIST_FIELDS = ('identifier', 'other_unique_name', 'title', 'version')
 
     data_product = models.ForeignKey(DataProduct, on_delete=models.PROTECT, related_name='external_objects')
     other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
