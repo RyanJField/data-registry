@@ -594,12 +594,12 @@ class DataProduct(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
 
-    `external_objects`: List of `ExternalObject` API URLs associated with this `DataProduct`
+    `external_object`: `ExternalObject` API URL associated with this `DataProduct`
     """
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     EXTRA_DISPLAY_FIELDS = (
-        'external_objects',
+        'external_object',
     )
 
     object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
