@@ -64,6 +64,7 @@ def external_objects_table_data(request):
         'totalNotFiltered': all_objects.count(),
         'rows': [
             {
+                'identifier': obj.identifier,
                 'other_unique_name': '<a href="data_product/%d">%s</a>' % (obj.data_product.id, obj.other_unique_name),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
