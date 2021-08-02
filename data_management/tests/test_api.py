@@ -403,7 +403,7 @@ class ExternalObjectAPITests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['other_unique_name'], 'scottish coronavirus-covid-19-management-information')
+        self.assertEqual(results[0]['other_unique_name'], 'scottish deaths-involving-coronavirus-covid-19')
 
 class QualityControlledAPITests(TestCase):
 
