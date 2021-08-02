@@ -385,13 +385,13 @@ class ExternalObjectAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('externalobject-list')
-        response = client.get(url, data={'identifier': 'https://dx.doi.org/10.15586%2Fjptcp.v27iSP1.691'}, format='json')
+        response = client.get(url, data={'other_unique_name': 'scottish coronavirus-covid-19-management-information'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['identifier'], 'https://dx.doi.org/10.15586%2Fjptcp.v27iSP1.691')
+        self.assertEqual(results[0]['other_unique_name'], 'scottish coronavirus-covid-19-management-information')
 
     def test_filter_by_title(self):
         client = APIClient()
@@ -403,8 +403,7 @@ class ExternalObjectAPITests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['identifier'], 'https://dx.doi.org/10.15586%2Fjptcp.v27iSP1.691')
-
+        self.assertEqual(results[0]['other_unique_name'], 'scottish coronavirus-covid-19-management-information')
 
 class QualityControlledAPITests(TestCase):
 
