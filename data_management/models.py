@@ -162,40 +162,15 @@ class Issue(BaseModel):
         return '%s [Severity %s]' % (self.short_desc(), self.severity)
 
 
-class Organisation(BaseModel):
-    """
-    ***Organisations that can be associated with an `Author`.***
-    ### Writable Fields:
-    `name`: Name of the `Organisation`
-
-    `identifier` (*optional*): Full URL of the identifer representing `Organisation` (e.g. ROR ID)
-
-    `uuid` (*optional*): UUID of the `Organisation`. If not specified a UUID is generated automatically.
-
-    ### Read-only Fields:
-    `url`: Reference to the instance of the `Organisation`, final integer is the `Organisation` id
-
-    `last_updated`: Datetime that this record was last updated
-
-    `updated_by`: Reference to the user that updated this record
-    """
-
-    name = models.CharField(max_length=PATH_FIELD_LENGTH, null=False, blank=False, unique=True)
-    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
-    uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
-
-
 class Author(BaseModel):
     """
     ***Authors that can be associated with an `Object` usually for use with `ExternalObject`s to record paper authors,
     etc.***
 
     ### Writable Fields:
-    `family_name`: Family name of the `Author`
+    `name` (*optional*): Full name or organisation name of the `Author`. Note that at least one of `name` or `identificer` must be specified.
 
-    `given_name`: Given name(s) of the `Author`
-
-    `identifier` (*optional*): Full URL of identifier (e.g. ORCiD ID) of the `Author`
+    `identifier` (*optional*): Full URL of identifier (e.g. ORCiD or ROR ID) of the `Author`
 
     `uuid` (*optional*): UUID of the `Author`. If not specified a UUID is generated automatically.
 
@@ -206,15 +181,29 @@ class Author(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    ADMIN_LIST_FIELDS = ('family_name', 'given_name')
+    ADMIN_LIST_FIELDS = ('name', 'identifier')
 
-    family_name = NameField(null=False, blank=False)
-    given_name = NameField(null=False, blank=False)
+    name = NameField(null=True, blank=False)
     identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=False, unique=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_identifier_and_or_name",
+                check=(
+                    models.Q(identifier__isnull=True, name__isnull=False)
+                    | models.Q(identifier__isnull=False, name__isnull=True)
+                    | models.Q(identifier__isnull=False, name__isnull=False)
+                ),
+            )
+        ]
+
     def __str__(self):
-        return '%s, %s' % (self.family_name, self.given_name)
+        if self.identifier:
+            return self.identifier
+        elif self.name:
+            return self.name
 
 
 class Object(BaseModel):
@@ -226,6 +215,8 @@ class Object(BaseModel):
 
     `storage_location` (*optional*): The URL of the `StorageLocation` which is the location of the physical data of
      this object, if applicable
+
+    `authors` (*optional*): List of `Author` URLs associated with this `Object`
 
     `uuid` (*optional*): UUID of the `Object`. If not specified a UUID is generated automatically.
     
@@ -242,8 +233,6 @@ class Object(BaseModel):
 
     `data_product`: The `DataProduct` API URL if one is associated with this `Object`
 
-    `authors`: List of `ObjectAuthorOrg` URLs associated with this `Object`
-
     `code_repo_release`: The `CodeRepoRelease` API URL if one is associated with this `Object`
 
     `quality_control`: The `QualityControl` API URL if one is associated with this `Object`
@@ -257,7 +246,6 @@ class Object(BaseModel):
         'data_product',
         'code_repo_release',
         'quality_control',
-        'authors',
         'licences',
         'keywords',
     )
@@ -267,6 +255,7 @@ class Object(BaseModel):
                                          related_name='location_for_object')
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     file_type = models.ForeignKey(FileType, on_delete=models.PROTECT, null=True, blank=True)
+    authors = models.ManyToManyField(Author, blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
     def save(self, *args, **kwargs):
@@ -304,49 +293,17 @@ class Object(BaseModel):
         return self.name()
 
 
-class ObjectAuthorOrg(BaseModel):
+class UserAuthor(BaseModel):
     """
-    ***A combination of an `Author` and list of `Organisation`s associated with a particular `Object`.***
+    ***A combination of an `Author` associated with a particular user.***
 
     ### Writable Fields:
-    `object`: The API URL of the `Object` to associate with this `ObjectAuthorOrg`
+    `user`: The API URL of the `User` to associate with this `UserAuthor`
 
-    `author`: The API URL of the `Author` to associated with this `ObjectAuthorOrg`
-
-    `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `ObjectAuthorOrg`
+    `author`: The API URL of the `Author` to associate with this `UserAuthor`
 
     ### Read-only Fields:
-    `url`: Reference to the instance of the `ObjectAuthorOrg`, final integer is the `ObjectAuthorOrg` id
-
-    `last_updated`: Datetime that this record was last updated
-
-    `updated_by`: Reference to the user that updated this record
-    """
-    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='authors', null=False)
-    author = models.ForeignKey(Author, on_delete=models.PROTECT, null=False, blank=False)
-    organisations = models.ManyToManyField(Organisation, blank=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('object', 'author'),
-                name='unique_object_author'),
-        ]
-
-
-class UserAuthorOrg(BaseModel):
-    """
-    ***A combination of an `Author` and list of `Organisation`s associated with a particular user.***
-
-    ### Writable Fields:
-    `user`: The API URL of the `User` to associate with this `UserAuthorOrg`
-
-    `author`: The API URL of the `Author` to associate with this `UserAuthorOrg`
-
-    `organisations` (*optional*): List of API URLs of the `Organisation`s to associate with this `UserAuthorOrg`
-
-    ### Read-only Fields:
-    `url`: Reference to the instance of the `UserAuthorOrg`, final integer is the `UserAuthorOrg` id
+    `url`: Reference to the instance of the `UserAuthor`, final integer is the `UserAuthor` id
 
     `last_updated`: Datetime that this record was last updated
 
@@ -354,7 +311,6 @@ class UserAuthorOrg(BaseModel):
     """
     user = models.OneToOneField(get_user_model(), on_delete=models.PROTECT, related_name='users', null=False, unique=True)
     author = models.ForeignKey(Author, on_delete=models.PROTECT, null=False, blank=False)
-    organisations = models.ManyToManyField(Organisation, blank=True)
 
 
 class ObjectComponent(BaseModel):

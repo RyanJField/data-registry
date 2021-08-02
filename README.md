@@ -1,6 +1,6 @@
 # Data registry
 
-[![][travis-master-img]][travis-master-url] [![][travis-develop-img]][travis-develop-url]
+[![FAIR Data Registry](https://github.com/FAIRDataPipeline/data-registry/actions/workflows/fair-data-registry.yaml/badge.svg)](https://github.com/FAIRDataPipeline/data-registry/actions/workflows/fair-data-registry.yaml)
 
 The SCRC data registry is a Django website and REST API which is used by the data-pipeline to store metadata about code runs and their inputs and outputs.
 

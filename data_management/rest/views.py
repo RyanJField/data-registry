@@ -150,16 +150,6 @@ class APIIntegrityError(exceptions.APIException):
     default_code = 'integrity_error'
 
 
-class RegexFilter(filters.Filter):
-    """
-    Custom API filter which can be used to add regex filtering to a field.
-    """
-    def __init__(self, *args, **kwargs):
-        kwargs['lookup_expr'] = 'regex'
-        super().__init__(*args, **kwargs)
-    field_class = forms.CharField
-
-
 class GlobFilter(filters.Filter):
     """
     Custom API filter which can be used to add Unix glob style pattern matching to a field.

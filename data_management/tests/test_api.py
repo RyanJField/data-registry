@@ -228,12 +228,22 @@ class ObjectComponentAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 32)
+        self.assertEqual(len(results), 48)
+
+    def test_get_detail_whole_object(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse('objectcomponent-detail', kwargs={'pk': 1})
+        response = client.get(url, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response.json()['name'], 'whole_object')
 
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        url = reverse('objectcomponent-detail', kwargs={'pk': 1})
+        url = reverse('objectcomponent-detail', kwargs={'pk': 17})
         response = client.get(url, format='json')
 
         self.assertEqual(response.status_code, 200)
@@ -359,7 +369,7 @@ class ExternalObjectAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 2)
 
     def test_get_detail(self):
         client = APIClient()
@@ -387,7 +397,7 @@ class ExternalObjectAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('externalobject-list')
-        response = client.get(url, data={'title': 'Covid-19: A systemic disease treated with a wide-ranging approach: A case report'}, format='json')
+        response = client.get(url, data={'title': 'scottish deaths-involving-coronavirus-covid-19'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
@@ -500,13 +510,13 @@ class AuthorAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['family_name'], 'Valenti')
+        self.assertEqual(response.json()['name'], 'Ivana Valenti')
 
     def test_filter_by_family_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'family_name': '*ti'}, format='json')
+        response = client.get(url, data={'name': '*ti'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
@@ -517,36 +527,25 @@ class AuthorAPITests(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'family_name': 'Cipriani'}, format='json')
+        response = client.get(url, data={'name': '*Cipriani'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['family_name'], 'Cipriani')
+        self.assertEqual(results[0]['name'], 'Maria Cipriani')
 
     def test_filter_by_given_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('author-list')
-        response = client.get(url, data={'given_name': 'Rosanna'}, format='json')
+        response = client.get(url, data={'name': 'Rosanna*'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['family_name'], 'Massabeti')
-
-    def test_filter_by_given_name_glob(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        url = reverse('author-list')
-        response = client.get(url, data={'given_name': '*na'}, format='json')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        results = response.json()['results']
-        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['name'], 'Rosanna Massabeti')
 
 
 class LicenceAPITests(TestCase):
@@ -643,12 +642,12 @@ class DataProductAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 11)
+        self.assertEqual(len(results), 13)
 
     def test_get_detail(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        url = reverse('dataproduct-detail', kwargs={'pk': 1})
+        url = reverse('dataproduct-detail', kwargs={'pk': 3})
         response = client.get(url, format='json')
 
         self.assertEqual(response.status_code, 200)
@@ -664,7 +663,7 @@ class DataProductAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 9)
 
     def test_filter_by_name(self):
         client = APIClient()
@@ -698,7 +697,7 @@ class DataProductAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
-        self.assertEqual(len(results), 11)
+        self.assertEqual(len(results), 13)
 
 
 class CodeRepoReleaseAPITests(TestCase):
