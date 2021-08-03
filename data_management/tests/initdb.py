@@ -290,7 +290,7 @@ def init_db(test=True):
     ExternalObject.objects.create(
         updated_by=user,
         data_product=dp_boy_mort_csv,
-        doi_or_unique_name='scottish deaths-involving-coronavirus-covid-19',
+        other_unique_name='scottish deaths-involving-coronavirus-covid-19',
         release_date=parser.isoparse('2010-07-09T12:00Z'),
         title='scottish deaths-involving-coronavirus-covid-19',
         description='scottish deaths-involving-coronavirus-covid-19 dataset',
@@ -308,7 +308,7 @@ def init_db(test=True):
     ExternalObject.objects.create(
         updated_by=user,
         data_product=dp_boy_cases_csv,
-        doi_or_unique_name='scottish coronavirus-covid-19-management-information',
+        other_unique_name='scottish coronavirus-covid-19-management-information',
         release_date=parser.isoparse('2010-07-10T18:38:00Z'),
         title='scottish coronavirus-covid-19-management-information',
         description='scottish coronavirus-covid-19-management-information dataset',
