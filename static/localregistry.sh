@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 export FAIR_HOME=$HOME/.fair/registry
 mkdir -p "$FAIR_HOME"
 git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME"
