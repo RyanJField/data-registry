@@ -284,7 +284,7 @@ def init_db(test=True):
         object=o_boy_mort_csv,
         namespace=n_fair,
         name='this/is/a/test/2',
-        version='0.1.0',
+        version='0.1.0'
     )
 
     ExternalObject.objects.create(
@@ -302,7 +302,7 @@ def init_db(test=True):
         object=o_boy_cases_csv,
         namespace=n_fair,
         name='this/is/a/test/1',
-        version='0.1.0',
+        version='0.1.0'
     )
 
     ExternalObject.objects.create(

@@ -22,7 +22,7 @@ def index(request):
     Releases.
     """
     data_products = models.Object.objects.filter(data_product__isnull=False)
-    external_objects = models.DataProduct.objects.filter(external_objects__isnull=False)
+    external_objects = models.DataProduct.objects.filter(external_object__isnull=False)
     code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
 
     ObjectData = namedtuple('object', 'name display_name count doc')
@@ -184,17 +184,13 @@ def data_product(request, namespace, data_product_name, version):
     return redirect(data_product.object.storage_location.full_uri())
 
 
-def external_object(request, doi, title, version):
+def external_object(request, other_unique_name, title, version):
     """
-    Redirect to the URL of a file given the DOI or unique name, title and version
+    Redirect to the URL of a file given the unique name, title and version
     """
-    # Even if the user specified "doi://" sometimes the server will only see "doi:/"
-    if 'doi:/' in doi and 'doi://' not in doi:
-        doi = doi.replace('doi:/', 'doi://')
-
     # Find the external object
     try:
-        external_object = models.ExternalObject.objects.get(Q(doi_or_unique_name=doi) & Q(title=title) & Q(version=version))
+        external_object = models.ExternalObject.objects.get(Q(other_unique_name=other_unique_name) & Q(title=title) & Q(version=version))
     except:
         return HttpResponseNotFound()
 

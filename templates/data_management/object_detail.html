@@ -42,30 +42,37 @@
         <dd class="col-sm-9">{{ object.data_product.version }}</dd>
       {% endif %}
 
-      {% if object.external_object %}
-        <dt class="col-sm-3">External Object DOI or Unique Name</dt>
-        <dd class="col-sm-9">{{ object.external_object.doi_or_unique_name }}</dd>
+      {% if object.data_product.external_object %}
+        {% if object.data_product.external_object.identifier %}
+        <dt class="col-sm-3">External Object Identifier</dt>
+        <dd class="col-sm-9">{{ object.data_product.external_object.identifier }}</dd>
+	{% endif %}
+      
+	{% if object.data_product.external_object.other_unique_name %}
+        <dt class="col-sm-3">External Object Other Unique Name</dt>
+        <dd class="col-sm-9">{{ object.data_product.external_object.other_unique_name }}</dd>
+	{% endif %}
 
         <dt class="col-sm-3">External Object Primary Source</dt>
-        <dd class="col-sm-9">{{ object.external_object.primary_not_supplement }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.primary_not_supplement }}</dd>
 
         <dt class="col-sm-3">External Object Release Date</dt>
-        <dd class="col-sm-9">{{ object.external_object.release_date }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.release_date }}</dd>
 
         <dt class="col-sm-3">External Object Title</dt>
-        <dd class="col-sm-9">{{ object.external_object.title }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.title }}</dd>
 
         <dt class="col-sm-3">External Object Description</dt>
-        <dd class="col-sm-9">{{ object.external_object.description }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.description }}</dd>
 
         <dt class="col-sm-3">External Object Source</dt>
-        <dd class="col-sm-9">{{ object.external_object.source }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.source }}</dd>
 
         <dt class="col-sm-3">External Object Original Store</dt>
-        <dd class="col-sm-9">{{ object.external_object.original_store }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.original_store }}</dd>
 
         <dt class="col-sm-3">External Object Version</dt>
-        <dd class="col-sm-9">{{ object.external_object.version }}</dd>
+        <dd class="col-sm-9">{{ object.data_product.external_object.version }}</dd>
       {% endif %}
       
       {% if object.file_type %}
@@ -78,9 +85,13 @@
     <dt class="col-sm-3">Download</dt>
     <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/data_product/{{ object.data_product.namespace }}:{{ object.data_product.name }}@{{ object.data_product.version }}">link</a></dd>
     {% endif %}
-    {% if object.external_object %}
+    {% if object.data_product.external_object %}
     <dt class="col-sm-3">Download</dt>
-    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.external_object.doi_or_unique_name }}:{{ object.external_object.title }}@{{ object.external_object.version }}">link</a></dd>
+    {% if object.data_product.external_object.other_unique_name %}
+    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.data_product.external_object.other_unique_name }}:{{ object.data_product.external_object.title }}@{{ object.data_product.external_object.version }}">link</a></dd>
+    {% else %}
+    <dd class="col-sm-9"><a href="{{ object.external_object.identifier }}">link</a></dd>
+    {% endif %}
     {% endif %}
     {% endif %}      
       

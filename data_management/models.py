@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from dynamic_validator import ModelFieldRequiredMixin
@@ -549,12 +550,12 @@ class DataProduct(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
 
-    `external_objects`: List of `ExternalObject` API URLs associated with this `DataProduct`
+    `external_object`: `ExternalObject` API URL associated with this `DataProduct`
     """
     ADMIN_LIST_FIELDS = ('namespace', 'name', 'version')
 
     EXTRA_DISPLAY_FIELDS = (
-        'external_objects',
+        'external_object',
     )
 
     object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
@@ -579,7 +580,11 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `doi_or_unique_name`: DOI or Name of the `ExternalObject`, unique in the context of the (`doi_or_unique_name`, `title`)
+    `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`).  This needs to be specified only if `other_unique_name` is not.
+
+    `other_unique_name`: Name of the `ExternalObject`, unique in the context of the triple (`other_unique_name`, `title`, `version`). This needs to be specified only if `identifier` is not.
+
+    unique in the context of the (`other_unique_name`, `title`, `version`)
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
@@ -601,26 +606,46 @@ class ExternalObject(BaseModel):
     `last_updated`: Datetime that this record was last updated
 
     `updated_by`: Reference to the user that updated this record
-    """
-    ADMIN_LIST_FIELDS = ('doi_or_unique_name', 'title')
 
-    data_product = models.ForeignKey(DataProduct, on_delete=models.PROTECT, related_name='external_objects')
-    doi_or_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=False, blank=False)
+    `version`: Version identifier of the `DataProduct` associated with this `ExternalObject`
+    """
+    ADMIN_LIST_FIELDS = ('identifier', 'other_unique_name', 'title', 'version')
+
+    data_product = models.OneToOneField(DataProduct, on_delete=models.PROTECT, related_name='external_object')
+    other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
+    identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    version = VersionField(null=True, blank=True, editable=False)
     original_store = models.ForeignKey(StorageLocation, on_delete=models.PROTECT, related_name='original_store_of', null=True, blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('doi_or_unique_name', 'title'),
+                fields=('other_unique_name', 'identifier', 'title', 'version'),
                 name='unique_external_object'),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_identifier_or_other_unique_name",
+                check=(
+                    models.Q(identifier__isnull=True, other_unique_name__isnull=False)
+                    | models.Q(identifier__isnull=False, other_unique_name__isnull=True)
+                ),
+            )
         ]
 
+    def save(self, *args, **kwargs):
+        # If version is not defined or is empty, use the version from the associated data product
+        if not self.version or self.version == '':
+            self.version = self.data_product.version
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return '%s %s' % (self.doi_or_unique_name, self.title)
+        if self.other_unique_name:
+            return '%s %s %s' % (self.other_unique_name, self.title, self.version)
+        else:
+            return '%s %s %s' % (self.identifier, self.title, self.version)
 
 
 class QualityControlled(BaseModel):
