@@ -634,11 +634,10 @@ class ExternalObject(BaseModel):
                      models.Q(alternate_identifier__isnull=False) &
                      models.Q(alternate_identifier_type__isnull=False)) | 
                     (models.Q(identifier__isnull=False) &
-                     models.Q(alternate_identifier__isnull=True) &
-                     models.Q(alternate_identifier_type__isnull=True)) |
-                    (models.Q(identifier__isnull=False) &
-                     models.Q(alternate_identifier__isnull=False) &
-                     models.Q(alternate_identifier_type__isnull=False))
+                     (models.Q(alternate_identifier__isnull=True) &
+                      models.Q(alternate_identifier_type__isnull=True)) |
+                     (models.Q(alternate_identifier__isnull=False) &
+                      models.Q(alternate_identifier_type__isnull=False)))
                 ),
             )
         ]
