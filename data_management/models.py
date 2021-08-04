@@ -625,7 +625,7 @@ class ExternalObject(BaseModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('alternate_identifier', 'identifier', 'title', 'version'),
+                fields=('identifier', 'alternate_identifier', 'alternate_identifier_type', 'title', 'version'),
                 name='unique_external_object'),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_identifier_or_alternate_identifier",
