@@ -184,13 +184,13 @@ def data_product(request, namespace, data_product_name, version):
     return redirect(data_product.object.storage_location.full_uri())
 
 
-def external_object(request, other_unique_name, title, version):
+def external_object(request, alternate_identifier, title, version):
     """
-    Redirect to the URL of a file given the unique name, title and version
+    Redirect to the URL of a file given the alternate identifier, title and version
     """
     # Find the external object
     try:
-        external_object = models.ExternalObject.objects.get(Q(other_unique_name=other_unique_name) & Q(title=title) & Q(version=version))
+        external_object = models.ExternalObject.objects.get(Q(alternate_identifier=alternate_identifier) & Q(title=title) & Q(version=version))
     except:
         return HttpResponseNotFound()
 

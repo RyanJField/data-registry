@@ -379,19 +379,19 @@ class ExternalObjectAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(response.json()['other_unique_name'], 'scottish deaths-involving-coronavirus-covid-19')
+        self.assertEqual(response.json()['alternate_identifier'], 'scottish deaths-involving-coronavirus-covid-19')
 
     def test_filter_by_name(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse('externalobject-list')
-        response = client.get(url, data={'other_unique_name': 'scottish coronavirus-covid-19-management-information'}, format='json')
+        response = client.get(url, data={'alternate_identifier': 'scottish coronavirus-covid-19-management-information'}, format='json')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['other_unique_name'], 'scottish coronavirus-covid-19-management-information')
+        self.assertEqual(results[0]['alternate_identifier'], 'scottish coronavirus-covid-19-management-information')
 
     def test_filter_by_title(self):
         client = APIClient()
@@ -403,7 +403,7 @@ class ExternalObjectAPITests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/json')
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['other_unique_name'], 'scottish deaths-involving-coronavirus-covid-19')
+        self.assertEqual(results[0]['alternate_identifier'], 'scottish deaths-involving-coronavirus-covid-19')
 
 class QualityControlledAPITests(TestCase):
 
