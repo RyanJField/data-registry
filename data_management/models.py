@@ -580,9 +580,9 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`).  This needs to be specified only if `alternate_identifier` is not.
+    `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`). At least one of `identifier` and `alternate_identifier` must be defined.
 
-    `alternate_identifier`: Name of the `ExternalObject`, unique in the context of the triple (`alternate_identifier`, `title`, `version`). This needs to be specified only if `identifier` is not.
+    `alternate_identifier`: Name of the `ExternalObject`, unique in the context of the triple (`alternate_identifier`, `title`, `version`).
 
     `alternate_identifier_type`: Type of `alternate_identifier`, required if `alternate_identifier` is defined
 
@@ -635,7 +635,10 @@ class ExternalObject(BaseModel):
                      models.Q(alternate_identifier_type__isnull=False)) | 
                     (models.Q(identifier__isnull=False) &
                      models.Q(alternate_identifier__isnull=True) &
-                     models.Q(alternate_identifier_type__isnull=True))
+                     models.Q(alternate_identifier_type__isnull=True)) |
+                    (models.Q(identifier__isnull=False) &
+                     models.Q(alternate_identifier__isnull=False) &
+                     models.Q(alternate_identifier_type__isnull=False)) |
                 ),
             )
         ]
