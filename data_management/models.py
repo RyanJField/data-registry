@@ -582,7 +582,7 @@ class ExternalObject(BaseModel):
     ### Writable Fields:
     `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`). At least one of `identifier` and `alternate_identifier` must be defined.
 
-    `alternate_identifier`: Name of the `ExternalObject`, unique in the context of the triple (`alternate_identifier`, `title`, `version`).
+    `alternate_identifier`: Name of the `ExternalObject`, unique in the context of the quadruple (`alternate_identifier`, `alternate_identifier_type`, `title`, `version`). Unlike `identifier`, this is free text, not a url. For instance, it can be a locally unique name for a data resource within the domain of issue. It is associated with a `alternate_identifier_type` which describes its origin.
 
     `alternate_identifier_type`: Type of `alternate_identifier`, required if `alternate_identifier` is defined
 
