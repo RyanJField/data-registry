@@ -580,11 +580,11 @@ class ExternalObject(BaseModel):
       modelling pipeline.***
 
     ### Writable Fields:
-    `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`).  This needs to be specified only if `other_unique_name` is not.
+    `identifier`: Full URL of identifier (e.g. DataCite DOI) of the `ExternalObject`, unique in the context of the triple (`identifier`, `title`, `version`).  This needs to be specified only if `alternate_identifier` is not.
 
-    `other_unique_name`: Name of the `ExternalObject`, unique in the context of the triple (`other_unique_name`, `title`, `version`). This needs to be specified only if `identifier` is not.
+    `alternate_identifier`: Name of the `ExternalObject`, unique in the context of the triple (`alternate_identifier`, `title`, `version`). This needs to be specified only if `identifier` is not.
 
-    unique in the context of the (`other_unique_name`, `title`, `version`)
+    `alternate_identifier_type`: Type of `alternate_identifier`, required if `alternate_identifier` is defined
 
     `primary_not_supplement` (*optional*): Boolean flag to indicate that the `ExternalObject` is a primary source
 
@@ -609,11 +609,12 @@ class ExternalObject(BaseModel):
 
     `version`: Version identifier of the `DataProduct` associated with this `ExternalObject`
     """
-    ADMIN_LIST_FIELDS = ('identifier', 'other_unique_name', 'title', 'version')
+    ADMIN_LIST_FIELDS = ('identifier', 'alternate_identifier', 'alternate_identifier_type', 'title', 'version')
 
     data_product = models.OneToOneField(DataProduct, on_delete=models.PROTECT, related_name='external_object')
-    other_unique_name = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
     identifier = models.URLField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
+    alternate_identifier = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
+    alternate_identifier_type = models.CharField(max_length=CHAR_FIELD_LENGTH, null=True, blank=True)
     primary_not_supplement = models.BooleanField(default=True)
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
@@ -624,13 +625,17 @@ class ExternalObject(BaseModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('other_unique_name', 'identifier', 'title', 'version'),
+                fields=('alternate_identifier', 'identifier', 'title', 'version'),
                 name='unique_external_object'),
             models.CheckConstraint(
-                name="%(app_label)s_%(class)s_identifier_or_other_unique_name",
+                name="%(app_label)s_%(class)s_identifier_or_alternate_identifier",
                 check=(
-                    models.Q(identifier__isnull=True, other_unique_name__isnull=False)
-                    | models.Q(identifier__isnull=False, other_unique_name__isnull=True)
+                    (models.Q(identifier__isnull=True) &
+                     models.Q(alternate_identifier__isnull=False) &
+                     models.Q(alternate_identifier_type__isnull=False)) | 
+                    (models.Q(identifier__isnull=False) &
+                     models.Q(alternate_identifier__isnull=True) &
+                     models.Q(alternate_identifier_type__isnull=True))
                 ),
             )
         ]
@@ -642,8 +647,8 @@ class ExternalObject(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        if self.other_unique_name:
-            return '%s %s %s' % (self.other_unique_name, self.title, self.version)
+        if self.alternate_identifier:
+            return '%s %s %s' % (self.alternate_identifier, self.title, self.version)
         else:
             return '%s %s %s' % (self.identifier, self.title, self.version)
 
