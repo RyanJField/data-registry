@@ -53,7 +53,7 @@ https://data.scrc.uk/data_product/<namespace>:<data product name>@<version>
 ```
 and for external objects use:
 ```
-https://data.scrc.uk/external_object/<other_unique_name>:<title>@<version>
+https://data.scrc.uk/external_object/<alternate_identifier>:<title>@<version>
 ```
 For external objects query parameters can be used to return different URLs:
 * **source**: returns the `Source` associated with the external object
