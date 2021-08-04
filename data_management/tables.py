@@ -48,7 +48,7 @@ def external_objects_table_data(request):
     if search:
         filtered_objects = all_objects.filter(
             Q(source__name__icontains=search) |
-            Q(other_unique_name__icontains=search) |
+            Q(alternate_identifier__icontains=search) |
             Q(identifier__icontains=search) |
             Q(release_date__icontains=search) |
             Q(title__icontains=search) |
@@ -65,7 +65,7 @@ def external_objects_table_data(request):
         'rows': [
             {
                 'identifier': obj.identifier,
-                'other_unique_name': '<a href="object/%d">%s</a>' % (obj.data_product.id, obj.other_unique_name),
+                'alternate_identifier': '<a href="object/%d">%s</a>' % (obj.data_product.id, obj.alternate_identifier),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
                 'version': obj.data_product.version,

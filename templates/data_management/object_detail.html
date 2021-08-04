@@ -48,9 +48,14 @@
         <dd class="col-sm-9">{{ object.data_product.external_object.identifier }}</dd>
 	{% endif %}
       
-	{% if object.data_product.external_object.other_unique_name %}
-        <dt class="col-sm-3">External Object Other Unique Name</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.other_unique_name }}</dd>
+	{% if object.data_product.external_object.alternate_identifier %}
+        <dt class="col-sm-3">External Object Alternate Identifier</dt>
+        <dd class="col-sm-9">{{ object.data_product.external_object.alternate_identifier }}</dd>
+	{% endif %}
+
+	{% if object.data_product.external_object.alternate_identifier_type %}
+	<dt class="col-sm-3">External Object Alternate Identifier Type</dt>
+	<dd class="col-sm-9">{{ object.data_product.external_object.alternate_identifier_type }}</dd>
 	{% endif %}
 
         <dt class="col-sm-3">External Object Primary Source</dt>
@@ -87,8 +92,8 @@
     {% endif %}
     {% if object.data_product.external_object %}
     <dt class="col-sm-3">Download</dt>
-    {% if object.data_product.external_object.other_unique_name %}
-    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.data_product.external_object.other_unique_name }}:{{ object.data_product.external_object.title }}@{{ object.data_product.external_object.version }}">link</a></dd>
+    {% if object.data_product.external_object.alternate_identifier %}
+    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.data_product.external_object.alternate_identifier }}:{{ object.data_product.external_object.title }}@{{ object.data_product.external_object.version }}">link</a></dd>
     {% else %}
     <dd class="col-sm-9"><a href="{{ object.external_object.identifier }}">link</a></dd>
     {% endif %}
