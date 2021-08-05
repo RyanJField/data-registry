@@ -293,7 +293,7 @@ class DataProductViewSet(BaseViewSet, mixins.UpdateModelMixin):
     __doc__ = models.DataProduct.__doc__
 
 
-class CodeRunViewSet(BaseViewSet, mixins.UpdateModelMixin):
+class CodeRunViewSet(BaseViewSet, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     model = models.CodeRun
     serializer_class = serializers.CodeRunSerializer
     filterset_fields = models.CodeRun.FILTERSET_FIELDS
