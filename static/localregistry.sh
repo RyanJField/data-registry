@@ -22,7 +22,7 @@ else
             git clone https://github.com/FAIRDataPipeline/data-registry.git -b $2 "$FAIR_HOME" > /dev/null 2>&1
             ;;
         -p|--prerelease)
-            TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases" | grep -Po '"tag_name": "\K.*?(?=")' | head -n 1`
+            TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases" | grep -Po '"tag_name": "\K.*?(?=")' | sort -r -V | head -n 1`
             echo "Cloning tag $TAG"
             git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
             cd "$FAIR_HOME"
