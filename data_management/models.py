@@ -168,7 +168,7 @@ class Author(BaseModel):
     etc.***
 
     ### Writable Fields:
-    `name` (*optional*): Full name or organisation name of the `Author`. Note that at least one of `name` or `identificer` must be specified.
+    `name` (*optional*): Full name or organisation name of the `Author`. Note that at least one of `name` or `identifier` must be specified.
 
     `identifier` (*optional*): Full URL of identifier (e.g. ORCiD or ROR ID) of the `Author`
 
