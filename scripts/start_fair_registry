@@ -1,10 +1,19 @@
 #!/bin/bash
+PORT=8000
 ORIGINAL_PWD=`pwd`
+if [ "$#" -eq 1 ]; then
+    PORT=$1
+fi
+if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+    echo "Invalid port '$PORT' specified"
+    exit 1
+fi
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 FAIR_HOME="$(dirname "${DIR}")"
 cd $FAIR_HOME
-nohup "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py runserver > $FAIR_HOME/output.log 2>&1 &
+nohup "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py runserver $PORT > $FAIR_HOME/output.log 2>&1 &
+echo $PORT > $FAIR_HOME/session_port.log
 
 count=0
 until [ $count -gt 6 ] || curl http://localhost:8000 > /dev/null 2>&1
@@ -13,12 +22,12 @@ do
     ((count++))
 done
 
-curl http://localhost:8000 > /dev/null 2>&1
+curl http://localhost:$PORT > /dev/null 2>&1
 retVal=$?
 if [ $retVal -ne 0 ]; then
     echo Error starting local registry
 else
-    echo Local registry now accepting connections on http://localhost:8000
+    echo Local registry now accepting connections on http://localhost:$PORT
 fi
 
 "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py get_token > "$FAIR_HOME"/token
