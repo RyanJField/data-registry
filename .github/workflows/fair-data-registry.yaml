@@ -25,9 +25,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python: ["3.7"]
+    env:
+      REGISTRY_PORT: 8001
     steps:
       - uses: actions/setup-python@v2
       - name: Deploy registry
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF##*/}/static/localregistry.sh)"
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF}/static/localregistry.sh)"
       - name: Start registry
-        run: ~/.fair/registry/scripts/start_fair_registry
+        run: ~/.fair/registry/scripts/start_fair_registry $REGISTRY_PORT
