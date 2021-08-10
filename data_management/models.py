@@ -561,7 +561,7 @@ class DataProduct(BaseModel):
     object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
     namespace = models.ForeignKey(Namespace, on_delete=models.PROTECT, related_name='data_products')
     name = NameField(null=False, blank=False)
-    version = VersionField(null=True, blank=True)
+    version = VersionField()
 
     class Meta:
         constraints = [
