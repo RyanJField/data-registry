@@ -16,7 +16,7 @@ nohup "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py runserver $PORT > $FAI
 echo $PORT > $FAIR_HOME/session_port.log
 
 count=0
-until [ $count -gt 6 ] || curl http://localhost:8000 > /dev/null 2>&1
+until [ $count -gt 6 ] || curl http://localhost:$PORT > /dev/null 2>&1
 do
     sleep 0.5
     ((count++))
