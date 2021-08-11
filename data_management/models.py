@@ -408,7 +408,7 @@ class CodeRun(BaseModel):
     def __str__(self):
         if self.code_repo:
             return '%s run %s' % (self.code_repo, self.description)
-        return self.uuid
+        return str(self.uuid)
 
 
 ###############################################################################
@@ -619,7 +619,7 @@ class ExternalObject(BaseModel):
     release_date = models.DateTimeField()
     title = models.CharField(max_length=CHAR_FIELD_LENGTH)
     description = models.TextField(max_length=TEXT_FIELD_LENGTH, null=True, blank=True)
-    version = VersionField(null=True, blank=True, editable=False)
+    version = VersionField(editable=False)
     original_store = models.ForeignKey(StorageLocation, on_delete=models.PROTECT, related_name='original_store_of', null=True, blank=True)
 
     class Meta:
