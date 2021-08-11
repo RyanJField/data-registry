@@ -1,17 +1,30 @@
 #!/bin/bash
 PORT=8000
 ORIGINAL_PWD=`pwd`
-if [ "$#" -eq 1 ]; then
-    PORT=$1
-fi
+case $1 in
+    -p|--port)
+        if [ -z "$2" ]; then
+            echo "No port provided."
+            exit 1
+        fi
+        PORT=$2
+        ;;
+    -h|--help)
+        echo "start_fair_registry [-p <port>]"
+        exit 0
+        ;;
+esac
+
 if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
     echo "Invalid port '$PORT' specified"
     exit 1
 fi
+
 export DJANGO_SETTINGS_MODULE="drams.local-settings"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 FAIR_HOME="$(dirname "${DIR}")"
 cd $FAIR_HOME
+
 nohup "$FAIR_HOME"/venv/bin/python "$FAIR_HOME"/manage.py runserver $PORT > $FAIR_HOME/output.log 2>&1 &
 echo $PORT > $FAIR_HOME/session_port.log
 
