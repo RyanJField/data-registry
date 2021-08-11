@@ -34,9 +34,12 @@ jobs:
         python: ["3.7"]
     env:
       REGISTRY_PORT: 8001
+      INSTALL_DIR: fair
     steps:
       - uses: actions/setup-python@v2
       - name: Deploy registry
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF}/static/localregistry.sh)"
+        run: curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF/refs\/heads\//}/static/localregistry.sh | bash -s -- -d $INSTALL_DIR -b ${GITHUB_REF/refs\/heads\//}
       - name: Start registry
-        run: ~/.fair/registry/scripts/start_fair_registry $REGISTRY_PORT
+        run: $INSTALL_DIR/registry/scripts/start_fair_registry -p $REGISTRY_PORT
+      - name: Test registry
+        run: curl http://localhost:$REGISTRY_PORT/api/
