@@ -97,14 +97,14 @@ class TextRenderer(renderers.BaseRenderer):
 ])
 class ProvReportView(views.APIView):
     """
-    API view for returning a PROV report for a CodeRun.
+    API view for returning a PROV report for a DataProduct.
 
     This report can be returned as JSON (default) or JPEG, SVG, XML or PROV-N using the custom renderers.
     """
 
     def get(self, request, pk, format=None):
-        code_run = get_object_or_404(models.CodeRun, pk=pk)
-        doc = generate_prov_document(code_run)
+        data_product = get_object_or_404(models.DataProduct, pk=pk)
+        doc = generate_prov_document(data_product)
         value = serialize_prov_document(doc, request.accepted_renderer.format)
         return Response(value)
 

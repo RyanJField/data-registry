@@ -338,7 +338,7 @@ class ObjectComponent(BaseModel):
 
     `input_of`: List of `CodeRun` that the `ObjectComponent` is being used as an input to
 
-    `output_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
+    `outputs_of`: List of `CodeRun` that the `ObjectComponent` was created as an output of
     """
     ADMIN_LIST_FIELDS = ('object', 'name')
     EXTRA_DISPLAY_FIELDS = ('inputs_of', 'outputs_of')
@@ -400,10 +400,6 @@ class CodeRun(BaseModel):
     outputs = models.ManyToManyField(ObjectComponent, related_name='outputs_of', blank=True)
     uuid = models.UUIDField(default=uuid4, editable=True, unique=True)
 
-    def prov_report(self):
-        url = reverse('prov_report', kwargs={'pk': self.id})
-        full_url = ''.join(['http://', get_current_site(None).domain, url])
-        return full_url
 
     def __str__(self):
         if self.code_repo:
@@ -569,6 +565,11 @@ class DataProduct(BaseModel):
                 fields=('namespace', 'name', 'version'),
                 name='unique_data_product'),
         ]
+
+    def prov_report(self):
+        url = reverse('prov_report', kwargs={'pk': self.id})
+        full_url = ''.join(['http://', get_current_site(None).domain, url])
+        return full_url
 
     def __str__(self):
         return '%s:%s version %s' % (self.namespace, self.name, self.version)

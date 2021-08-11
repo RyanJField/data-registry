@@ -27,27 +27,35 @@ def _generate_object_meta(obj):
     except models.CodeRepoRelease.DoesNotExist:
         pass
 
-    try:
-        data.append(('title', str(obj.external_object.title)))
-        data.append(('version', str(obj.external_object.version)))
-        data.append(('release_date', str(obj.external_object.release_date)))
-    except models.ExternalObject.DoesNotExist:
-        pass
-
     return data
 
+def get_whole_object_component(components):
+    for component in components:
+        if component.name == "whole_object":
+            return component
 
-def generate_prov_document(code_run):
+def generate_prov_document(data_product):
     """
-    Generate a PROV document for a CodeRun detailing all the input and outputs and how they were generated.
+    Generate a PROV document for a DataProduct detailing all the input and outputs and how they were generated.
 
     This uses the W3C PROV ontology (https://www.w3.org/TR/prov-o/).
 
-    :param code_run: The CodeRun to generate the PROV document for
+    :param data_product: The DataProduct to generate the PROV document for
     :return: A PROV-O document
     """
     doc = prov.model.ProvDocument()
     doc.set_default_namespace('http://data.scrc.uk')
+    data = doc.entity(
+        '/api/data_product/' + str(data_product.id),
+        {
+            'last updated': str(data_product.last_updated),
+            'version': data_product.version
+        }
+    )
+    components = data_product.object.components.all()
+    whole_object = get_whole_object_component(components)
+    print(whole_object.outputs_of.all())
+    code_run = whole_object.outputs_of.all()[0]
     cr = doc.activity(
         '/api/code_run/' + str(code_run.id),
         str(code_run.run_date),
@@ -57,19 +65,9 @@ def generate_prov_document(code_run):
             'description': code_run.description,
         }
     )
+    doc.wasGeneratedBy(data, cr)
     prov_objects = {}
-    prov_object_components = {}
     for input in code_run.inputs.all():
-        if input.id in prov_object_components:
-            i = prov_object_components[input.id]
-        else:
-            i = doc.entity('/api/object_component/' + str(input.id), (
-                (prov.model.PROV_TYPE, 'file'),
-                ('name', input.name)
-            ))
-            prov_object_components[input.id] = i
-        doc.association(cr, i)
-
         if input.object.id in prov_objects:
             obj = prov_objects[input.object.id]
         else:
@@ -77,29 +75,8 @@ def generate_prov_document(code_run):
                 (prov.model.PROV_TYPE, 'file'),
                 *_generate_object_meta(input.object)
             ))
+            doc.used(cr, obj)
             prov_objects[input.object.id] = obj
-        doc.association(i, obj)
-
-    for output in code_run.outputs.all():
-        if output.id in prov_object_components:
-            o = prov_object_components[output.id]
-        else:
-            o = doc.entity('/api/object_component/' + str(output.id), (
-                (prov.model.PROV_TYPE, 'file'),
-                ('name', output.name)
-            ))
-            prov_object_components[output.id] = o
-        doc.association(cr, o)
-
-        if output.object.id in prov_objects:
-            obj = prov_objects[output.object.id]
-        else:
-            obj = doc.entity('/api/object/' + str(output.object.id), (
-                (prov.model.PROV_TYPE, 'file'),
-                *_generate_object_meta(output.object)
-            ))
-            prov_objects[output.object.id] = obj
-        doc.association(o, obj)
 
     return doc
 
