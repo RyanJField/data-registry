@@ -202,9 +202,8 @@ class Author(BaseModel):
 
     def save(self, *args, **kwargs):
         if self.identifier:
-            m = hashlib.md5()
-            m.update(self.identifier.encode('utf-8'))
-            self.uuid = UUID(m.hexdigest())
+            hash = hashlib.sha256(self.identifier.encode('utf-8'))
+            self.uuid = UUID(hash.hexdigest()[::2])
         super().save(*args, **kwargs)
 
     def __str__(self):
