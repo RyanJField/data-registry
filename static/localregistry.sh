@@ -11,7 +11,7 @@ while [ -n "$1" ]; do
         INSTALL_DIR=$2
         ;;
         -h|--help)
-            echo "/bin/bash -c local_registry.sh [-d <install-directory>]"
+            echo "/bin/bash -c localregistry.sh [-d <install-directory>]"
             echo "                               [-t <git-tag> | -b <git-branch> | -p | -m ]"
             echo ""
             echo "Arguments:"
@@ -46,11 +46,10 @@ while [ -n "$1" ]; do
     shift
 done
 
-export FAIR_HOME=$INSTALL_DIR/registry
+export FAIR_HOME=$([[ $INSTALL_DIR = /* ]] && echo "$INSTALL_DIR" || echo "$PWD/${INSTALL_DIR#./}")/registry
 echo "Installing to '$FAIR_HOME'"
 
 mkdir -p "$FAIR_HOME"
-export FAIR_HOME=$(realpath $INSTALL_DIR/registry)
 
 if [ ! -z $(echo ${GIT_TAG} | xargs) ]; then
     git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
