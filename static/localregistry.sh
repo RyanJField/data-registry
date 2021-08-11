@@ -46,7 +46,7 @@ while [ -n "$1" ]; do
     shift
 done
 
-export FAIR_HOME=$([[ $INSTALL_DIR = /* ]] && echo "$INSTALL_DIR" || echo "$PWD/${INSTALL_DIR#./}")/registry
+export FAIR_HOME="$([[ $INSTALL_DIR = /* ]] && echo $INSTALL_DIR || echo $PWD/${INSTALL_DIR#./})/registry"
 echo "Installing to '$FAIR_HOME'"
 
 mkdir -p "$FAIR_HOME"
