@@ -5,7 +5,7 @@ from prov.constants import PROV_ROLE, PROV_TYPE
 import prov.dot
 import prov.model
 import prov.serializers
-
+from urllib.parse import urlparse
 from data_management.views import external_object
 
 from . import models
@@ -22,12 +22,10 @@ def _generate_object_meta(obj):
     if obj.description:
         data.append(('description', obj.description))
 
-    try:
-        data.append(('namespace', str(obj.data_product.namespace)))
-        data.append(('name', str(obj.data_product.name)))
-        data.append(('version', str(obj.data_product.version)))
-    except models.DataProduct.DoesNotExist:
-        pass
+    for data_product in obj.data_products.all():
+        data.append(('namespace', str(data_product.namespace)))
+        data.append(('name', str(data_product.name)))
+        data.append(('version', str(data_product.version)))
 
     if obj.file_type is not None:
         data.append(('file_type', str(obj.file_type.name)))
@@ -56,25 +54,39 @@ def _add_author_agents(authors, doc, entity):
         doc.wasAttributedTo(entity, author_agent, None, {PROV_ROLE: 'author'})
 
 
-def _add_code_repo_release(cr_activity, doc, code_repo_release):
+def _add_code_repo_release(cr_activity, doc, code_repo):
     """
     Add code repo release to the code run activity.
 
     @param cr_activity: a prov.activity representing the code run
     @param doc: a ProvDocument that the entities will belong to
-    @param code_repo_release: a code_repo_release object
+    @param code_repo: a code_repo object
 
     """
-    code_release_entity = doc.entity(
-        f'api/code_repo_release/{code_repo_release.id}',
-        {
-            'name': code_repo_release.name,
-            'version': code_repo_release.version,
-            'website': code_repo_release.website,
-        },
-    )
+    try:
+        code_repo_release = code_repo.code_repo_release
+    except models.Object.code_repo_release.RelatedObjectDoesNotExist:
+        code_repo_release = None
 
-    _add_author_agents(code_repo_release.object.authors.all(), doc, code_release_entity)
+    if code_repo_release is None:
+        code_release_entity = doc.entity(
+            f'api/code_repo/{code_repo.id}',
+            (
+                *_generate_object_meta(code_repo),
+            ),
+        )
+    else:
+        code_release_entity = doc.entity(
+            f'api/code_repo_release/{code_repo_release.id}',
+            (
+                *_generate_object_meta(code_repo),
+                ('name', code_repo_release.name),
+                ('version', code_repo_release.version),
+                ('website', code_repo_release.website),
+            ),
+        )
+
+    _add_author_agents(code_repo.authors.all(), doc, code_release_entity)
     doc.used(cr_activity, code_release_entity, None, None, {PROV_ROLE: 'software'})
 
 
@@ -90,35 +102,37 @@ def _add_external_object(doc, data_product, data_product_entity):
     # check for external object linked to the data product
     try:
         external_object = data_product.external_object
-        data = []
-        data.append(('title', external_object.title))
-        data.append(('release_date', external_object.release_date))
-        data.append(('version', external_object.version))
-
-        if external_object.identifier:
-            data.append(('identifier', external_object.identifier))
-
-        if external_object.alternate_identifier:
-            data.append(('alternate_identifier', external_object.alternate_identifier))
-
-        if external_object.alternate_identifier_type:
-            data.append(
-                ('alternate_identifier_type', external_object.alternate_identifier_type)
-            )
-
-        if external_object.description:
-            data.append(('description', external_object.description))
-
-        external_object_entity = doc.entity(
-            f'api/external_object/{external_object.id}', (*data,)
-        )
-        doc.specializationOf(external_object_entity, data_product_entity)
-
     except (
-        AttributeError,
         models.DataProduct.external_object.RelatedObjectDoesNotExist,
     ):
-        pass
+        return
+
+    data = []
+    data.append(('title', external_object.title))
+    data.append(('release_date', external_object.release_date))
+    data.append(('version', external_object.version))
+
+    if external_object.identifier:
+        data.append(('identifier', external_object.identifier))
+
+    if external_object.alternate_identifier:
+        data.append(('alternate_identifier', external_object.alternate_identifier))
+
+    if external_object.alternate_identifier_type:
+        data.append(
+            ('alternate_identifier_type', external_object.alternate_identifier_type)
+        )
+
+    if external_object.description:
+        data.append(('description', external_object.description))
+
+    if external_object.original_store:
+        data.append(('original_store', str(external_object.original_store)))
+
+    external_object_entity = doc.entity(
+        f'api/external_object/{external_object.id}', (*data,)
+    )
+    doc.specializationOf(external_object_entity, data_product_entity)
 
 
 def _add_linked_files(
@@ -137,35 +151,37 @@ def _add_linked_files(
 
     """
     for component in object_components:
-        if not input_objects and component.object.id == dp_id:
-            # we have already added the original data product
-            continue
-        try:
-            file_id = f'api/data_product/{component.object.data_product.id}'
-        except models.Object.data_product.RelatedObjectDoesNotExist:
-            # it is not a data product so move on to the next object
-            continue
-        file_entity = doc.entity(
-            file_id,
-            (
-                (PROV_TYPE, 'file'),
-                *_generate_object_meta(component.object),
-            ),
-        )
+        obj = component.object
+        data_products = obj.data_products.all()
 
-        # add external object linked to the data product
-        _add_external_object(doc, component.object.data_product, file_entity)
+        for data_product in data_products:
+            if not input_objects and data_product.id == dp_id:
+                # we have already added the original data product
+                continue
 
-        _add_author_agents(component.object.authors.all(), doc, file_entity)
+            file_id = f'api/data_product/{data_product.id}'
+            file_entity = doc.entity(
+                file_id,
+                (
+                    (PROV_TYPE, 'file'),
+                    *_generate_object_meta(obj),
+                ),
+            )
 
-        if input_objects:
-            # add link to the code run
-            doc.used(cr_activity, file_entity, None, None, {PROV_ROLE: 'input data'})
-            # add the link to the data product
-            doc.wasDerivedFrom(dp_entity, file_entity)
-        else:
-            # add the link to the code run
-            doc.wasGeneratedBy(file_entity, cr_activity)
+            # add external object linked to the data product
+            _add_external_object(doc, data_product, file_entity)
+
+            _add_author_agents(obj.authors.all(), doc, file_entity)
+
+            if input_objects:
+                # add link to the code run
+                doc.used(
+                    cr_activity, file_entity, None, None, {PROV_ROLE: 'input data'})
+                # add the link to the data product
+                doc.wasDerivedFrom(dp_entity, file_entity)
+            else:
+                # add the link to the code run
+                doc.wasGeneratedBy(file_entity, cr_activity)
 
 
 def _add_model_config(cr_activity, doc, model_config):
@@ -187,6 +203,30 @@ def _add_model_config(cr_activity, doc, model_config):
     )
 
 
+def _add_submission_script(cr_activity, doc, submission_script):
+    """
+    Add submission script to the code run activity.
+
+    @param cr_activity: a prov.activity representing the code run
+    @param doc: a ProvDocument that the entities will belong to
+    @param submission_script: a submission_script object
+
+    """
+    submission_script_entity = doc.entity(
+        'api/object/' + str(submission_script.id),
+        (*_generate_object_meta(submission_script),),
+    )
+
+    _add_author_agents(submission_script.authors.all(), doc, submission_script_entity)
+    doc.used(
+        cr_activity,
+        submission_script_entity,
+        None,
+        None,
+        {PROV_ROLE: 'submission script'},
+    )
+
+
 def get_whole_object_component(components):
     for component in components:
         if component.whole_object:
@@ -205,9 +245,12 @@ def generate_prov_document(data_product):
     :return: A PROV-O document
 
     """
+    # get the url from the prov report
+    url_components = urlparse(data_product.prov_report())
+    url = f"{url_components.scheme}://{url_components.netloc}/"
+
     doc = prov.model.ProvDocument()
-    # TODO should the namespace be set dynamically?
-    doc.set_default_namespace('http://data.scrc.uk/')
+    doc.set_default_namespace(url)
 
     # add the data product
     dp_entity = doc.entity(
@@ -259,31 +302,15 @@ def generate_prov_document(data_product):
     )
 
     # add the code repo release
-    if (
-        code_run.code_repo is not None
-        and code_run.code_repo.code_repo_release is not None
-    ):
-        _add_code_repo_release(cr_activity, doc, code_run.code_repo.code_repo_release)
+    if code_run.code_repo is not None:
+        _add_code_repo_release(cr_activity, doc, code_run.code_repo)
 
     # add the model config
     if code_run.model_config is not None:
         _add_model_config(cr_activity, doc, code_run.model_config)
 
     # add the submission script
-    submission_script = code_run.submission_script
-    submission_script_entity = doc.entity(
-        'api/object/' + str(submission_script.id),
-        (*_generate_object_meta(submission_script),),
-    )
-
-    _add_author_agents(submission_script.authors.all(), doc, submission_script_entity)
-    doc.used(
-        cr_activity,
-        submission_script_entity,
-        None,
-        None,
-        {PROV_ROLE: 'submission script'},
-    )
+    _add_submission_script(cr_activity, doc, code_run.submission_script)
 
     # add input files
     _add_linked_files(cr_activity, doc, dp_entity, None, True, code_run.inputs.all())
@@ -293,7 +320,7 @@ def generate_prov_document(data_product):
         cr_activity,
         doc,
         dp_entity,
-        data_product.object.id,
+        data_product.id,
         False,
         code_run.outputs.all(),
     )
