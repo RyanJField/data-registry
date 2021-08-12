@@ -388,7 +388,6 @@ class CodeRun(BaseModel):
 
     `updated_by`: Reference to the user that updated this record
     """
-    EXTRA_DISPLAY_FIELDS = ('prov_report',)
     ADMIN_LIST_FIELDS = ('description',)
 
     code_repo = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='code_repo_of', null=True, blank=True)
@@ -552,6 +551,7 @@ class DataProduct(BaseModel):
 
     EXTRA_DISPLAY_FIELDS = (
         'external_object',
+        'prov_report',
     )
 
     object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
