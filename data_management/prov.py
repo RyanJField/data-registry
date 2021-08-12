@@ -31,7 +31,8 @@ def _generate_object_meta(obj):
 
 def get_whole_object_component(components):
     for component in components:
-        if component.name == "whole_object":
+        if component.whole_object:
+            print("yep, thats the whole object component")
             return component
 
 def generate_prov_document(data_product):
@@ -52,9 +53,28 @@ def generate_prov_document(data_product):
             'version': data_product.version
         }
     )
+    obj = data_product.object
+    print(dir(obj))
+    obj_entity = doc.entity(
+        '/api/object/' + str(obj.id),
+        {
+            'last_updated': obj.last_updated,
+            'description': obj.description
+        }
+    )
+    doc.specializationOf(data, obj_entity)
+    for author in obj.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(obj_entity, author_agent)
+
     components = data_product.object.components.all()
     whole_object = get_whole_object_component(components)
-    print(whole_object.outputs_of.all())
+    obj = whole_object.object
     code_run = whole_object.outputs_of.all()[0]
     cr = doc.activity(
         '/api/code_run/' + str(code_run.id),
@@ -65,7 +85,25 @@ def generate_prov_document(data_product):
             'description': code_run.description,
         }
     )
-    doc.wasGeneratedBy(data, cr)
+    submission_script = code_run.submission_script
+    submission_script_entity = doc.entity(
+        'api/object/' + str(submission_script),
+        {
+            'last_updated': submission_script.last_updated,
+            'description': submission_script.description
+        }
+    )
+    for author in submission_script.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(submission_script_entity, author_agent)
+
+    doc.wasGeneratedBy(obj_entity, cr)
+    doc.used(cr, submission_script_entity)
     prov_objects = {}
     for input in code_run.inputs.all():
         if input.object.id in prov_objects:
@@ -73,10 +111,21 @@ def generate_prov_document(data_product):
         else:
             obj = doc.entity('/api/object/' + str(input.object.id), (
                 (prov.model.PROV_TYPE, 'file'),
-                *_generate_object_meta(input.object)
+                *_generate_object_meta(input.object),
+                ("last updated", str(input.last_updated)),
+                ('description', input.object.description)
             ))
             doc.used(cr, obj)
+            doc.wasDerivedFrom(obj_entity, obj)
             prov_objects[input.object.id] = obj
+            for author in input.object.authors.all():
+                author_agent = doc.agent(
+                    '/api/author/' + str(author.name),
+                    {
+                        'identifier': author.identifier
+                    }
+                )
+                doc.wasAttributedTo(obj, author_agent)
 
     return doc
 
