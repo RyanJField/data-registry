@@ -292,17 +292,17 @@ class DataProductViewSet(BaseViewSet, mixins.UpdateModelMixin):
     filterset_fields = models.DataProduct.FILTERSET_FIELDS
     __doc__ = models.DataProduct.__doc__
 
+    def create(self, request, *args, **kwargs):
+        if 'prov_report' not in request.data:
+            request.data['prov_report'] = []
+        return super().create(request, *args, **kwargs)
+
 
 class CodeRunViewSet(BaseViewSet, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     model = models.CodeRun
     serializer_class = serializers.CodeRunSerializer
     filterset_fields = models.CodeRun.FILTERSET_FIELDS
     __doc__ = models.CodeRun.__doc__
-
-    def create(self, request, *args, **kwargs):
-        if 'prov_report' not in request.data:
-            request.data['prov_report'] = []
-        return super().create(request, *args, **kwargs)
 
 
 for name, cls in models.all_models.items():
