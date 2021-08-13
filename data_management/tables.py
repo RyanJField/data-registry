@@ -30,7 +30,7 @@ def data_product_table_data(request):
         'rows': [
             {
                 'namespace': str(obj.namespace),
-                'name': '<a href="data_product/%d">%s</a>' % (obj.object.id, obj.name),
+                'name': '<a href="/data_product/%d">%s</a>' % (obj.object.id, obj.name),
                 'version': obj.version,
             } for obj in page_objects
         ],
@@ -65,7 +65,7 @@ def external_objects_table_data(request):
         'rows': [
             {
                 'identifier': obj.identifier,
-                'alternate_identifier': '<a href="object/%d">%s</a>' % (obj.data_product.id, obj.alternate_identifier),
+                'alternate_identifier': '<a href="/external_object/%d">%s</a>' % (obj.data_product.id, obj.alternate_identifier),
                 'release_date': str(obj.release_date),
                 'title': obj.title,
                 'version': obj.data_product.version,
@@ -98,7 +98,7 @@ def code_repo_release_table_data(request):
         'totalNotFiltered': all_objects.count(),
         'rows': [
             {
-                'name': '<a href="object/%d">%s</a>' % (obj.object.id, obj.name),
+                'name': '<a href="/object/%d">%s</a>' % (obj.object.id, obj.name),
                 'version': obj.version,
                 'website': obj.website,
             } for obj in page_objects
