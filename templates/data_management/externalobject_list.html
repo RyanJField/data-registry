@@ -9,37 +9,5 @@
 
 {% block content %}
 {{ block.super }}
-<div class="card">
-  <div class="card-body">
-    <h2>External Objects</h2>
-    <table
-      data-toggle="table"
-      data-pagination="true"
-      data-search="true"
-      data-sortable="true"
-      data-sort-name="issue-count"
-      data-sort-order="desc">
-    <thead>
-    <tr>
-	        <th data-sortable="true" data-field="identifier">Identifier</th>
-    <th data-sortable="true" data-field="alternate_identifier">Alternate Identifier</th>
-    <th data-sortable="true" data-field="release_date">Release Date</th>
-    <th data-sortable="true" data-field="title">Title</th>
-    <th data-sortable="true" data-field="version">Version</th>
-      </tr>
-      </thead>
-      <tbody>
-          {% for externalobject in externalobjects %}
-            <tr>
-		    <td>{{ externalobject.identifier }}</td>
-		    <td><a href="/external_object/{{ externalobject.pk }}">{{ externalobject.alternate_identifier }}</a></td>
-		    <td>{{ externalobject.release_date }}</td>
-		    <td>{{ externalobject.title }}</td>
-		    <td>{{ externalobject.version }}</td>
-            </tr>
-          {% endfor %}
-      </tbody>
-      </table>
-  </div>
-</div>
+{% include "data_management/externalobject_table.html" %}
 {% endblock %}
