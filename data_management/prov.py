@@ -29,6 +29,16 @@ def _generate_object_meta(obj):
 
     if obj.description:
         data.append(('description', obj.description))
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
+=======
+
+    try:
+        data.append(('namespace', str(obj.data_product.namespace)))
+        data.append(('name', str(obj.data_product.name)))
+        data.append(('version', str(obj.data_product.version)))
+    except models.DataProduct.DoesNotExist:
+        pass
+>>>>>>> 37e56f9 Refactored some things into private function
 
     for data_product in obj.data_products.all():
         data.append(('namespace', str(data_product.namespace)))
@@ -256,12 +266,19 @@ def generate_prov_document(data_product):
     doc = prov.model.ProvDocument()
     doc.set_default_namespace('http://data.scrc.uk')
     data = doc.entity(
-        '/api/data_product/' + str(data_product.id),
-        {
-            'last updated': str(data_product.last_updated),
-            'version': data_product.version
-        }
+        '/api/object/' + str(data_product.object.id),
+        (
+            *_generate_object_meta(data_product.object),
+        )
     )
+    for author in data_product.object.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(data, author_agent)
     if data_product.external_object:
         external_object = data_product.external_object
         external_object_entity = doc.entity(
@@ -275,6 +292,7 @@ def generate_prov_document(data_product):
             }
         )
         doc.specializationOf(external_object_entity, data)
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
     obj = data_product.object
     obj_entity = doc.entity(
         '/api/object/' + str(obj.id),
@@ -293,6 +311,8 @@ def generate_prov_document(data_product):
         )
         doc.wasAttributedTo(obj_entity, author_agent)
 >>>>>>> 6875e3e Extend prov-report and add option for no attributes
+=======
+>>>>>>> 37e56f9 Refactored some things into private function
 
     :return: A PROV-O document
 
@@ -357,9 +377,9 @@ def generate_prov_document(data_product):
     model_config = code_run.model_config
     model_config_entity = doc.entity(
         'api/object/' + str(model_config.id),
-        {
-            'description': model_config.description,
-        }
+        (
+            *_generate_object_meta(model_config),
+        )
     )
     for author in model_config.authors.all():
         author_agent = doc.agent(
@@ -373,10 +393,9 @@ def generate_prov_document(data_product):
     submission_script = code_run.submission_script
     submission_script_entity = doc.entity(
         'api/object/' + str(submission_script.id),
-        {
-            'last_updated': submission_script.last_updated,
-            'description': submission_script.description
-        }
+        (
+            *_generate_object_meta(submission_script),
+        )
     )
     for author in submission_script.authors.all():
         author_agent = doc.agent(
@@ -388,6 +407,7 @@ def generate_prov_document(data_product):
         doc.wasAttributedTo(submission_script_entity, author_agent)
 >>>>>>> 6875e3e Extend prov-report and add option for no attributes
 
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
     doc.wasGeneratedBy(dp_entity, cr_activity)
 
     run_agent = doc.agent(
@@ -429,6 +449,31 @@ def generate_prov_document(data_product):
         False,
         code_run.outputs.all(),
     )
+=======
+    doc.wasGeneratedBy(data, cr)
+    doc.used(cr, submission_script_entity)
+    prov_objects = {}
+    for input in code_run.inputs.all():
+        if input.object.id in prov_objects:
+            obj = prov_objects[input.object.id]
+        else:
+            obj = doc.entity('/api/object/' + str(input.object.id),
+            (
+                (prov.model.PROV_TYPE, 'file'),
+                *_generate_object_meta(input.object),
+            ))
+            doc.used(cr, obj)
+            doc.wasDerivedFrom(data, obj)
+            prov_objects[input.object.id] = obj
+            for author in input.object.authors.all():
+                author_agent = doc.agent(
+                    '/api/author/' + str(author.name),
+                    {
+                        'identifier': author.identifier
+                    }
+                )
+                doc.wasAttributedTo(obj, author_agent)
+>>>>>>> 37e56f9 Refactored some things into private function
 
     return doc
 
