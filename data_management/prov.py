@@ -1,3 +1,5 @@
+from prov import identifier
+from data_management.views import external_object
 import prov.model
 import prov.serializers
 import prov.dot
@@ -52,6 +54,19 @@ def generate_prov_document(data_product):
             'version': data_product.version
         }
     )
+    if data_product.external_object:
+        external_object = data_product.external_object
+        external_object_entity = doc.entity(
+            '/api/external_object/' + str(external_object.id),
+            {
+                'title': external_object.title,
+                'identifier': external_object.identifier,
+                'alternate_identifier': external_object.alternate_identifier,
+                'alternate_identifier_type': external_object.alternate_identifier_type,
+                'release_date': external_object.release_date,
+            }
+        )
+        doc.specializationOf(external_object_entity, data)
     obj = data_product.object
     obj_entity = doc.entity(
         '/api/object/' + str(obj.id),
