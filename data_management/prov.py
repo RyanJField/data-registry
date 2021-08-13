@@ -32,7 +32,6 @@ def _generate_object_meta(obj):
 def get_whole_object_component(components):
     for component in components:
         if component.whole_object:
-            print("yep, thats the whole object component")
             return component
 
 def generate_prov_document(data_product):
@@ -54,7 +53,6 @@ def generate_prov_document(data_product):
         }
     )
     obj = data_product.object
-    print(dir(obj))
     obj_entity = doc.entity(
         '/api/object/' + str(obj.id),
         {
@@ -85,9 +83,43 @@ def generate_prov_document(data_product):
             'description': code_run.description,
         }
     )
+    code_repo_release = code_run.code_repo.code_repo_release
+    code_release_entity = doc.entity(
+        'api/code_repo_release/' + str(code_repo_release.id),
+        {
+            'name': code_repo_release.name,
+            'version': code_repo_release.version,
+            'website': code_repo_release.website
+        }
+    )
+    for author in code_repo_release.object.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(code_release_entity, author_agent)
+    doc.used(cr, code_release_entity)
+    model_config = code_run.model_config
+    model_config_entity = doc.entity(
+        'api/object/' + str(model_config.id),
+        {
+            'description': model_config.description,
+        }
+    )
+    for author in model_config.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(model_config_entity, author_agent)
+    doc.used(cr, model_config_entity)
     submission_script = code_run.submission_script
     submission_script_entity = doc.entity(
-        'api/object/' + str(submission_script),
+        'api/object/' + str(submission_script.id),
         {
             'last_updated': submission_script.last_updated,
             'description': submission_script.description
@@ -130,7 +162,7 @@ def generate_prov_document(data_product):
     return doc
 
 
-def serialize_prov_document(doc, format):
+def serialize_prov_document(doc, format, show_attributes=True):
     """
     Serialise a PROV document as either a JPEG or SVG image or an XML or PROV-N report.
 
@@ -139,7 +171,7 @@ def serialize_prov_document(doc, format):
     :return: The PROV report in the specified format
     """
     if format in ('jpg', 'svg'):
-        dot = prov.dot.prov_to_dot(doc)
+        dot = prov.dot.prov_to_dot(doc, show_element_attributes=show_attributes)
         with io.BytesIO() as buf:
             if format == 'jpg':
                 buf.write(dot.create_jpg())
