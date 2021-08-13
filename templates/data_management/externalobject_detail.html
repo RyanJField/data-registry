@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% breadcrumb list_display_name|title list_name %}
+{% breadcrumb externalobject.title model_name externalobject.pk %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="card">
+  <div class="card-body">
+    <h3>{{ externalobject.title }}</h3>
+    <dl class="row">
+      <dt class="col-sm-3">Updated By</dt>
+      <dd class="col-sm-9">{{ externalobject.updated_by }}</dd>
+
+      <dt class="col-sm-3">Last Updated On</dt>
+      <dd class="col-sm-9">{{ externalobject.last_updated }}</dd>
+
+      <dt class="col-sm-3">Identifier</dt>
+      <dd class="col-sm-9">{{ externalobject.identifier }}</dd>
+
+      <dt class="col-sm-3">Alternate Identifier</dt>
+      <dd class="col-sm-9">{{ externalobject.alternate_identifier }}</dd>
+
+      <dt class="col-sm-3">Alternate Identifier Type</dt>
+      <dd class="col-sm-9">{{ externalobject.alternate_identifier_type}}</dd>
+
+        <dt class="col-sm-3">Primary Source</dt>
+        <dd class="col-sm-9">{{ externalobject.primary_not_supplement }}</dd>
+
+        <dt class="col-sm-3">Release Date</dt>
+        <dd class="col-sm-9">{{ externalobject.release_date }}</dd>
+
+        <dt class="col-sm-3">Title</dt>
+        <dd class="col-sm-9">{{ externalobject.title }}</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">{{ externalobject.description }}</dd>
+
+        <dt class="col-sm-3">Source</dt>
+        <dd class="col-sm-9">{{ externalobject.source }}</dd>
+
+        <dt class="col-sm-3">Original Store</dt>
+        <dd class="col-sm-9">{{ externalobject.original_store }}</dd>
+
+        <dt class="col-sm-3">Version</dt>
+        <dd class="col-sm-9">{{ externalobject.version }}</dd>
+
+      <dt class="col-sm-3">Data Product</dt>
+      <dd class="col-sm-9"><a href="/data_product/{{ externalobject.data_product.pk }}">{{ request.get_host }}/data_product/{{ externalobject.data_product.pk }}</a></dd>
+
+    </dl>
+  </div>
+</div>
+{% endblock %}
