@@ -12,8 +12,13 @@ from . import models
 def _generate_object_meta(obj):
     data = []
 
+    data.append(('last_updated', obj.last_updated))
+
     if obj.storage_location:
         data.append(('storage', str(obj.storage_location)))
+
+    if obj.description:
+        data.append(('description', obj.description))
 
     try:
         data.append(('namespace', str(obj.data_product.namespace)))
@@ -48,12 +53,19 @@ def generate_prov_document(data_product):
     doc = prov.model.ProvDocument()
     doc.set_default_namespace('http://data.scrc.uk')
     data = doc.entity(
-        '/api/data_product/' + str(data_product.id),
-        {
-            'last updated': str(data_product.last_updated),
-            'version': data_product.version
-        }
+        '/api/object/' + str(data_product.object.id),
+        (
+            *_generate_object_meta(data_product.object),
+        )
     )
+    for author in data_product.object.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(data, author_agent)
     if data_product.external_object:
         external_object = data_product.external_object
         external_object_entity = doc.entity(
@@ -67,23 +79,6 @@ def generate_prov_document(data_product):
             }
         )
         doc.specializationOf(external_object_entity, data)
-    obj = data_product.object
-    obj_entity = doc.entity(
-        '/api/object/' + str(obj.id),
-        {
-            'last_updated': obj.last_updated,
-            'description': obj.description
-        }
-    )
-    doc.specializationOf(data, obj_entity)
-    for author in obj.authors.all():
-        author_agent = doc.agent(
-            '/api/author/' + str(author.name),
-            {
-                'identifier': author.identifier
-            }
-        )
-        doc.wasAttributedTo(obj_entity, author_agent)
 
     components = data_product.object.components.all()
     whole_object = get_whole_object_component(components)
@@ -119,9 +114,9 @@ def generate_prov_document(data_product):
     model_config = code_run.model_config
     model_config_entity = doc.entity(
         'api/object/' + str(model_config.id),
-        {
-            'description': model_config.description,
-        }
+        (
+            *_generate_object_meta(model_config),
+        )
     )
     for author in model_config.authors.all():
         author_agent = doc.agent(
@@ -135,10 +130,9 @@ def generate_prov_document(data_product):
     submission_script = code_run.submission_script
     submission_script_entity = doc.entity(
         'api/object/' + str(submission_script.id),
-        {
-            'last_updated': submission_script.last_updated,
-            'description': submission_script.description
-        }
+        (
+            *_generate_object_meta(submission_script),
+        )
     )
     for author in submission_script.authors.all():
         author_agent = doc.agent(
@@ -149,21 +143,20 @@ def generate_prov_document(data_product):
         )
         doc.wasAttributedTo(submission_script_entity, author_agent)
 
-    doc.wasGeneratedBy(obj_entity, cr)
+    doc.wasGeneratedBy(data, cr)
     doc.used(cr, submission_script_entity)
     prov_objects = {}
     for input in code_run.inputs.all():
         if input.object.id in prov_objects:
             obj = prov_objects[input.object.id]
         else:
-            obj = doc.entity('/api/object/' + str(input.object.id), (
+            obj = doc.entity('/api/object/' + str(input.object.id),
+            (
                 (prov.model.PROV_TYPE, 'file'),
                 *_generate_object_meta(input.object),
-                ("last updated", str(input.last_updated)),
-                ('description', input.object.description)
             ))
             doc.used(cr, obj)
-            doc.wasDerivedFrom(obj_entity, obj)
+            doc.wasDerivedFrom(data, obj)
             prov_objects[input.object.id] = obj
             for author in input.object.authors.all():
                 author_agent = doc.agent(
