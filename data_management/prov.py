@@ -241,6 +241,37 @@ def generate_prov_document(data_product):
     This uses the W3C PROV ontology (https://www.w3.org/TR/prov-o/).
 
     :param data_product: The DataProduct to generate the PROV document for
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
+=======
+    :return: A PROV-O document
+    """
+    doc = prov.model.ProvDocument()
+    doc.set_default_namespace('http://data.scrc.uk')
+    data = doc.entity(
+        '/api/data_product/' + str(data_product.id),
+        {
+            'last updated': str(data_product.last_updated),
+            'version': data_product.version
+        }
+    )
+    obj = data_product.object
+    obj_entity = doc.entity(
+        '/api/object/' + str(obj.id),
+        {
+            'last_updated': obj.last_updated,
+            'description': obj.description
+        }
+    )
+    doc.specializationOf(data, obj_entity)
+    for author in obj.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(obj_entity, author_agent)
+>>>>>>> 6875e3e Extend prov-report and add option for no attributes
 
     :return: A PROV-O document
 
@@ -282,6 +313,59 @@ def generate_prov_document(data_product):
             'description': code_run.description,
         },
     )
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
+=======
+    code_repo_release = code_run.code_repo.code_repo_release
+    code_release_entity = doc.entity(
+        'api/code_repo_release/' + str(code_repo_release.id),
+        {
+            'name': code_repo_release.name,
+            'version': code_repo_release.version,
+            'website': code_repo_release.website
+        }
+    )
+    for author in code_repo_release.object.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(code_release_entity, author_agent)
+    doc.used(cr, code_release_entity)
+    model_config = code_run.model_config
+    model_config_entity = doc.entity(
+        'api/object/' + str(model_config.id),
+        {
+            'description': model_config.description,
+        }
+    )
+    for author in model_config.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(model_config_entity, author_agent)
+    doc.used(cr, model_config_entity)
+    submission_script = code_run.submission_script
+    submission_script_entity = doc.entity(
+        'api/object/' + str(submission_script.id),
+        {
+            'last_updated': submission_script.last_updated,
+            'description': submission_script.description
+        }
+    )
+    for author in submission_script.authors.all():
+        author_agent = doc.agent(
+            '/api/author/' + str(author.name),
+            {
+                'identifier': author.identifier
+            }
+        )
+        doc.wasAttributedTo(submission_script_entity, author_agent)
+>>>>>>> 6875e3e Extend prov-report and add option for no attributes
 
     doc.wasGeneratedBy(dp_entity, cr_activity)
 
@@ -328,7 +412,11 @@ def generate_prov_document(data_product):
     return doc
 
 
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
 def serialize_prov_document(doc, format_, show_attributes=True):
+=======
+def serialize_prov_document(doc, format, show_attributes=True):
+>>>>>>> 6875e3e Extend prov-report and add option for no attributes
     """
     Serialise a PROV document as either a JPEG or SVG image or an XML or PROV-N report.
 
@@ -336,7 +424,11 @@ def serialize_prov_document(doc, format_, show_attributes=True):
     :param format_: The format to generate: jpg, svg, xml or provn
     :return: The PROV report in the specified format
     """
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
     if format_ in ('jpg', 'svg'):
+=======
+    if format in ('jpg', 'svg'):
+>>>>>>> 6875e3e Extend prov-report and add option for no attributes
         dot = prov.dot.prov_to_dot(doc, show_element_attributes=show_attributes)
         with io.BytesIO() as buf:
             if format_ == 'jpg':

@@ -102,10 +102,17 @@ class ProvReportView(views.APIView):
     renderer_classes = [renderers.BrowsableAPIRenderer, renderers.JSONRenderer,
                         JPEGRenderer, SVGRenderer, XMLRenderer, ProvnRenderer]
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         data_product = get_object_or_404(models.DataProduct, pk=pk)
         doc = generate_prov_document(data_product)
-        value = serialize_prov_document(doc, request.accepted_renderer.format)
+        show_attributes = request.query_params.get('attributes', True)
+        if show_attributes == "False":
+            show_attributes = False
+        value = serialize_prov_document(
+            doc,
+            request.accepted_renderer.format,
+            show_attributes=bool(show_attributes)
+        )
         return Response(value)
 
 
