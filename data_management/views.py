@@ -106,6 +106,13 @@ class ExternalObjectListView(generic.ListView):
     model = models.ExternalObject
     context_object_name = 'externalobjects'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_name'] = 'externalobjects'
+        context['list_display_name'] = 'External Objects'
+        context['model_name'] = 'externalobject'
+        return context
+
 
 class ExternalObjectDetailView(generic.DetailView):
     """
@@ -127,6 +134,13 @@ class DataProductListView(generic.ListView):
     """
     model = models.DataProduct
     context_object_name = 'dataproducts'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_name'] = 'dataproducts'
+        context['list_display_name'] = 'Data Products'
+        context['model_name'] = 'dataproduct'
+        return context
 
 
 class DataProductDetailView(generic.DetailView):
