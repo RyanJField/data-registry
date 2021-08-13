@@ -110,7 +110,6 @@ class ExternalObjectListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['list_name'] = 'externalobjects'
         context['list_display_name'] = 'External Objects'
-        context['model_name'] = 'externalobject'
         return context
 
 
@@ -138,7 +137,6 @@ class DataProductListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['list_name'] = 'dataproducts'
         context['list_display_name'] = 'Data Products'
-        context['model_name'] = 'dataproduct'
         return context
 
 
@@ -153,6 +151,7 @@ class DataProductDetailView(generic.DetailView):
         context['list_name'] = 'dataproducts'
         context['list_display_name'] = 'Data Products'
         return context
+
 
 class IssueListView(generic.ListView):
     """
