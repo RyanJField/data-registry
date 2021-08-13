@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% breadcrumb display_name|title model_name %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="card">
+  <div class="card-body">
+    <h2>Data Products</h2>
+    <table
+      data-toggle="table"
+      data-pagination="true"
+      data-search="true"
+      data-sortable="true"
+      data-sort-name="issue-count"
+      data-sort-order="desc">
+    <thead>
+    <tr>
+      <th data-sortable="true" data-field="namespace">Namespace</th>
+    <th data-sortable="true" data-field="name">Name</th>
+    <th data-sortable="true" data-field="version">Version</th>
+      </tr>
+      </thead>
+      <tbody>
+          {% for dataproduct in dataproducts %}
+            <tr>
+		    <td>{{dataproduct.namespace}}</td>
+		    <td><a href="/data_product/{{ dataproduct.pk }}">{{dataproduct.name}}</a></td>
+		    <td>{{dataproduct.version}}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}
