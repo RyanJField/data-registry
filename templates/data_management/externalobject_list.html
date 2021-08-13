@@ -4,7 +4,7 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-{% breadcrumb display_name|title model_name %}
+{% breadcrumb list_display_name|title list_name "External Objects" %}
 {% endblock %}
 
 {% block content %}
