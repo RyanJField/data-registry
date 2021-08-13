@@ -31,55 +31,6 @@
         <dd class="col-sm-9">{{ object.code_repo_release.website }}</dd>
       {% endif %}
 
-      {% if object.data_product %}
-        <dt class="col-sm-3">Data Product Namespace</dt>
-        <dd class="col-sm-9">{{ object.data_product.namespace }}</dd>
-
-        <dt class="col-sm-3">Data Product Name</dt>
-        <dd class="col-sm-9">{{ object.data_product.name }}</dd>
-
-        <dt class="col-sm-3">Data Product Version</dt>
-        <dd class="col-sm-9">{{ object.data_product.version }}</dd>
-      {% endif %}
-
-      {% if object.data_product.external_object %}
-        {% if object.data_product.external_object.identifier %}
-        <dt class="col-sm-3">External Object Identifier</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.identifier }}</dd>
-	{% endif %}
-      
-	{% if object.data_product.external_object.alternate_identifier %}
-        <dt class="col-sm-3">External Object Alternate Identifier</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.alternate_identifier }}</dd>
-	{% endif %}
-
-	{% if object.data_product.external_object.alternate_identifier_type %}
-	<dt class="col-sm-3">External Object Alternate Identifier Type</dt>
-	<dd class="col-sm-9">{{ object.data_product.external_object.alternate_identifier_type }}</dd>
-	{% endif %}
-
-        <dt class="col-sm-3">External Object Primary Source</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.primary_not_supplement }}</dd>
-
-        <dt class="col-sm-3">External Object Release Date</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.release_date }}</dd>
-
-        <dt class="col-sm-3">External Object Title</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.title }}</dd>
-
-        <dt class="col-sm-3">External Object Description</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.description }}</dd>
-
-        <dt class="col-sm-3">External Object Source</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.source }}</dd>
-
-        <dt class="col-sm-3">External Object Original Store</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.original_store }}</dd>
-
-        <dt class="col-sm-3">External Object Version</dt>
-        <dd class="col-sm-9">{{ object.data_product.external_object.version }}</dd>
-      {% endif %}
-      
       {% if object.file_type %}
         <dt class="col-sm-3">File type</dt>
         <dd class="col-sm-9">{{ object.file_type.name }}</dd>
