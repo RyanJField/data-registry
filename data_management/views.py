@@ -101,7 +101,7 @@ for name, cls in models.all_models.items():
 
 class ExternalObjectListView(generic.ListView):
     """
-    View for displaying all Issues.
+    View for displaying all ExternalObjects.
     """
     model = models.ExternalObject
     context_object_name = 'externalobjects'
@@ -115,7 +115,7 @@ class ExternalObjectListView(generic.ListView):
 
 class ExternalObjectDetailView(generic.DetailView):
     """
-    View for displaying details about a specific Issue.
+    View for displaying details about a specific ExternalObject.
     """
     model = models.ExternalObject
 
@@ -128,7 +128,7 @@ class ExternalObjectDetailView(generic.DetailView):
 
 class DataProductListView(generic.ListView):
     """
-    View for displaying all Issues.
+    View for displaying all DataProducts.
     """
     model = models.DataProduct
     context_object_name = 'dataproducts'
@@ -142,7 +142,7 @@ class DataProductListView(generic.ListView):
 
 class DataProductDetailView(generic.DetailView):
     """
-    View for displaying details about a specific Issue.
+    View for displaying details about a specific DataProduct.
     """
     model = models.DataProduct
 
