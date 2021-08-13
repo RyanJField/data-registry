@@ -99,6 +99,49 @@ for name, cls in models.all_models.items():
     globals()[name + "DetailView"] = type(name + "DetailView", (BaseDetailView,), data)
 
 
+class ExternalObjectListView(generic.ListView):
+    """
+    View for displaying all Issues.
+    """
+    model = models.ExternalObject
+    context_object_name = 'externalobjects'
+
+
+class ExternalObjectDetailView(generic.DetailView):
+    """
+    View for displaying details about a specific Issue.
+    """
+    model = models.ExternalObject
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_name'] = 'externalobjects'
+        context['list_display_name'] = 'External Objects'
+        context['model_name'] = 'externalobject'
+        return context
+
+
+class DataProductListView(generic.ListView):
+    """
+    View for displaying all Issues.
+    """
+    model = models.DataProduct
+    context_object_name = 'dataproducts'
+
+
+class DataProductDetailView(generic.DetailView):
+    """
+    View for displaying details about a specific Issue.
+    """
+    model = models.DataProduct
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_name'] = 'dataproducts'
+        context['list_display_name'] = 'Data Products'
+        context['model_name'] = 'dataproduct'
+        return context
+
 class IssueListView(generic.ListView):
     """
     View for displaying all Issues.
