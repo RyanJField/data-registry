@@ -109,21 +109,21 @@
 <script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
 <script>
   function dataProductsData(params, options) {
-    var url = 'tables/dataproducts'
+    var url = '/tables/dataproducts'
     $.get(url + '?' + $.param(params.data)).then(function (res) {
       params.success(res)
     })
   }
 
   function externalObjectsData(params, options) {
-    var url = 'tables/externalobjects'
+    var url = '/tables/externalobjects'
     $.get(url + '?' + $.param(params.data)).then(function (res) {
       params.success(res)
     })
   }
 
   function codeRepoReleasesData(params, options) {
-    var url = 'tables/codereporeleases'
+    var url = '/tables/codereporeleases'
     $.get(url + '?' + $.param(params.data)).then(function (res) {
       params.success(res)
     })

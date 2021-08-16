@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% breadcrumb list_display_name|title list_name %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+{% include "data_management/externalobject_table.html" %}
+{% endblock %}

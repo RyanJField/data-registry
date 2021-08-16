@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% breadcrumb list_display_name|title list_name %}
+{% breadcrumb dataproduct.name DataProducts data_product.pk %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="card">
+  <div class="card-body">
+    <h3>{{ dataproduct.name }}</h3>
+    <dl class="row">
+      <dt class="col-sm-3">Updated By</dt>
+      <dd class="col-sm-9">{{ dataproduct.updated_by }}</dd>
+
+      <dt class="col-sm-3">Last Updated On</dt>
+      <dd class="col-sm-9">{{ dataproduct.last_updated }}</dd>
+
+      <dt class="col-sm-3">Namespace</dt>
+      <dd class="col-sm-9">{{ dataproduct.namespace }}</dd>
+
+      <dt class="col-sm-3">Version</dt>
+      <dd class="col-sm-9">{{ dataproduct.version }}</dd>
+
+      <dt class="col-sm-3">Object</dt>
+      <dd class="col-sm-9"><a href="/object/{{ dataproduct.object.pk }}">{{ request.get_host }}/object/{{ dataproduct.object.pk }}</a></dd>
+
+    </dl>
+  </div>
+</div>
+{% endblock %}
