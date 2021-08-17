@@ -37,18 +37,8 @@
       {% endif %}
       
     {% if object.storage_location %}
-    {% if object.data_product %}
     <dt class="col-sm-3">Download</dt>
-    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/data_product/{{ object.data_product.namespace }}:{{ object.data_product.name }}@{{ object.data_product.version }}">link</a></dd>
-    {% endif %}
-    {% if object.data_product.external_object %}
-    <dt class="col-sm-3">Download</dt>
-    {% if object.data_product.external_object.alternate_identifier %}
-    <dd class="col-sm-9"><a href="{{ request.META.HTTP_NAME }}/external_object/{{ object.data_product.external_object.alternate_identifier }}:{{ object.data_product.external_object.title }}@{{ object.data_product.external_object.version }}">link</a></dd>
-    {% else %}
-    <dd class="col-sm-9"><a href="{{ object.external_object.identifier }}">link</a></dd>
-    {% endif %}
-    {% endif %}
+    <dd class="col-sm-9"><a href="{{ object.storage_location }}">link</a></dd>
     {% endif %}      
       
     </dl>
