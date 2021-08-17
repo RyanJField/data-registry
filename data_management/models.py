@@ -231,7 +231,7 @@ class Object(BaseModel):
 
     `components`: List of `ObjectComponents` API URLs associated with this `Object`
 
-    `data_product`: The `DataProduct` API URL if one is associated with this `Object`
+    `data_products`: List of `DataProduct` API URLs if one or more is associated with this `Object`
 
     `code_repo_release`: The `CodeRepoRelease` API URL if one is associated with this `Object`
 
@@ -243,7 +243,7 @@ class Object(BaseModel):
     """
     EXTRA_DISPLAY_FIELDS = (
         'components',
-        'data_product',
+        'data_products',
         'code_repo_release',
         'quality_control',
         'licences',
@@ -278,7 +278,7 @@ class Object(BaseModel):
         if self.storage_location:
             return False
         try:
-            if self.data_product:
+            if self.data_products:
                 return False
         except DataProduct.DoesNotExist:
             pass
