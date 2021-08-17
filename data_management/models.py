@@ -560,7 +560,7 @@ class DataProduct(BaseModel):
         'prov_report',
     )
 
-    object = models.OneToOneField(Object, on_delete=models.PROTECT, related_name='data_product')
+    object = models.ForeignKey(Object, on_delete=models.PROTECT, related_name='data_products')
     namespace = models.ForeignKey(Namespace, on_delete=models.PROTECT, related_name='data_products')
     name = NameField(null=False, blank=False)
     version = VersionField()
