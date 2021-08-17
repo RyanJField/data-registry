@@ -1,4 +1,5 @@
-from uuid import uuid4
+import hashlib
+from uuid import uuid4, UUID
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
@@ -198,6 +199,11 @@ class Author(BaseModel):
                 ),
             )
         ]
+
+    def save(self, *args, **kwargs):
+        if self.identifier:
+            self.uuid = UUID(hashlib.sha256(self.identifier.encode('utf-8')).hexdigest()[::2])
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.identifier:
