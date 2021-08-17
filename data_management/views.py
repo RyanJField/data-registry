@@ -21,7 +21,7 @@ def index(request):
     Default view showing tables of the database objects, divided into Data Products, External Objects and Code Repo
     Releases.
     """
-    data_products = models.Object.objects.filter(data_product__isnull=False)
+    data_products = models.Object.objects.filter(data_products__isnull=False)
     external_objects = models.DataProduct.objects.filter(external_object__isnull=False)
     code_repo_release = models.Object.objects.filter(code_repo_release__isnull=False)
 
