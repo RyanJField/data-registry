@@ -44,7 +44,6 @@ class BaseSerializer(serializers.HyperlinkedModelSerializer):
 class BaseSerializerUUID(BaseSerializer):
     uuid = serializers.UUIDField(initial=uuid4, default=uuid4)
 
-
 class IssueSerializer(BaseSerializerUUID):
 
     class Meta(BaseSerializer.Meta):
@@ -52,10 +51,18 @@ class IssueSerializer(BaseSerializerUUID):
 
 
 class CodeRunSerializer(BaseSerializer):
+    prov_report = serializers.SerializerMethodField()
+
     class Meta(BaseSerializer.Meta):
         model = models.CodeRun
 
     uuid = serializers.UUIDField(initial=uuid4, default=uuid4)
+
+    def get_prov_report(self, obj):
+        request = self.context.get('request')
+        if request:
+            return ''.join(['http://', request.get_host(), obj.prov_report()])
+        return obj.prov_report()
 
 
 class DataProductSerializer(BaseSerializer):
