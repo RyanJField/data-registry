@@ -61,7 +61,7 @@ class CodeRunSerializer(BaseSerializer):
     def get_prov_report(self, obj):
         request = self.context.get('request')
         if request:
-            return ''.join(['http://', request.get_host(), obj.prov_report()])
+            return request.build_absolute_uri(obj.prov_report())
         return obj.prov_report()
 
 
