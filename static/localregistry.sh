@@ -1,38 +1,75 @@
 #!/bin/bash
 set -e
-export FAIR_HOME=$HOME/.fair/registry
+INSTALL_DIR=$HOME/.fair
+while [ -n "$1" ]; do
+    case $1 in
+        -d|--directory)
+        if [ -z $(echo $2 | xargs) ]; then
+            echo "No install directory provided."
+            exit 1
+        fi
+        INSTALL_DIR=$2
+        ;;
+        -h|--help)
+            echo "/bin/bash -c localregistry.sh [-d <install-directory>]"
+            echo "                               [-t <git-tag> | -b <git-branch> | -p | -m ]"
+            echo ""
+            echo "Arguments:"
+            echo "    -d                  Install directory"
+            echo "    -b <git-branch>     Install from specific git branch"
+            echo "    -t <git-tag>        Install from specific git tag"
+            echo "    -p                  Install from latest pre-release"
+            echo "    -m                  Install from latest state of branch 'main'"
+            exit 0
+        ;;
+        -t|--tag)
+            if [ -z $(echo $2 | xargs) ]; then
+                echo "No tag provided."
+                exit 1
+            fi
+            GIT_TAG=$2
+        ;;
+        -b|--branch)
+            if [ -z $(echo $2 | xargs) ]; then
+                echo "No branch provided."
+                exit 1
+            fi
+            GIT_BRANCH=$2
+        ;;
+        -p|--prerelease)
+            GIT_PRE_RELEASE=$1
+        ;;
+        -m|--main)
+            GIT_BRANCH="main"
+        ;;
+    esac
+    shift
+done
+
+export FAIR_HOME="$([[ $INSTALL_DIR = /* ]] && echo $INSTALL_DIR || echo $PWD/${INSTALL_DIR#./})/registry"
+echo "Installing to '$FAIR_HOME'"
+
 mkdir -p "$FAIR_HOME"
 
-if [ $# -eq 0 ]; then
-    TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")'`
+if [ ! -z $(echo ${GIT_TAG} | xargs) ]; then
+    git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
+    cd "$FAIR_HOME"
+    git checkout tags/${GIT_TAG} > /dev/null 2>&1
+elif [ ! -z $(echo ${GIT_BRANCH} | xargs) ]; then
+    echo "Cloning branch ${GIT_BRANCH}"
+    git clone https://github.com/FAIRDataPipeline/data-registry.git -b ${GIT_BRANCH} "$FAIR_HOME" > /dev/null 2>&1
+elif [ ! -z $(echo ${GIT_PRE_RELEASE} | xargs) ]; then
+    TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases" | sed -n 's/^.*"tag_name": "v\(.*\)",.*$/\1/p' | sort -r -V | head -n 1`
     echo "Cloning tag $TAG"
     git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
     cd "$FAIR_HOME"
     git checkout tags/$TAG > /dev/null 2>&1
 else
-    case $1 in
-        -t|--tag)
-            echo "Cloning tag $2"
-            git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
-            cd "$FAIR_HOME"
-            git checkout tags/$2 > /dev/null 2>&1
-            ;;
-        -b|--branch)
-            echo "Cloning branch $2"
-            git clone https://github.com/FAIRDataPipeline/data-registry.git -b $2 "$FAIR_HOME" > /dev/null 2>&1
-            ;;
-        -p|--prerelease)
-            TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases" | grep -Po '"tag_name": "\K.*?(?=")' | sort -r -V | head -n 1`
-            echo "Cloning tag $TAG"
-            git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
-            cd "$FAIR_HOME"
-            git checkout tags/$TAG > /dev/null 2>&1
-            ;;
-        -m|--main)
-            echo "Cloning branch 'main'"
-            git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
-            ;;
-    esac
+    TAG=`curl --silent "https://api.github.com/repos/FAIRDataPipeline/data-registry/releases/latest" | sed -n 's/^.*"tag_name": "v\(.*\)",.*$/\1/p'`
+    echo "Cloning tag $TAG"
+    git clone https://github.com/FAIRDataPipeline/data-registry.git "$FAIR_HOME" > /dev/null 2>&1
+    cd "$FAIR_HOME"
+    git checkout tags/$TAG > /dev/null 2>&1
 fi
 
 python3 -m venv "$FAIR_HOME"/venv
