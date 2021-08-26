@@ -977,6 +977,7 @@ class ProvAPITests(TestCase):
             "_:id10": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/1",
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
                 "prov:role": "input data",
             },
             "_:id13": {
@@ -988,6 +989,19 @@ class ProvAPITests(TestCase):
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/5",
                 "prov:role": "input data",
+=======
+                "prov:role": "inputData",
+            },
+            "_:id13": {
+                "prov:activity": "api/code_run/1",
+                "prov:entity": "api/data_product/4",
+                "prov:role": "inputData",
+            },
+            "_:id16": {
+                "prov:activity": "api/code_run/1",
+                "prov:entity": "api/data_product/5",
+                "prov:role": "inputData",
+>>>>>>> 23bb1ef Update to provenance document.
             },
         }
         self.assertEqual(results["used"], expected_result)
