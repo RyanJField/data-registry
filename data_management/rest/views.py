@@ -70,7 +70,7 @@ class ProvnRenderer(renderers.BaseRenderer):
     """
     Custom renderer for returning PROV-N data (as defined in https://www.w3.org/TR/2013/REC-prov-n-20130430/).
     """
-    media_type = 'text/plain'
+    media_type = 'text/provenance-notation'
     format = 'provn'
     charset = 'utf8'
     render_style = 'text'
@@ -92,15 +92,15 @@ class TextRenderer(renderers.BaseRenderer):
         return data['text']
 
 
-@renderer_classes([
-    renderers.BrowsableAPIRenderer, renderers.JSONRenderer, JPEGRenderer, SVGRenderer, XMLRenderer, ProvnRenderer
-])
 class ProvReportView(views.APIView):
     """
     API view for returning a PROV report for a DataProduct.
 
-    This report can be returned as JSON (default) or JPEG, SVG, XML or PROV-N using the custom renderers.
+    This report can be returned as JSON (default) or JPEG, SVG, XML or PROV-N
+    using the custom renderers.
     """
+    renderer_classes = [renderers.BrowsableAPIRenderer, renderers.JSONRenderer,
+                        JPEGRenderer, SVGRenderer, XMLRenderer, ProvnRenderer]
 
     def get(self, request, pk):
         data_product = get_object_or_404(models.DataProduct, pk=pk)
