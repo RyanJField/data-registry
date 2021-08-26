@@ -14,7 +14,11 @@ jobs:
         uses: actions/setup-python@v2
       - name: Install graphviz on ubuntu
         run:  |
+<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
               if [ ${{ runner.os }} == "Linux" ]; then
+=======
+              if [ "$RUNNER_OS" == "Linux" ]; then
+>>>>>>> c0cfa97 update github workflow to test for os before installing graphviz
                   sudo apt-get install graphviz
               else
                   brew install graphviz
