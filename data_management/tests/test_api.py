@@ -977,17 +977,17 @@ class ProvAPITests(TestCase):
             "_:id10": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/1",
-                "prov:role": "inputData",
+                "prov:role": "input data",
             },
             "_:id13": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/4",
-                "prov:role": "inputData",
+                "prov:role": "input data",
             },
             "_:id16": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/5",
-                "prov:role": "inputData",
+                "prov:role": "input data",
             },
         }
         self.assertEqual(results["used"], expected_result)
