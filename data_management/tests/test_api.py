@@ -989,13 +989,13 @@ class ProvAPITests(TestCase):
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/5",
                 "prov:role": "input data",
-=======
-                "prov:role": "inputData",
+                "prov:role": "input data",
+                "prov:role": "input data",
             },
             "_:id13": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/4",
-                "prov:role": "inputData",
+                "prov:role": "input data",
             },
             "_:id16": {
                 "prov:activity": "api/code_run/1",
