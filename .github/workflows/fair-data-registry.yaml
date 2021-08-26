@@ -12,18 +12,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
-<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
       - name: Install graphviz on ubuntu
         run:  |
-              if [ "$RUNNER_OS" == "Linux" ]; then
+              if [ ${{ runner.os }} == "Linux" ]; then
                   sudo apt-get install graphviz
               else
                   brew install graphviz
               fi
-=======
-      - name: Install graphviz
-        run: apt install -y graphviz
->>>>>>> 378334c add graphviz package to the git workflow
       - name: Install Python dependencies
         uses: py-actions/py-dependency-install@v2
         with:
@@ -35,16 +30,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python: ["3.7"]
-    env:
-      REGISTRY_PORT: 8001
-      INSTALL_DIR: fair
     steps:
       - uses: actions/setup-python@v2
       - name: Deploy registry
-        run: curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF/refs\/heads\//}/static/localregistry.sh | bash -s -- -d $INSTALL_DIR -b ${GITHUB_REF/refs\/heads\//}
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/FAIRDataPipeline/data-registry/${GITHUB_REF##*/}/static/localregistry.sh)"
       - name: Start registry
-        run: $INSTALL_DIR/registry/scripts/start_fair_registry -p $REGISTRY_PORT
-      - name: Test registry
-        run: curl http://localhost:$REGISTRY_PORT/api/
+        run: ~/.fair/registry/scripts/start_fair_registry
