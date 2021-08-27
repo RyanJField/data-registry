@@ -980,7 +980,6 @@ class ProvAPITests(TestCase):
             "_:id10": {
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/1",
-<<<<<<< Upstream, based on branch 'antony/prov-report' of https://github.com/FAIRDataPipeline/data-registry.git
                 "prov:role": "input data",
             },
             "_:id13": {
@@ -992,19 +991,6 @@ class ProvAPITests(TestCase):
                 "prov:activity": "api/code_run/1",
                 "prov:entity": "api/data_product/5",
                 "prov:role": "input data",
-                "prov:role": "input data",
-                "prov:role": "input data",
-            },
-            "_:id13": {
-                "prov:activity": "api/code_run/1",
-                "prov:entity": "api/data_product/4",
-                "prov:role": "input data",
-            },
-            "_:id16": {
-                "prov:activity": "api/code_run/1",
-                "prov:entity": "api/data_product/5",
-                "prov:role": "inputData",
->>>>>>> 23bb1ef Update to provenance document.
             },
         }
         self.assertEqual(results["used"], expected_result)
@@ -1092,7 +1078,7 @@ class ProvAPITests(TestCase):
         result_end = result_bits[1].split("xsd:dateTime, ", 1)[1]
         result = result_bits[0] + result_end
         expected_result = """document
-  default <http://data.scrc.uk/>
+  default <http://example.com/>
   
   entity(api/data_product/1, [prov:type="file", storage="https://data.scrc.uk/api/text_file/input/1", description="input 1 object", namespace="prov", name="this/is/cr/test/input/1", version="0.2.0"])
   agent(api/author/1, [prov:type="prov:Person", name="Ivana Valenti"])
@@ -1131,16 +1117,14 @@ endDocument"""
         client.force_authenticate(user=self.user)
         url = reverse("prov_report", kwargs={"pk": 7})
         response = client.get(url, format="xml", HTTP_ACCEPT="text/xml")
-        # self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/xml; charset=utf8")
         self.assertNotContains(response, "api/code_repo/", 200)
-        self.assertNotContains(response, "api/code_repo_release/", status_code=200)
+        self.assertNotContains(response, "api/code_repo_release/", 200)
 
     def test_get_no_repo_release(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         url = reverse("prov_report", kwargs={"pk": 6})
         response = client.get(url, format="xml", HTTP_ACCEPT="text/xml")
-        # self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/xml; charset=utf8")
         self.assertContains(response, "api/code_repo/", status_code=200)
