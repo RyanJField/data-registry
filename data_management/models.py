@@ -1,7 +1,6 @@
 import hashlib
 from uuid import uuid4, UUID
 
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -408,8 +407,7 @@ class CodeRun(BaseModel):
 
     def prov_report(self):
         url = reverse('prov_report', kwargs={'pk': self.id})
-        full_url = ''.join(['http://', get_current_site(None).domain, url])
-        return full_url
+        return url
 
     def __str__(self):
         if self.code_repo:
