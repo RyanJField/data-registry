@@ -41,16 +41,23 @@ def init_db(test=True):
         root="https://data.scrc.uk/api/text_file/",
     )
 
-    sr_scot = StorageRoot.objects.create(
+    sr_example = StorageRoot.objects.create(
         updated_by=user,
-        root="https://statistics.gov.scot/sparql.csv?query=",
+        root="https://example.org/",
     )
 
-    sl_scot = StorageLocation.objects.create(
+    sl_file_1 = StorageLocation.objects.create(
         updated_by=user,
-        path="PREFIX qb: <http://purl.org/linked-data/cube#>PREFIX data: <http://statistics.gov.scot/data/>PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>PREFIX dim: <http://purl.org/linked-data/sdmx/2009/dimension#>PREFIX sdim: <http://statistics.gov.scot/def/dimension/>PREFIX stat: <http://statistics.data.gov.uk/def/statistical-entity#>PREFIX mp: <http://statistics.gov.scot/def/measure-properties/>SELECT ?featurecode ?featurename ?areatypename ?date ?cause ?location ?gender ?age ?type ?countWHERE {  ?indicator qb:dataSet data:deaths-involving-coronavirus-covid-19;              mp:count ?count;              qb:measureType ?measType;              sdim:age ?value;              sdim:causeofdeath ?causeDeath;              sdim:locationofdeath ?locDeath;              sdim:sex ?sex;              dim:refArea ?featurecode;              dim:refPeriod ?period.              ?measType rdfs:label ?type.              ?value rdfs:label ?age.              ?causeDeath rdfs:label ?cause.              ?locDeath rdfs:label ?location.              ?sex rdfs:label ?gender.              ?featurecode stat:code ?areatype;                rdfs:label ?featurename.              ?areatype rdfs:label ?areatypename.              ?period rdfs:label ?date.}",
-        hash="346df017da291fe0e9d1169846efb12f3377ae18",
-        storage_root=sr_scot,
+        path="file_strore/1.txt",
+        hash="346df017da291fe0e9d1169846efb12f3377aef1",
+        storage_root=sr_example,
+    )
+
+    sl_file_2 = StorageLocation.objects.create(
+        updated_by=user,
+        path="file_strore/2.txt",
+        hash="346df017da291fe0e9d1169846efb12f3377aef2",
+        storage_root=sr_example,
     )
 
     sl_code = StorageLocation.objects.create(
@@ -127,6 +134,7 @@ def init_db(test=True):
     a3 = Author.objects.create(updated_by=user, name="Rosanna Massabeti")
 
     o_code = Object.objects.create(updated_by=user, storage_location=sl_code)
+    o_code_2 = Object.objects.create(updated_by=user, storage_location=sl_code)
     o_model_config = Object.objects.create(
         updated_by=user, storage_location=sl_model_config
     )
@@ -157,6 +165,8 @@ def init_db(test=True):
         updated_by=user, storage_location=sl_output_2, description="output 2 object"
     )
     o_output_2.authors.add(a3)
+    o_output_3 = Object.objects.create(updated_by=user)
+    o_output_4 = Object.objects.create(updated_by=user)
 
     n_prov = Namespace.objects.create(updated_by=user, name="prov")
 
@@ -176,7 +186,7 @@ def init_db(test=True):
         release_date=parser.isoparse("2020-07-10T18:38:00Z"),
         title="this is cr test input 1",
         description="this is code run test input 1",
-        original_store=sl_scot,
+        original_store=sl_file_1,
     )
 
     dp_cr_output_1 = DataProduct.objects.create(
@@ -196,7 +206,7 @@ def init_db(test=True):
         release_date=parser.isoparse("2021-07-10T18:38:00Z"),
         title="this is cr test output 1",
         description="this is code run test output 1",
-        original_store=sl_scot,
+        original_store=sl_file_2,
     )
 
     dp_cr_output_2 = DataProduct.objects.create(
@@ -210,12 +220,9 @@ def init_db(test=True):
     ExternalObject.objects.create(
         updated_by=user,
         data_product=dp_cr_output_2,
-        alternate_identifier="this_is_cr_test_output_2",
-        alternate_identifier_type="text",
+        identifier="this_is_cr_test_output_2",
         release_date=parser.isoparse("2021-07-10T18:38:00Z"),
         title="this is cr test output 2",
-        description="this is code run test output 2",
-        original_store=sl_scot,
     )
 
     DataProduct.objects.create(
@@ -234,6 +241,22 @@ def init_db(test=True):
         version="0.2.0",
     )
 
+    DataProduct.objects.create(
+        updated_by=user,
+        object=o_output_3,
+        namespace=n_prov,
+        name="this/is/cr/test/output/3",
+        version="0.3.0",
+    )
+
+    DataProduct.objects.create(
+        updated_by=user,
+        object=o_output_4,
+        namespace=n_prov,
+        name="this/is/cr/test/output/4",
+        version="0.4.0",
+    )
+
     CodeRepoRelease.objects.create(
         updated_by=user,
         name="ScottishCovidResponse/SCRCdata",
@@ -242,7 +265,7 @@ def init_db(test=True):
         object=o_code,
     )
 
-    cr2 = CodeRun.objects.create(
+    cr1 = CodeRun.objects.create(
         updated_by=user,
         run_date="2021-07-17T18:21:11Z",
         description="Test run",
@@ -250,7 +273,7 @@ def init_db(test=True):
         model_config=o_model_config,
         submission_script=o_script,
     )
-    cr2.inputs.set(
+    cr1.inputs.set(
         [
             o_input_1.components.first(),
             o_input_2.components.first(),
@@ -258,7 +281,28 @@ def init_db(test=True):
             o_input_4.components.first(),
         ]
     )
-    cr2.outputs.set([o_output_1.components.first(), o_output_2.components.first()])
+    cr1.outputs.set([o_output_1.components.first(), o_output_2.components.first()])
+
+    cr2 = CodeRun.objects.create(
+        updated_by=user,
+        run_date="2021-07-17T19:21:11Z",
+        code_repo=o_code_2,
+        submission_script=o_script,
+    )
+    cr2.inputs.set(
+        [o_input_1.components.first()]
+    )
+    cr2.outputs.set([o_output_3.components.first()])
+
+    cr3 = CodeRun.objects.create(
+        updated_by=user,
+        run_date="2021-07-17T19:21:11Z",
+        submission_script=o_script,
+    )
+    cr3.inputs.set(
+        [o_input_1.components.first()]
+    )
+    cr3.outputs.set([o_output_4.components.first()])
 
 
 if __name__ == "__main__":

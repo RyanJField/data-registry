@@ -871,6 +871,7 @@ class ProvAPITests(TestCase):
         expected_result = {
             "title": "this is cr test input 1",
             "release_date": {"$": "2020-07-10T18:38:00+00:00", "type": "xsd:dateTime"},
+            "original_store": "https://example.org/file_strore/1.txt",
             "version": "0.2.0",
             "alternate_identifier": "this_is_cr_test_input_1",
             "alternate_identifier_type": "text",
@@ -881,6 +882,7 @@ class ProvAPITests(TestCase):
         expected_result = {
             "title": "this is cr test output 1",
             "release_date": {"$": "2021-07-10T18:38:00+00:00", "type": "xsd:dateTime"},
+            "original_store": "https://example.org/file_strore/2.txt",
             "version": "0.2.0",
             "alternate_identifier": "this_is_cr_test_output_1",
             "alternate_identifier_type": "text",
@@ -893,23 +895,24 @@ class ProvAPITests(TestCase):
             "title": "this is cr test output 2",
             "release_date": {"$": "2021-07-10T18:38:00+00:00", "type": "xsd:dateTime"},
             "version": "0.2.0",
-            "alternate_identifier": "this_is_cr_test_output_2",
-            "alternate_identifier_type": "text",
-            "description": "this is code run test output 2",
+            "identifier": "this_is_cr_test_output_2",
         }
         self.assertEqual(results["entity"]["api/external_object/3"], expected_result)
 
         expected_result = {
+            "storage": "https://github.comScottishCovidResponse/SCRCdata repository",
             "name": "ScottishCovidResponse/SCRCdata",
             "version": "0.1.0",
             "website": "https://github.com/ScottishCovidResponse/SCRCdata",
         }
-        self.assertEqual(results["entity"]["api/code_repo_release/1"], expected_result)
+        prov_out = results["entity"]["api/code_repo_release/1"]
+        del prov_out["last_updated"]
+        self.assertEqual(prov_out, expected_result)
 
         expected_result = {
             "storage": "https://data.scrc.uk/api/text_file/15/?format=text"
         }
-        prov_out = results["entity"]["api/object/2"]
+        prov_out = results["entity"]["api/object/3"]
         del prov_out["last_updated"]
         self.assertEqual(prov_out, expected_result)
 
@@ -917,7 +920,7 @@ class ProvAPITests(TestCase):
             "file_type": "text file",
             "storage": "https://data.scrc.uk/api/text_file/16/?format=text",
         }
-        prov_out = results["entity"]["api/object/3"]
+        prov_out = results["entity"]["api/object/4"]
         del prov_out["last_updated"]
         self.assertEqual(prov_out, expected_result)
 
@@ -966,12 +969,12 @@ class ProvAPITests(TestCase):
             },
             "_:id6": {
                 "prov:activity": "api/code_run/1",
-                "prov:entity": "api/object/2",
+                "prov:entity": "api/object/3",
                 "prov:role": "model configuration",
             },
             "_:id7": {
                 "prov:activity": "api/code_run/1",
-                "prov:entity": "api/object/3",
+                "prov:entity": "api/object/4",
                 "prov:role": "submission script",
             },
             "_:id10": {
@@ -1094,7 +1097,7 @@ class ProvAPITests(TestCase):
   entity(api/data_product/1, [prov:type="file", storage="https://data.scrc.uk/api/text_file/input/1", description="input 1 object", namespace="prov", name="this/is/cr/test/input/1", version="0.2.0"])
   agent(api/author/1, [prov:type="prov:Person", name="Ivana Valenti"])
   wasAttributedTo(api/data_product/1, api/author/1, [prov:role="author"])
-  entity(api/external_object/1, [title="this is cr test input 1", release_date="2020-07-10T18:38:00+00:00" %% xsd:dateTime, version="0.2.0", alternate_identifier="this_is_cr_test_input_1", alternate_identifier_type="text", description="this is code run test input 1"])
+  entity(api/external_object/1, [title="this is cr test input 1", release_date="2020-07-10T18:38:00+00:00" %% xsd:dateTime, version="0.2.0", alternate_identifier="this_is_cr_test_input_1", alternate_identifier_type="text", description="this is code run test input 1", original_store="https://example.org/file_strore/1.txt"])
   specializationOf(api/external_object/1, api/data_product/1)
 endDocument"""
         self.assertEqual(result, expected_result)
@@ -1122,3 +1125,22 @@ endDocument"""
         response = client.get(url, format="svg", HTTP_ACCEPT="image/svg+xml")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "image/svg+xml")
+
+    def test_get_no_repo(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse("prov_report", kwargs={"pk": 7})
+        response = client.get(url, format="xml", HTTP_ACCEPT="text/xml")
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/xml; charset=utf8")
+        self.assertNotContains(response, "api/code_repo/", 200)
+        self.assertNotContains(response, "api/code_repo_release/", status_code=200)
+
+    def test_get_no_repo_release(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        url = reverse("prov_report", kwargs={"pk": 6})
+        response = client.get(url, format="xml", HTTP_ACCEPT="text/xml")
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/xml; charset=utf8")
+        self.assertContains(response, "api/code_repo/", status_code=200)
